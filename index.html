@@ -3,18 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Foodborne Pathogens Explorer</title>
+    <title>Geriatric Differential Diagnosis Challenge</title>
     <style>
-        :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --accent-color: #e74c3c;
-            --background-color: #ecf0f1;
-            --card-background: #ffffff;
-            --text-color: #2c3e50;
-            --border-color: #bdc3c7;
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -22,1659 +12,490 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             padding: 20px;
         }
 
-        header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 30px 0;
-            text-align: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        .game-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
             font-size: 2.5em;
-            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
 
-        .subtitle {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-
-        .filters {
-            margin: 30px 0;
+        .patient-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             padding: 20px;
-            background-color: var(--card-background);
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
-        .filter-group {
-            margin-bottom: 15px;
+        .patient-info h2 {
+            margin-bottom: 10px;
+            font-size: 1.5em;
         }
 
-        .filter-group label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: var(--primary-color);
-        }
-
-        .filter-buttons {
-            display: flex;
-            flex-wrap: wrap;
+        .symptoms {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 10px;
+            margin-top: 15px;
         }
 
-        .filter-btn {
-            padding: 8px 16px;
-            border: 2px solid var(--border-color);
-            background-color: white;
+        .symptom-tag {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 12px;
             border-radius: 20px;
+            font-size: 0.9em;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .differential-section {
+            margin-bottom: 30px;
+        }
+
+        .differential-section h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .diagnosis-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .diagnosis-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 0.9em;
+            position: relative;
+            overflow: hidden;
         }
 
-        .filter-btn:hover {
-            border-color: var(--secondary-color);
-            transform: translateY(-2px);
-        }
-
-        .filter-btn.active {
-            background-color: var(--secondary-color);
-            color: white;
-            border-color: var(--secondary-color);
-        }
-
-        .search-box {
+        .diagnosis-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            padding: 12px;
-            font-size: 1em;
-            border: 2px solid var(--border-color);
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .diagnosis-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+
+        .diagnosis-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1));
+        }
+
+        .diagnosis-card.correct {
+            border-color: #4caf50;
+            background: rgba(76, 175, 80, 0.1);
+            animation: pulse 0.5s;
+        }
+
+        .diagnosis-card.incorrect {
+            border-color: #f44336;
+            background: rgba(244, 67, 54, 0.1);
+            animation: shake 0.5s;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .diagnosis-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .diagnosis-hint {
+            font-size: 0.85em;
+            color: #666;
+            font-style: italic;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
             border-radius: 25px;
-            margin-bottom: 20px;
-            transition: border-color 0.3s ease;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
-        .search-box:focus {
-            outline: none;
-            border-color: var(--secondary-color);
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
         }
 
-        .pathogen-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
             gap: 20px;
             margin-top: 30px;
         }
 
-        .pathogen-card {
-            background-color: var(--card-background);
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .pathogen-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-        }
-
-        .pathogen-card.hidden {
-            display: none;
-        }
-
-        .pathogen-name {
-            font-size: 1.4em;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 10px;
-        }
-
-        .pathogen-detail {
-            margin-bottom: 12px;
-        }
-
-        .detail-label {
-            font-weight: bold;
-            color: var(--secondary-color);
-            display: inline-block;
-            width: 140px;
-            vertical-align: top;
-        }
-
-        .detail-value {
-            display: inline-block;
-            width: calc(100% - 150px);
-        }
-
-        .pathogen-type {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: var(--accent-color);
-            color: white;
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 0.8em;
-            font-weight: bold;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            z-index: 1000;
-            overflow-y: auto;
-        }
-
-        .modal-content {
-            background-color: white;
-            margin: 50px auto;
-            padding: 40px;
-            width: 90%;
-            max-width: 800px;
-            border-radius: 10px;
-            position: relative;
-        }
-
-        .close {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 30px;
-            font-weight: bold;
-            color: var(--border-color);
-            cursor: pointer;
-            transition: color 0.3s ease;
-        }
-
-        .close:hover {
-            color: var(--accent-color);
-        }
-
-        .reference-list {
+        .feedback {
+            background: #f5f5f5;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 5px;
             margin-top: 20px;
-            padding-top: 20px;
-            border-top: 2px solid var(--border-color);
-        }
-
-        .reference-item {
-            margin-bottom: 15px;
-            padding-left: 20px;
-            position: relative;
-        }
-
-        .reference-item::before {
-            content: "•";
-            position: absolute;
-            left: 0;
-            color: var(--secondary-color);
-            font-weight: bold;
-        }
-
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            margin: 30px 0;
-            padding: 20px;
-            background-color: var(--card-background);
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .game-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-
-        .game-btn {
-            background-color: var(--secondary-color);
-            color: white;
-            padding: 12px 30px;
-            border: none;
-            border-radius: 25px;
-            font-size: 1.1em;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .game-btn:hover {
-            background-color: var(--primary-color);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .memory-game {
             display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.8);
-            z-index: 2000;
-            overflow-y: auto;
+            animation: slideIn 0.5s ease;
         }
 
-        .game-container {
-            background-color: white;
-            margin: 20px auto;
-            padding: 30px;
-            width: 95%;
-            max-width: 1200px;
-            border-radius: 10px;
-            position: relative;
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
-        .game-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        .game-title {
-            font-size: 2em;
-            color: var(--primary-color);
-        }
-
-        .game-stats {
-            display: flex;
-            gap: 30px;
-        }
-
-        .game-stat {
-            text-align: center;
-        }
-
-        .game-stat-value {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: var(--secondary-color);
-        }
-
-        .game-stat-label {
-            font-size: 0.9em;
-            color: var(--text-color);
-        }
-
-        .memory-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .memory-card {
-            background-color: var(--primary-color);
-            border-radius: 10px;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            min-height: 120px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-
-        .memory-card:hover:not(.flipped):not(.matched) {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-
-        .memory-card.flipped,
-        .memory-card.matched {
-            background-color: var(--card-background);
-            color: var(--text-color);
-            cursor: default;
-        }
-
-        .memory-card.matched {
-            background-color: #2ecc71;
-            color: white;
-        }
-
-        .card-content {
-            display: none;
-            font-size: 0.9em;
-            line-height: 1.4;
-        }
-
-        .memory-card.flipped .card-content,
-        .memory-card.matched .card-content {
+        .feedback.show {
             display: block;
         }
 
-        .card-back {
-            color: white;
-            font-size: 1.2em;
-            font-weight: bold;
-        }
-
-        .memory-card.flipped .card-back,
-        .memory-card.matched .card-back {
-            display: none;
-        }
-
-        .game-controls {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .control-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .new-game-btn {
-            background-color: var(--secondary-color);
-            color: white;
-        }
-
-        .close-game-btn {
-            background-color: var(--accent-color);
-            color: white;
-        }
-
-        .hint-btn {
-            background-color: #f39c12;
-            color: white;
-        }
-
-        .hint-btn:disabled {
-            background-color: #95a5a6;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-        .control-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-        }
-
-        .win-message {
-            display: none;
+        .score {
             text-align: center;
-            padding: 40px;
-            background-color: #2ecc71;
-            color: white;
-            border-radius: 10px;
-            margin: 20px 0;
-        }
-
-        .win-message h2 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        @media (max-width: 768px) {
-            .memory-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .game-stats {
-                flex-direction: column;
-                gap: 10px;
-            }
-        }
-
-        /* Trivia Wheel Styles */
-        .trivia-wheel-game {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.8);
-            z-index: 2000;
-            overflow-y: auto;
-        }
-
-        .trivia-container {
-            background-color: white;
-            margin: 20px auto;
-            padding: 30px;
-            width: 95%;
-            max-width: 1200px;
-            border-radius: 10px;
-            position: relative;
-        }
-
-        .wheel-section {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            gap: 40px;
-            margin: 20px 0;
-        }
-
-        .wheel-container {
-            position: relative;
-            width: 400px;
-            height: 400px;
-        }
-
-        .wheel {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 0 20px rgba(0,0,0,0.3);
-            transition: transform 4s cubic-bezier(0.25, 0.1, 0.25, 1);
-            background: conic-gradient(
-                from 0deg,
-                #e74c3c 0deg 45deg,
-                #3498db 45deg 90deg,
-                #2ecc71 90deg 135deg,
-                #f39c12 135deg 180deg,
-                #9b59b6 180deg 225deg,
-                #1abc9c 225deg 270deg,
-                #34495e 270deg 315deg,
-                #e67e22 315deg 360deg
-            );
-        }
-
-        .wheel-legend {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            min-width: 250px;
-        }
-
-        .legend-title {
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            font-size: 1.1em;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .legend-color {
-            width: 30px;
-            height: 30px;
-            border-radius: 5px;
-            margin-right: 10px;
-            flex-shrink: 0;
-        }
-
-        .wheel-pointer {
-            position: absolute;
-            top: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 20px solid transparent;
-            border-right: 20px solid transparent;
-            border-top: 40px solid var(--accent-color);
-            z-index: 10;
-        }
-
-        .spin-button {
-            background-color: var(--secondary-color);
-            color: white;
-            padding: 15px 40px;
-            border: none;
-            border-radius: 30px;
             font-size: 1.2em;
+            color: #667eea;
+            margin-top: 20px;
             font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 20px 0;
         }
 
-        .spin-button:hover:not(:disabled) {
-            background-color: var(--primary-color);
-            transform: scale(1.05);
-        }
-
-        .spin-button:disabled {
-            background-color: #95a5a6;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-        .trivia-question-section {
-            margin: 30px 0;
-            padding: 20px;
-            background-color: #f8f9fa;
+        .explanation {
+            background: #fff;
+            border: 1px solid #e0e0e0;
             border-radius: 10px;
-            min-height: 200px;
-        }
-
-        .trivia-question {
-            font-size: 1.3em;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
-
-        .trivia-options {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-
-        .trivia-option {
             padding: 15px;
-            background-color: white;
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
-            cursor: pointer;
+            margin-top: 10px;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        .phase-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .phase-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e0e0e0;
             transition: all 0.3s ease;
         }
 
-        .trivia-option:hover:not(.correct):not(.incorrect):not(.disabled) {
-            border-color: var(--secondary-color);
-            transform: translateY(-2px);
+        .phase-dot.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: scale(1.3);
         }
 
-        .trivia-option.correct {
-            background-color: #2ecc71;
-            color: white;
-            border-color: #2ecc71;
-        }
-
-        .trivia-option.incorrect {
-            background-color: var(--accent-color);
-            color: white;
-            border-color: var(--accent-color);
-        }
-
-        .trivia-option.disabled {
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-        .trivia-score {
-            font-size: 1.5em;
-            color: var(--secondary-color);
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .trivia-controls {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 20px;
+        .phase-dot.completed {
+            background: #4caf50;
         }
 
         @media (max-width: 768px) {
-            .wheel-section {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .wheel-container {
-                width: 300px;
-                height: 300px;
-            }
-            
-            .wheel-legend {
-                margin-top: 20px;
-                width: 100%;
-                max-width: 350px;
-            }
-            
-            .trivia-options {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2em;
-            font-weight: bold;
-            color: var(--secondary-color);
-        }
-
-        .stat-label {
-            color: var(--text-color);
-            font-size: 0.9em;
-        }
-
-        @media (max-width: 768px) {
-            .pathogen-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .detail-label {
-                display: block;
-                width: 100%;
-                margin-bottom: 5px;
-            }
-            
-            .detail-value {
-                display: block;
-                width: 100%;
-                padding-left: 10px;
-            }
+            h1 { font-size: 2em; }
+            .game-container { padding: 20px; }
+            .diagnosis-options { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Foodborne Pathogens Explorer</h1>
-        <p class="subtitle">Interactive guide to common foodborne illness pathogens</p>
-    </header>
-
-    <div class="container">
-        <div class="game-buttons">
-            <button class="game-btn" id="startGameBtn">Play Kravetz Contagion</button>
-            <button class="game-btn" id="startTriviaBtn" style="background-color: #9b59b6;">Wheel of Misfortune</button>
-        </div>
+    <div class="game-container">
+        <h1>🏥 Geriatric Differential Diagnosis Challenge</h1>
         
-        <div class="stats">
-            <div class="stat-item">
-                <div class="stat-number" id="totalPathogens">8</div>
-                <div class="stat-label">Total Pathogens</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" id="visiblePathogens">8</div>
-                <div class="stat-label">Visible Pathogens</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" id="activeFilters">0</div>
-                <div class="stat-label">Active Filters</div>
+        <div class="patient-info">
+            <h2>Patient: Mrs. Nancy Davidson, 80 years old</h2>
+            <p><strong>Chief Complaint:</strong> "I don't feel very well and I've lost my appetite"</p>
+            <div class="symptoms">
+                <div class="symptom-tag">Weakness (6 months)</div>
+                <div class="symptom-tag">Loss of appetite</div>
+                <div class="symptom-tag">Confusion</div>
+                <div class="symptom-tag">Forgetfulness</div>
+                <div class="symptom-tag">Weight loss</div>
+                <div class="symptom-tag">Feeling cold</div>
+                <div class="symptom-tag">Dizziness</div>
+                <div class="symptom-tag">Multiple falls</div>
             </div>
         </div>
 
-        <div class="filters">
-            <input type="text" class="search-box" id="searchBox" placeholder="Search pathogens, sources, symptoms...">
-            
-            <div class="filter-group">
-                <label>Filter by Incubation Period:</label>
-                <div class="filter-buttons" id="incubationFilters">
-                    <button class="filter-btn" data-filter="hours">Hours (< 24h)</button>
-                    <button class="filter-btn" data-filter="days">Days (1-7d)</button>
-                    <button class="filter-btn" data-filter="weeks">Weeks (> 7d)</button>
-                </div>
-            </div>
-            
-            <div class="filter-group">
-                <label>Filter by Common Source:</label>
-                <div class="filter-buttons" id="sourceFilters">
-                    <button class="filter-btn" data-filter="poultry">Poultry</button>
-                    <button class="filter-btn" data-filter="beef">Beef</button>
-                    <button class="filter-btn" data-filter="dairy">Dairy</button>
-                    <button class="filter-btn" data-filter="water">Water</button>
-                    <button class="filter-btn" data-filter="produce">Produce</button>
-                    <button class="filter-btn" data-filter="handler">Food Handler</button>
-                </div>
-            </div>
-            
-            <div class="filter-group">
-                <label>Filter by Pathogen Type:</label>
-                <div class="filter-buttons" id="typeFilters">
-                    <button class="filter-btn" data-filter="bacterial">Bacterial</button>
-                    <button class="filter-btn" data-filter="viral">Viral</button>
-                    <button class="filter-btn" data-filter="parasitic">Parasitic</button>
-                </div>
-            </div>
-            
-            <button class="filter-btn" id="clearFilters" style="background-color: var(--accent-color); color: white; border-color: var(--accent-color);">Clear All Filters</button>
+        <div class="phase-indicator">
+            <div class="phase-dot active" data-phase="0"></div>
+            <div class="phase-dot" data-phase="1"></div>
+            <div class="phase-dot" data-phase="2"></div>
         </div>
 
-        <div class="pathogen-grid" id="pathogenGrid"></div>
-    </div>
-
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <div id="modalContent"></div>
+        <div class="differential-section">
+            <h3 id="phase-title">Phase 1: Initial Differential - Common Causes</h3>
+            <p id="phase-instruction">Select all conditions that should be on your initial differential diagnosis list:</p>
+            <div class="diagnosis-options" id="diagnosis-options"></div>
         </div>
-    </div>
 
-    <div id="memoryGame" class="memory-game">
-        <div class="game-container">
-            <div class="game-header">
-                <h2 class="game-title">Pathogen Memory Match</h2>
-                <div class="game-stats">
-                    <div class="game-stat">
-                        <div class="game-stat-value" id="moveCount">0</div>
-                        <div class="game-stat-label">Moves</div>
-                    </div>
-                    <div class="game-stat">
-                        <div class="game-stat-value" id="matchCount">0</div>
-                        <div class="game-stat-label">Matches</div>
-                    </div>
-                    <div class="game-stat">
-                        <div class="game-stat-value" id="timeElapsed">0:00</div>
-                        <div class="game-stat-label">Time</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="winMessage" class="win-message">
-                <h2>Congratulations!</h2>
-                <p>You've matched all pathogens in <span id="finalMoves"></span> moves and <span id="finalTime"></span>!</p>
-            </div>
-            
-            <div id="memoryGrid" class="memory-grid"></div>
-            
-            <div class="game-controls">
-                <button class="control-btn new-game-btn" id="newGameBtn">New Game</button>
-                <button class="control-btn hint-btn" id="hintBtn">Hint (Solve 1 Pair)</button>
-                <button class="control-btn close-game-btn" id="closeGameBtn">Close Game</button>
-            </div>
-        </div>
-    </div>
+        <div class="feedback" id="feedback"></div>
 
-    <div id="triviaWheel" class="trivia-wheel-game">
-        <div class="trivia-container">
-            <div class="game-header">
-                <h2 class="game-title">Pathogen Trivia Wheel</h2>
-                <div class="trivia-score">Score: <span id="triviaScore">0</span> / <span id="triviaTotal">0</span></div>
-            </div>
-            
-            <div class="wheel-section">
-                <div class="wheel-container">
-                    <div class="wheel-pointer"></div>
-                    <div id="wheel" class="wheel"></div>
-                </div>
-                <div class="wheel-legend">
-                    <div class="legend-title">Pathogen Legend</div>
-                    <div id="wheelLegend"></div>
-                </div>
-            </div>
-            
-            <div style="text-align: center;">
-                <button id="spinBtn" class="spin-button">SPIN THE WHEEL!</button>
-            </div>
-            
-            <div class="trivia-question-section" id="questionSection" style="display: none;">
-                <div class="trivia-question" id="triviaQuestion"></div>
-                <div class="trivia-options" id="triviaOptions"></div>
-            </div>
-            
-            <div class="trivia-controls">
-                <button class="control-btn new-game-btn" id="newTriviaBtn">New Game</button>
-                <button class="control-btn close-game-btn" id="closeTriviaBtn">Close Game</button>
-            </div>
+        <div class="controls">
+            <button id="submit-btn" onclick="submitAnswers()">Submit Selections</button>
+            <button id="next-btn" onclick="nextPhase()" style="display: none;">Next Phase →</button>
         </div>
+
+        <div class="score" id="score"></div>
     </div>
 
     <script>
-        const pathogens = [
+        let currentPhase = 0;
+        let selectedDiagnoses = new Set();
+        let totalScore = 0;
+        let phaseScores = [];
+
+        const phases = [
             {
-                name: "Salmonella (non-typhoidal)",
-                type: "bacterial",
-                sources: "Undercooked poultry, eggs, unpasteurized milk, produce, reptiles, fecal-oral",
-                incubation: "12–96 h (can be ≥7 days)",
-                duration: "4–7 days (range 1–7)",
-                references: ["[1-3]"],
-                tags: ["poultry", "dairy", "produce", "days"],
-                details: "Non-typhoidal Salmonella is one of the most common causes of foodborne illness worldwide. It can survive in dry environments and multiply at room temperature."
+                title: "Phase 1: Initial Differential - Common Causes",
+                instruction: "Select all conditions that should be on your initial differential diagnosis list:",
+                diagnoses: [
+                    { name: "Depression", hint: "Mood disorder common in elderly", correct: true, explanation: "Depression is very common in elderly patients and can cause appetite loss, weakness, and cognitive symptoms." },
+                    { name: "Malnutrition", hint: "Nutritional deficiency", correct: true, explanation: "Malnutrition can cause weakness, confusion, and multiple vitamin deficiencies as seen in this case." },
+                    { name: "Dementia", hint: "Cognitive decline", correct: true, explanation: "Early dementia should be considered with memory problems and confusion in elderly patients." },
+                    { name: "Hypothyroidism", hint: "Endocrine disorder", correct: true, explanation: "Hypothyroidism can cause fatigue, cold intolerance, and cognitive slowing." },
+                    { name: "Acute MI", hint: "Cardiac emergency", correct: false, explanation: "While possible, the 6-month timeline makes acute MI less likely as primary cause." },
+                    { name: "Medication effects", hint: "Drug-related", correct: true, explanation: "Polypharmacy and medication side effects are common causes of symptoms in elderly." },
+                    { name: "Pneumonia", hint: "Respiratory infection", correct: false, explanation: "No fever or respiratory symptoms make pneumonia less likely." },
+                    { name: "Dehydration", hint: "Fluid deficit", correct: true, explanation: "Dehydration is common in elderly and can cause weakness, dizziness, and confusion." }
+                ]
             },
             {
-                name: "Clostridium perfringens",
-                type: "bacterial",
-                sources: "Beef, poultry, gravies, food held at improper temps",
-                incubation: "6–24 h (median ~10 h)",
-                duration: "24–48 h",
-                references: ["[1, 3-4]"],
-                tags: ["beef", "poultry", "hours"],
-                details: "C. perfringens is commonly found in the environment and forms spores that can survive cooking. Illness typically occurs when foods are prepared in large quantities and held at unsafe temperatures."
+                title: "Phase 2: Specific Deficiencies & Anemias",
+                instruction: "Based on the lab findings, which specific deficiencies should be considered?",
+                diagnoses: [
+                    { name: "Vitamin B12 deficiency", hint: "Cobalamin deficiency", correct: true, explanation: "Lab shows low B12, elevated MMA and homocysteine, plus neurological symptoms." },
+                    { name: "Iron deficiency anemia", hint: "Low iron stores", correct: true, explanation: "Low ferritin, low iron saturation, and microcytic cells on blood smear confirm this." },
+                    { name: "Folate deficiency", hint: "Folic acid deficiency", correct: true, explanation: "Low serum and RBC folate levels are present." },
+                    { name: "Vitamin D deficiency", hint: "Calciferol deficiency", correct: false, explanation: "While possible, not specifically indicated by presented labs." },
+                    { name: "Hypokalemia", hint: "Low potassium", correct: true, explanation: "K+ of 2.3 with U waves on ECG confirms significant hypokalemia." },
+                    { name: "Hypomagnesemia", hint: "Low magnesium", correct: true, explanation: "Mg of 1.0 (low) can contribute to weakness and cardiac issues." },
+                    { name: "Hypercalcemia", hint: "High calcium", correct: false, explanation: "Calcium is normal at 8.9 mg/dL." },
+                    { name: "Thiamine deficiency", hint: "Vitamin B1 deficiency", correct: false, explanation: "While possible in malnourished patients, no specific evidence presented." }
+                ]
             },
             {
-                name: "Campylobacter species",
-                type: "bacterial",
-                sources: "Undercooked poultry, unpasteurized milk, contaminated water",
-                incubation: "2–5 days (range 1–10 d)",
-                duration: "~1 week (range 2–10 d)",
-                references: ["[1, 3-4]"],
-                tags: ["poultry", "dairy", "water", "days"],
-                details: "Campylobacter is the most common bacterial cause of diarrheal illness in many countries. It's particularly associated with handling raw poultry."
-            },
-            {
-                name: "Staphylococcus aureus",
-                type: "bacterial",
-                sources: "Preformed toxin in meats, dairy, bakery products, food handler contamination",
-                incubation: "1–7 h (median ~4 h)",
-                duration: "24–48 h",
-                references: ["[1, 3-4]"],
-                tags: ["dairy", "handler", "hours"],
-                details: "S. aureus produces heat-stable toxins in food. The illness is caused by the toxin, not the bacteria itself, which is why symptoms appear so quickly."
-            },
-            {
-                name: "Giardia lamblia",
-                type: "parasitic",
-                sources: "Contaminated water (streams, lakes), fecal-oral, daycare, food",
-                incubation: "1–2 weeks (range 3–25 d)",
-                duration: "Weeks to months (if untreated)",
-                references: ["[1]"],
-                tags: ["water", "weeks"],
-                details: "Giardia is a microscopic parasite that causes giardiasis. It's protected by an outer shell that allows it to survive outside the body for long periods."
-            },
-            {
-                name: "E. coli O157:H7 (STEC)",
-                type: "bacterial",
-                sources: "Undercooked beef, raw produce, unpasteurized juice, fecal-oral",
-                incubation: "1–10 days (median 3–4 d)",
-                duration: "5–10 days",
-                references: ["[1, 3-4]"],
-                tags: ["beef", "produce", "days"],
-                details: "Shiga toxin-producing E. coli can cause severe illness including hemolytic uremic syndrome (HUS), particularly in children and the elderly."
-            },
-            {
-                name: "Bacillus cereus",
-                type: "bacterial",
-                sources: "Fried rice, starchy foods (emetic); meats, vegetables (diarrheal)",
-                incubation: "1–6 h (emetic), 6–15 h (diarrheal)",
-                duration: "24 h (emetic), 24–48 h (diarrheal)",
-                references: ["[1, 3-4]"],
-                tags: ["hours"],
-                details: "B. cereus causes two types of illness: emetic (vomiting) syndrome associated with rice dishes, and diarrheal syndrome associated with various foods."
-            },
-            {
-                name: "Norovirus",
-                type: "viral",
-                sources: "Shellfish, fresh produce, person-to-person, food handler, water",
-                incubation: "12–48 h (median ~32 h)",
-                duration: "12–60 h (1–3 days)",
-                references: ["[1, 3-4]"],
-                tags: ["produce", "handler", "water", "hours", "days"],
-                details: "Norovirus is highly contagious and the leading cause of foodborne illness outbreaks. It can spread rapidly in closed environments like cruise ships and schools."
+                title: "Phase 3: Contributing Factors",
+                instruction: "Which factors likely contributed to this patient's presentation?",
+                diagnoses: [
+                    { name: "Social isolation", hint: "Living alone, no family nearby", correct: true, explanation: "Widowed, no children, no family in state increases risk for self-neglect." },
+                    { name: "PPI use (Omeprazole)", hint: "Reduces B12 absorption", correct: true, explanation: "Long-term PPI use can impair B12 and iron absorption." },
+                    { name: "Poor oral intake", hint: "Difficulty shopping/cooking", correct: true, explanation: "Patient reports difficulty with meal preparation and often forgets to eat." },
+                    { name: "High-dose statin", hint: "Simvastatin 80mg", correct: true, explanation: "High-dose statins can cause muscle weakness and cognitive effects." },
+                    { name: "Alcohol abuse", hint: "Substance use", correct: false, explanation: "Patient denies alcohol use, ETOH level negative." },
+                    { name: "Recent grief", hint: "Widowed 2 years ago", correct: true, explanation: "Loss of spouse after 55 years can trigger depression and self-neglect." },
+                    { name: "Hyperthyroidism", hint: "Overactive thyroid", correct: false, explanation: "TSH and free T4 are normal, ruling out thyroid dysfunction." },
+                    { name: "Chronic diarrhea", hint: "GI losses", correct: true, explanation: "Intermittent diarrhea since hospitalizations can worsen electrolyte losses." }
+                ]
             }
         ];
 
-        const references = [
-            {
-                id: 1,
-                text: "2017 Infectious Diseases Society of America Clinical Practice Guidelines for the Diagnosis and Management of Infectious Diarrhea. Shane AL, Mody RK, Crump JA, et al. Clinical Infectious Diseases : An Official Publication of the Infectious Diseases Society of America. 2017;65(12):e45-e80. doi:10.1093/cid/cix669."
-            },
-            {
-                id: 2,
-                text: "Salmonellosis, Nontyphoidal. Ian Plumb, Patricia (Patti) Fields, Beau Bruce. CDC Yellow Book"
-            },
-            {
-                id: 3,
-                text: "Foodborne Illness Acquired in the United States-Major Pathogens, 2019. Scallan Walter EJ, Cui Z, Tierney R, et al. Emerging Infectious Diseases. 2025;31(4):669-677. doi:10.3201/eid3104.240913."
-            },
-            {
-                id: 4,
-                text: "Incubation Periods of Enteric Illnesses in Foodborne Outbreaks, United States, 1998-2013. Chai SJ, Gu W, O'Connor KA, Richardson LC, Tauxe RV. Epidemiology and Infection. 2019;147:e285. doi:10.1017/S0950268819001651."
-            }
-        ];
-
-        let activeFilters = {
-            incubation: [],
-            source: [],
-            type: [],
-            search: ''
-        };
-
-        function renderPathogenGrid() {
-            const grid = document.getElementById('pathogenGrid');
-            grid.innerHTML = '';
+        function initPhase() {
+            const phase = phases[currentPhase];
+            document.getElementById('phase-title').textContent = phase.title;
+            document.getElementById('phase-instruction').textContent = phase.instruction;
             
-            pathogens.forEach(pathogen => {
-                const card = document.createElement('div');
-                card.className = 'pathogen-card';
-                card.dataset.tags = pathogen.tags.join(' ');
-                card.dataset.type = pathogen.type;
-                
-                const typeClass = pathogen.type.charAt(0).toUpperCase() + pathogen.type.slice(1);
-                
-                card.innerHTML = `
-                    <div class="pathogen-type">${typeClass}</div>
-                    <h2 class="pathogen-name">${pathogen.name}</h2>
-                    <div class="pathogen-detail">
-                        <span class="detail-label">Sources:</span>
-                        <span class="detail-value">${pathogen.sources}</span>
-                    </div>
-                    <div class="pathogen-detail">
-                        <span class="detail-label">Incubation:</span>
-                        <span class="detail-value">${pathogen.incubation}</span>
-                    </div>
-                    <div class="pathogen-detail">
-                        <span class="detail-label">Duration:</span>
-                        <span class="detail-value">${pathogen.duration}</span>
-                    </div>
-                `;
-                
-                card.addEventListener('click', () => showModal(pathogen));
-                grid.appendChild(card);
-            });
-        }
-
-        function showModal(pathogen) {
-            const modal = document.getElementById('modal');
-            const modalContent = document.getElementById('modalContent');
-            
-            modalContent.innerHTML = `
-                <h2>${pathogen.name}</h2>
-                <div class="pathogen-type" style="position: static; display: inline-block; margin: 10px 0;">${pathogen.type.charAt(0).toUpperCase() + pathogen.type.slice(1)}</div>
-                
-                <div style="margin: 20px 0;">
-                    <h3 style="color: var(--secondary-color); margin-bottom: 10px;">Common Sources of Exposure</h3>
-                    <p>${pathogen.sources}</p>
-                </div>
-                
-                <div style="margin: 20px 0;">
-                    <h3 style="color: var(--secondary-color); margin-bottom: 10px;">Incubation Period</h3>
-                    <p>${pathogen.incubation}</p>
-                </div>
-                
-                <div style="margin: 20px 0;">
-                    <h3 style="color: var(--secondary-color); margin-bottom: 10px;">Duration of Symptoms</h3>
-                    <p>${pathogen.duration}</p>
-                </div>
-                
-                <div style="margin: 20px 0;">
-                    <h3 style="color: var(--secondary-color); margin-bottom: 10px;">Additional Information</h3>
-                    <p>${pathogen.details}</p>
-                </div>
-                
-                <div class="reference-list">
-                    <h3 style="color: var(--secondary-color); margin-bottom: 10px;">References ${pathogen.references.join(', ')}</h3>
-                    ${pathogen.references.map(ref => {
-                        const refNum = parseInt(ref.match(/\d+/)[0]);
-                        const reference = references.find(r => r.id === refNum);
-                        return reference ? `<div class="reference-item">${reference.text}</div>` : '';
-                    }).join('')}
-                </div>
-            `;
-            
-            modal.style.display = 'block';
-        }
-
-        function filterPathogens() {
-            const cards = document.querySelectorAll('.pathogen-card');
-            let visibleCount = 0;
-            
-            cards.forEach(card => {
-                let show = true;
-                
-                // Search filter
-                if (activeFilters.search) {
-                    const searchTerm = activeFilters.search.toLowerCase();
-                    const cardText = card.textContent.toLowerCase();
-                    if (!cardText.includes(searchTerm)) {
-                        show = false;
-                    }
-                }
-                
-                // Incubation filter
-                if (activeFilters.incubation.length > 0) {
-                    const tags = card.dataset.tags.split(' ');
-                    if (!activeFilters.incubation.some(filter => tags.includes(filter))) {
-                        show = false;
-                    }
-                }
-                
-                // Source filter
-                if (activeFilters.source.length > 0) {
-                    const tags = card.dataset.tags.split(' ');
-                    if (!activeFilters.source.some(filter => tags.includes(filter))) {
-                        show = false;
-                    }
-                }
-                
-                // Type filter
-                if (activeFilters.type.length > 0) {
-                    const type = card.dataset.type;
-                    if (!activeFilters.type.includes(type)) {
-                        show = false;
-                    }
-                }
-                
-                if (show) {
-                    card.classList.remove('hidden');
-                    visibleCount++;
-                } else {
-                    card.classList.add('hidden');
-                }
-            });
-            
-            updateStats(visibleCount);
-        }
-
-        function updateStats(visibleCount) {
-            document.getElementById('visiblePathogens').textContent = visibleCount;
-            const totalActiveFilters = activeFilters.incubation.length + 
-                                     activeFilters.source.length + 
-                                     activeFilters.type.length + 
-                                     (activeFilters.search ? 1 : 0);
-            document.getElementById('activeFilters').textContent = totalActiveFilters;
-        }
-
-        // Event listeners
-        document.getElementById('searchBox').addEventListener('input', (e) => {
-            activeFilters.search = e.target.value;
-            filterPathogens();
-        });
-
-        document.getElementById('incubationFilters').addEventListener('click', (e) => {
-            if (e.target.classList.contains('filter-btn')) {
-                const filter = e.target.dataset.filter;
-                if (e.target.classList.contains('active')) {
-                    e.target.classList.remove('active');
-                    activeFilters.incubation = activeFilters.incubation.filter(f => f !== filter);
-                } else {
-                    e.target.classList.add('active');
-                    activeFilters.incubation.push(filter);
-                }
-                filterPathogens();
-            }
-        });
-
-        document.getElementById('sourceFilters').addEventListener('click', (e) => {
-            if (e.target.classList.contains('filter-btn')) {
-                const filter = e.target.dataset.filter;
-                if (e.target.classList.contains('active')) {
-                    e.target.classList.remove('active');
-                    activeFilters.source = activeFilters.source.filter(f => f !== filter);
-                } else {
-                    e.target.classList.add('active');
-                    activeFilters.source.push(filter);
-                }
-                filterPathogens();
-            }
-        });
-
-        document.getElementById('typeFilters').addEventListener('click', (e) => {
-            if (e.target.classList.contains('filter-btn')) {
-                const filter = e.target.dataset.filter;
-                if (e.target.classList.contains('active')) {
-                    e.target.classList.remove('active');
-                    activeFilters.type = activeFilters.type.filter(f => f !== filter);
-                } else {
-                    e.target.classList.add('active');
-                    activeFilters.type.push(filter);
-                }
-                filterPathogens();
-            }
-        });
-
-        document.getElementById('clearFilters').addEventListener('click', () => {
-            activeFilters = {
-                incubation: [],
-                source: [],
-                type: [],
-                search: ''
-            };
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('searchBox').value = '';
-            filterPathogens();
-        });
-
-        // Modal close
-        document.querySelector('.close').addEventListener('click', () => {
-            document.getElementById('modal').style.display = 'none';
-        });
-
-        window.addEventListener('click', (e) => {
-            const modal = document.getElementById('modal');
-            if (e.target === modal) {
-                modal.style.display = 'none';
-            }
-        });
-
-        // Initialize
-        renderPathogenGrid();
-
-        // Memory Game Logic
-        let gameCards = [];
-        let flippedCards = [];
-        let matchedPairs = 0;
-        let moves = 0;
-        let gameTimer = null;
-        let startTime = null;
-
-        function createGameCards() {
-            const gameData = [];
-            
-            // Create pairs of pathogen names and their details
-            pathogens.forEach(pathogen => {
-                // Sources pair
-                gameData.push({
-                    id: pathogen.name + '-sources',
-                    type: 'name',
-                    content: pathogen.name,
-                    pairId: pathogen.name + '-sources'
-                });
-                gameData.push({
-                    id: pathogen.name + '-sources-detail',
-                    type: 'detail',
-                    content: `Sources: ${pathogen.sources}`,
-                    pairId: pathogen.name + '-sources'
-                });
-                
-                // Incubation pair
-                gameData.push({
-                    id: pathogen.name + '-incubation',
-                    type: 'name',
-                    content: pathogen.name,
-                    pairId: pathogen.name + '-incubation'
-                });
-                gameData.push({
-                    id: pathogen.name + '-incubation-detail',
-                    type: 'detail',
-                    content: `Incubation: ${pathogen.incubation}`,
-                    pairId: pathogen.name + '-incubation'
-                });
-            });
-            
-            // Shuffle the cards
-            return gameData.sort(() => Math.random() - 0.5);
-        }
-
-        function startGame() {
-            gameCards = createGameCards();
-            flippedCards = [];
-            matchedPairs = 0;
-            moves = 0;
-            startTime = Date.now();
-            
-            document.getElementById('moveCount').textContent = moves;
-            document.getElementById('matchCount').textContent = matchedPairs;
-            document.getElementById('winMessage').style.display = 'none';
-            document.getElementById('hintBtn').disabled = false;
-            
-            renderGameGrid();
-            startTimer();
-            
-            document.getElementById('memoryGame').style.display = 'block';
-        }
-
-        function renderGameGrid() {
-            const grid = document.getElementById('memoryGrid');
-            grid.innerHTML = '';
-            
-            gameCards.forEach((card, index) => {
-                const cardElement = document.createElement('div');
-                cardElement.className = 'memory-card';
-                cardElement.dataset.index = index;
-                cardElement.dataset.pairId = card.pairId;
-                
-                cardElement.innerHTML = `
-                    <div class="card-back">?</div>
-                    <div class="card-content">${card.content}</div>
-                `;
-                
-                cardElement.addEventListener('click', () => flipCard(index));
-                grid.appendChild(cardElement);
-            });
-        }
-
-        function flipCard(index) {
-            const card = document.querySelector(`[data-index="${index}"]`);
-            
-            // Don't flip if already flipped or matched
-            if (card.classList.contains('flipped') || card.classList.contains('matched')) {
-                return;
-            }
-            
-            // Don't flip if two cards are already flipped
-            if (flippedCards.length >= 2) {
-                return;
-            }
-            
-            card.classList.add('flipped');
-            flippedCards.push(index);
-            
-            if (flippedCards.length === 2) {
-                moves++;
-                document.getElementById('moveCount').textContent = moves;
-                checkMatch();
-            }
-        }
-
-        function checkMatch() {
-            const [index1, index2] = flippedCards;
-            const card1 = gameCards[index1];
-            const card2 = gameCards[index2];
-            
-            if (card1.pairId === card2.pairId) {
-                // Match found!
-                setTimeout(() => {
-                    document.querySelector(`[data-index="${index1}"]`).classList.add('matched');
-                    document.querySelector(`[data-index="${index2}"]`).classList.add('matched');
-                    matchedPairs++;
-                    document.getElementById('matchCount').textContent = matchedPairs;
-                    
-                    if (matchedPairs === gameCards.length / 2) {
-                        endGame();
-                    }
-                    
-                    flippedCards = [];
-                }, 500);
-            } else {
-                // No match
-                setTimeout(() => {
-                    document.querySelector(`[data-index="${index1}"]`).classList.remove('flipped');
-                    document.querySelector(`[data-index="${index2}"]`).classList.remove('flipped');
-                    flippedCards = [];
-                }, 1000);
-            }
-        }
-
-        function startTimer() {
-            gameTimer = setInterval(() => {
-                const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                const minutes = Math.floor(elapsed / 60);
-                const seconds = elapsed % 60;
-                document.getElementById('timeElapsed').textContent = 
-                    `${minutes}:${seconds.toString().padStart(2, '0')}`;
-            }, 1000);
-        }
-
-        function endGame() {
-            clearInterval(gameTimer);
-            const elapsed = Math.floor((Date.now() - startTime) / 1000);
-            const minutes = Math.floor(elapsed / 60);
-            const seconds = elapsed % 60;
-            
-            document.getElementById('finalMoves').textContent = moves;
-            document.getElementById('finalTime').textContent = 
-                `${minutes}:${seconds.toString().padStart(2, '0')}`;
-            document.getElementById('winMessage').style.display = 'block';
-        }
-
-        function useHint() {
-            // Find all unmatched pairs
-            const unmatchedPairs = {};
-            
-            gameCards.forEach((card, index) => {
-                const cardElement = document.querySelector(`[data-index="${index}"]`);
-                if (!cardElement.classList.contains('matched')) {
-                    if (!unmatchedPairs[card.pairId]) {
-                        unmatchedPairs[card.pairId] = [];
-                    }
-                    unmatchedPairs[card.pairId].push(index);
-                }
-            });
-            
-            // Get the first unmatched pair
-            const pairIds = Object.keys(unmatchedPairs);
-            if (pairIds.length === 0) return;
-            
-            const firstPairId = pairIds[0];
-            const [index1, index2] = unmatchedPairs[firstPairId];
-            
-            // Clear any currently flipped cards
-            flippedCards.forEach(index => {
-                const card = document.querySelector(`[data-index="${index}"]`);
-                if (!card.classList.contains('matched')) {
-                    card.classList.remove('flipped');
-                }
-            });
-            flippedCards = [];
-            
-            // Flip and match the hint pair
-            setTimeout(() => {
-                document.querySelector(`[data-index="${index1}"]`).classList.add('flipped');
-                document.querySelector(`[data-index="${index2}"]`).classList.add('flipped');
-                
-                setTimeout(() => {
-                    document.querySelector(`[data-index="${index1}"]`).classList.add('matched');
-                    document.querySelector(`[data-index="${index2}"]`).classList.add('matched');
-                    matchedPairs++;
-                    document.getElementById('matchCount').textContent = matchedPairs;
-                    
-                    if (matchedPairs === gameCards.length / 2) {
-                        endGame();
-                    }
-                }, 500);
-            }, 100);
-            
-            // Count this as a move
-            moves++;
-            document.getElementById('moveCount').textContent = moves;
-            
-            // Disable hint button if no more pairs to solve
-            if (pairIds.length <= 1) {
-                document.getElementById('hintBtn').disabled = true;
-            }
-        }
-
-        // Game event listeners
-        document.getElementById('startGameBtn').addEventListener('click', startGame);
-        document.getElementById('newGameBtn').addEventListener('click', startGame);
-        document.getElementById('hintBtn').addEventListener('click', useHint);
-        document.getElementById('closeGameBtn').addEventListener('click', () => {
-            clearInterval(gameTimer);
-            document.getElementById('memoryGame').style.display = 'none';
-        });
-
-        // Trivia Wheel Game
-        let triviaScore = 0;
-        let triviaTotal = 0;
-        let currentPathogen = null;
-        let wheelRotation = 0;
-        let isSpinning = false;
-
-        const triviaQuestions = {
-            'Salmonella (non-typhoidal)': [
-                {
-                    question: "What is the typical incubation period for Salmonella?",
-                    options: ["1-4 hours", "12-96 hours", "2-5 days", "1-2 weeks"],
-                    correct: 1,
-                    category: "incubation"
-                },
-                {
-                    question: "Which food source is NOT commonly associated with Salmonella?",
-                    options: ["Undercooked poultry", "Shellfish", "Eggs", "Reptiles"],
-                    correct: 1,
-                    category: "source"
-                },
-                {
-                    question: "How long do Salmonella symptoms typically last?",
-                    options: ["24 hours", "2-3 days", "4-7 days", "2 weeks"],
-                    correct: 2,
-                    category: "duration"
-                }
-            ],
-            'Clostridium perfringens': [
-                {
-                    question: "What conditions commonly lead to C. perfringens illness?",
-                    options: ["Cold storage", "Food held at improper temps", "Freezing", "Acidic foods"],
-                    correct: 1,
-                    category: "source"
-                },
-                {
-                    question: "What is the median incubation period for C. perfringens?",
-                    options: ["2 hours", "10 hours", "24 hours", "48 hours"],
-                    correct: 1,
-                    category: "incubation"
-                },
-                {
-                    question: "Which foods are most commonly associated with C. perfringens?",
-                    options: ["Seafood and fish", "Beef and gravies", "Fresh fruits", "Dairy products"],
-                    correct: 1,
-                    category: "source"
-                }
-            ],
-            'Campylobacter species': [
-                {
-                    question: "What is the most common source of Campylobacter?",
-                    options: ["Beef", "Pork", "Poultry", "Seafood"],
-                    correct: 2,
-                    category: "source"
-                },
-                {
-                    question: "How long can Campylobacter symptoms last?",
-                    options: ["24 hours", "2-3 days", "About 1 week", "1 month"],
-                    correct: 2,
-                    category: "duration"
-                },
-                {
-                    question: "What type of pathogen is Campylobacter?",
-                    options: ["Virus", "Bacteria", "Parasite", "Fungus"],
-                    correct: 1,
-                    category: "type"
-                }
-            ],
-            'Staphylococcus aureus': [
-                {
-                    question: "What makes S. aureus food poisoning unique?",
-                    options: ["It's viral", "It's from preformed toxins", "It only affects children", "It's airborne"],
-                    correct: 1,
-                    category: "characteristic"
-                },
-                {
-                    question: "How quickly do S. aureus symptoms typically appear?",
-                    options: ["1-7 hours", "12-24 hours", "2-5 days", "1 week"],
-                    correct: 0,
-                    category: "incubation"
-                },
-                {
-                    question: "Which source is associated with S. aureus contamination?",
-                    options: ["Contaminated water", "Food handler contamination", "Undercooked beef", "Raw shellfish"],
-                    correct: 1,
-                    category: "source"
-                }
-            ],
-            'Giardia lamblia': [
-                {
-                    question: "What type of organism is Giardia?",
-                    options: ["Bacteria", "Virus", "Parasite", "Fungus"],
-                    correct: 2,
-                    category: "type"
-                },
-                {
-                    question: "What is the primary source of Giardia infection?",
-                    options: ["Undercooked meat", "Contaminated water", "Dairy products", "Fried rice"],
-                    correct: 1,
-                    category: "source"
-                },
-                {
-                    question: "How long can untreated Giardia symptoms last?",
-                    options: ["24-48 hours", "1 week", "Weeks to months", "1 year"],
-                    correct: 2,
-                    category: "duration"
-                }
-            ],
-            'E. coli O157:H7 (STEC)': [
-                {
-                    question: "What serious complication can E. coli O157:H7 cause?",
-                    options: ["Pneumonia", "Hemolytic uremic syndrome", "Meningitis", "Hepatitis"],
-                    correct: 1,
-                    category: "complication"
-                },
-                {
-                    question: "What is the most common source of E. coli O157:H7?",
-                    options: ["Poultry", "Undercooked beef", "Seafood", "Eggs"],
-                    correct: 1,
-                    category: "source"
-                },
-                {
-                    question: "What is the median incubation period for E. coli O157:H7?",
-                    options: ["6-12 hours", "1 day", "3-4 days", "1 week"],
-                    correct: 2,
-                    category: "incubation"
-                }
-            ],
-            'Bacillus cereus': [
-                {
-                    question: "B. cereus causes two types of illness. Which food is associated with the emetic type?",
-                    options: ["Meat", "Vegetables", "Fried rice", "Dairy"],
-                    correct: 2,
-                    category: "source"
-                },
-                {
-                    question: "How quickly does the emetic form of B. cereus cause symptoms?",
-                    options: ["1-6 hours", "12-24 hours", "2 days", "1 week"],
-                    correct: 0,
-                    category: "incubation"
-                },
-                {
-                    question: "How long do B. cereus symptoms typically last?",
-                    options: ["6 hours", "24 hours", "3 days", "1 week"],
-                    correct: 1,
-                    category: "duration"
-                }
-            ],
-            'Norovirus': [
-                {
-                    question: "What type of pathogen is Norovirus?",
-                    options: ["Bacteria", "Virus", "Parasite", "Prion"],
-                    correct: 1,
-                    category: "type"
-                },
-                {
-                    question: "How is Norovirus commonly spread?",
-                    options: ["Only through food", "Only through water", "Person-to-person and food", "Only airborne"],
-                    correct: 2,
-                    category: "transmission"
-                },
-                {
-                    question: "Where do Norovirus outbreaks commonly occur?",
-                    options: ["Home kitchens only", "Cruise ships and schools", "Farms only", "Hospitals only"],
-                    correct: 1,
-                    category: "outbreak"
-                }
-            ]
-        };
-
-        function initializeWheel() {
-            const colors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c', '#34495e', '#e67e22'];
-            
-            // Create legend
-            const legendContainer = document.getElementById('wheelLegend');
-            legendContainer.innerHTML = '';
-            
-            pathogens.forEach((pathogen, index) => {
-                const legendItem = document.createElement('div');
-                legendItem.className = 'legend-item';
-                
-                const colorBox = document.createElement('div');
-                colorBox.className = 'legend-color';
-                colorBox.style.backgroundColor = colors[index % colors.length];
-                
-                const label = document.createElement('div');
-                label.textContent = pathogen.name;
-                label.style.fontSize = '0.9em';
-                
-                legendItem.appendChild(colorBox);
-                legendItem.appendChild(label);
-                legendContainer.appendChild(legendItem);
-            });
-        }
-
-        function spinWheel() {
-            if (isSpinning) return;
-            
-            isSpinning = true;
-            document.getElementById('spinBtn').disabled = true;
-            document.getElementById('questionSection').style.display = 'none';
-            
-            // Random spin between 5-8 full rotations plus random angle
-            const spins = Math.floor(Math.random() * 4) + 5;
-            const randomAngle = Math.floor(Math.random() * 360);
-            const totalRotation = spins * 360 + randomAngle;
-            
-            wheelRotation += totalRotation;
-            
-            const wheel = document.getElementById('wheel');
-            wheel.style.transform = `rotate(${wheelRotation}deg)`;
-            
-            setTimeout(() => {
-                // Calculate which segment we landed on
-                const normalizedAngle = (360 - (wheelRotation % 360)) % 360;
-                const segmentAngle = 360 / pathogens.length;
-                const selectedIndex = Math.floor(normalizedAngle / segmentAngle);
-                
-                currentPathogen = pathogens[selectedIndex];
-                showTriviaQuestion();
-                isSpinning = false;
-            }, 4000);
-        }
-
-        function showTriviaQuestion() {
-            const questions = triviaQuestions[currentPathogen.name];
-            const randomQuestion = questions[Math.floor(Math.random() * questions.length)];
-            
-            document.getElementById('triviaQuestion').textContent = randomQuestion.question;
-            
-            const optionsContainer = document.getElementById('triviaOptions');
+            const optionsContainer = document.getElementById('diagnosis-options');
             optionsContainer.innerHTML = '';
             
-            randomQuestion.options.forEach((option, index) => {
-                const optionDiv = document.createElement('div');
-                optionDiv.className = 'trivia-option';
-                optionDiv.textContent = option;
-                optionDiv.addEventListener('click', () => checkAnswer(index, randomQuestion.correct));
-                optionsContainer.appendChild(optionDiv);
+            phase.diagnoses.forEach((diagnosis, index) => {
+                const card = document.createElement('div');
+                card.className = 'diagnosis-card';
+                card.dataset.index = index;
+                card.onclick = () => toggleSelection(index);
+                
+                card.innerHTML = `
+                    <div class="diagnosis-name">${diagnosis.name}</div>
+                    <div class="diagnosis-hint">${diagnosis.hint}</div>
+                `;
+                
+                optionsContainer.appendChild(card);
             });
             
-            document.getElementById('questionSection').style.display = 'block';
-            triviaTotal++;
-            updateTriviaScore();
+            selectedDiagnoses.clear();
+            document.getElementById('feedback').classList.remove('show');
+            document.getElementById('submit-btn').style.display = 'block';
+            document.getElementById('next-btn').style.display = 'none';
+            
+            updatePhaseIndicator();
         }
 
-        function checkAnswer(selected, correct) {
-            const options = document.querySelectorAll('.trivia-option');
-            options.forEach(opt => opt.classList.add('disabled'));
+        function toggleSelection(index) {
+            const card = document.querySelector(`[data-index="${index}"]`);
             
-            if (selected === correct) {
-                options[selected].classList.add('correct');
-                triviaScore++;
+            if (selectedDiagnoses.has(index)) {
+                selectedDiagnoses.delete(index);
+                card.classList.remove('selected');
             } else {
-                options[selected].classList.add('incorrect');
-                options[correct].classList.add('correct');
+                selectedDiagnoses.add(index);
+                card.classList.add('selected');
+            }
+        }
+
+        function submitAnswers() {
+            const phase = phases[currentPhase];
+            let correct = 0;
+            let total = 0;
+            let feedback = '<h4>Results:</h4>';
+            
+            phase.diagnoses.forEach((diagnosis, index) => {
+                const card = document.querySelector(`[data-index="${index}"]`);
+                const isSelected = selectedDiagnoses.has(index);
+                
+                if (diagnosis.correct) total++;
+                
+                if (diagnosis.correct && isSelected) {
+                    card.classList.add('correct');
+                    correct++;
+                } else if (!diagnosis.correct && isSelected) {
+                    card.classList.add('incorrect');
+                } else if (diagnosis.correct && !isSelected) {
+                    card.style.border = '2px dashed #ff9800';
+                }
+                
+                if (diagnosis.correct) {
+                    feedback += `<div class="explanation"><strong>${diagnosis.name}:</strong> ${diagnosis.explanation}</div>`;
+                }
+            });
+            
+            const phaseScore = Math.round((correct / total) * 100);
+            phaseScores.push(phaseScore);
+            
+            feedback = `<p><strong>You identified ${correct} out of ${total} correct diagnoses (${phaseScore}%)</strong></p>` + feedback;
+            
+            document.getElementById('feedback').innerHTML = feedback;
+            document.getElementById('feedback').classList.add('show');
+            
+            document.getElementById('submit-btn').style.display = 'none';
+            
+            if (currentPhase < phases.length - 1) {
+                document.getElementById('next-btn').style.display = 'block';
+            } else {
+                showFinalScore();
             }
             
-            updateTriviaScore();
+            document.querySelectorAll('.diagnosis-card').forEach(card => {
+                card.onclick = null;
+            });
+        }
+
+        function nextPhase() {
+            document.querySelector(`.phase-dot[data-phase="${currentPhase}"]`).classList.add('completed');
+            currentPhase++;
+            initPhase();
+        }
+
+        function updatePhaseIndicator() {
+            document.querySelectorAll('.phase-dot').forEach((dot, index) => {
+                dot.classList.remove('active');
+                if (index === currentPhase) {
+                    dot.classList.add('active');
+                }
+            });
+        }
+
+        function showFinalScore() {
+            const avgScore = Math.round(phaseScores.reduce((a, b) => a + b, 0) / phaseScores.length);
+            let message = '';
             
-            setTimeout(() => {
-                document.getElementById('spinBtn').disabled = false;
-                document.getElementById('questionSection').style.display = 'none';
-            }, 2000);
+            if (avgScore >= 90) {
+                message = '🏆 Excellent! You have strong clinical reasoning skills!';
+            } else if (avgScore >= 70) {
+                message = '👏 Good work! You identified most key diagnoses.';
+            } else if (avgScore >= 50) {
+                message = '💪 Keep practicing! Review the explanations to improve.';
+            } else {
+                message = '📚 Consider reviewing geriatric syndromes and nutritional deficiencies.';
+            }
+            
+            document.getElementById('score').innerHTML = `
+                <h3>Final Score: ${avgScore}%</h3>
+                <p>${message}</p>
+                <button onclick="location.reload()">Play Again</button>
+            `;
         }
 
-        function updateTriviaScore() {
-            document.getElementById('triviaScore').textContent = triviaScore;
-            document.getElementById('triviaTotal').textContent = triviaTotal;
-        }
-
-        function startTriviaGame() {
-            triviaScore = 0;
-            triviaTotal = 0;
-            wheelRotation = 0;
-            updateTriviaScore();
-            initializeWheel();
-            document.getElementById('triviaWheel').style.display = 'block';
-            document.getElementById('spinBtn').disabled = false;
-            document.getElementById('questionSection').style.display = 'none';
-        }
-
-        // Trivia event listeners
-        document.getElementById('startTriviaBtn').addEventListener('click', startTriviaGame);
-        document.getElementById('spinBtn').addEventListener('click', spinWheel);
-        document.getElementById('newTriviaBtn').addEventListener('click', startTriviaGame);
-        document.getElementById('closeTriviaBtn').addEventListener('click', () => {
-            document.getElementById('triviaWheel').style.display = 'none';
-        });
+        // Initialize the game
+        initPhase();
     </script>
 </body>
 </html>
