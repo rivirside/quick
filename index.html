@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EPS vs. TD: Team Competition</title>
+    <title>EPS vs. TD: Team Competition (Simplified Scoring)</title>
     <style>
         :root {
             --team1-color: #3498db; /* Blue */
@@ -71,6 +71,9 @@
         #setup-box button {
             background-color: var(--success-color);
             color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
         }
         
         /* --- Quiz & Timer Styles --- */
@@ -96,51 +99,91 @@
             margin-bottom: 15px;
         }
 
-        .game-buttons-container {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 15px;
-        }
-
-        button {
-            padding: 12px 20px;
-            font-size: 1.1em;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-        
         /* Ready Button */
         #ready-btn {
             background-color: var(--team1-color);
             color: white;
             width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
         }
         #ready-btn:hover { background-color: #2980b9; }
 
         /* Scoring Controls */
         #scoring-controls {
-            display: none; /* Hidden until answering starts */
-            border-top: 1px solid #ccc;
+            display: none;
             padding-top: 20px;
-            margin-top: 20px;
-            justify-content: space-around;
+            margin-top: 15px;
+            border-top: 1px solid #ccc;
         }
         
-        .score-column {
-            width: 45%;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        .scoring-group {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f0f4f7;
         }
-        
-        .score-column button { width: 100%; }
 
-        .correct-btn { background-color: var(--success-color); color: white; }
-        .correct-btn:hover { background-color: #27ad60; }
-        .incorrect-btn { background-color: var(--danger-color); color: white; }
-        .incorrect-btn:hover { background-color: #c47c0f; }
+        .scoring-group h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        
+        /* Radio Button Styling */
+        .radio-buttons label {
+            padding: 10px 15px;
+            margin: 0 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        .radio-buttons input[type="radio"] {
+            display: none;
+        }
+        
+        /* Team Toggle */
+        #team-toggles input:checked + label {
+            background-color: var(--team1-color);
+            color: white;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+        }
+        #team-toggles label[for="team2"]:hover { background-color: var(--team2-color); }
+        #team-toggles input:checked + label[for="team2"] {
+            background-color: var(--team2-color);
+            color: white;
+        }
+        
+        /* Outcome Toggle */
+        #outcome-toggles input:checked + label.correct-label {
+            background-color: var(--success-color);
+            color: white;
+        }
+        #outcome-toggles input:checked + label.incorrect-label {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        #submit-btn {
+            background-color: var(--success-color);
+            color: white;
+            width: 100%;
+            margin-top: 15px;
+            padding: 15px;
+        }
+        #submit-btn:hover { background-color: #27ad60; }
+        
+        /* Next Button */
+        #next-btn {
+            background-color: #3498db;
+            color: white;
+            width: 100%;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+        }
 
         /* Feedback Box */
         #feedback-box {
@@ -184,72 +227,83 @@
         <div id="question-box">Click 'Ready' when both teams are set for the question.</div>
 
         <button id="ready-btn" onclick="startQuestion()" style="display: none;">Ready for Question 1 / 9</button>
-        <button id="next-btn" onclick="nextQuestion()" style="display: none;">Next Question</button>
+        
+        <div id="scoring-controls">
+            <div class="scoring-group">
+                <h3>Award Point to:</h3>
+                <div class="radio-buttons" id="team-toggles">
+                    <input type="radio" id="team1" name="scoringTeam" value="1" required>
+                    <label for="team1">Team Alpha</label>
+                    <input type="radio" id="team2" name="scoringTeam" value="2">
+                    <label for="team2">Team Beta</label>
+                </div>
+            </div>
 
-        <div id="scoring-controls" class="game-buttons-container">
-            <div class="score-column">
-                <h3 id="score-team1-name">Team Alpha</h3>
-                <button class="correct-btn" onclick="scoreAnswer(1, true)">Correct (Fact)</button>
-                <button class="correct-btn" onclick="scoreAnswer(1, false)">Correct (Fiction)</button>
-                <button class="incorrect-btn" onclick="scoreAnswer(1, null)">Incorrect</button>
+            <div class="scoring-group">
+                <h3>Answer Outcome:</h3>
+                <div class="radio-buttons" id="outcome-toggles">
+                    <input type="radio" id="correct" name="scoringOutcome" value="correct" required>
+                    <label for="correct" class="correct-label">Correct Answer</label>
+                    <input type="radio" id="incorrect" name="scoringOutcome" value="incorrect">
+                    <label for="incorrect" class="incorrect-label">Incorrect Answer</label>
+                </div>
             </div>
-            <div class="score-column">
-                <h3 id="score-team2-name">Team Beta</h3>
-                <button class="correct-btn" onclick="scoreAnswer(2, true)">Correct (Fact)</button>
-                <button class="correct-btn" onclick="scoreAnswer(2, false)">Correct (Fiction)</button>
-                <button class="incorrect-btn" onclick="scoreAnswer(2, null)">Incorrect</button>
-            </div>
+
+            <button id="submit-btn" onclick="submitScore()">SUBMIT ANSWER</button>
         </div>
+        
+        <button id="next-btn" onclick="nextQuestion()">Next Question</button>
 
         <div id="feedback-box"></div>
     </div>
 
     <script>
+        // Use standard text for the explanations to avoid LaTeX formatting issues
         const quizQuestions = [
             {
                 statement: "Extrapyramidal side effects (EPS) typically develop after months or years of medication exposure.",
                 answer: false, // Fiction
-                explanation: "FICTION. $\\text{EPS}$ can occur **acutely** (days to weeks). $\\text{TD}$ typically develops after months or years of exposure."
+                explanation: "FICTION. EPS can occur **acutely** (days to weeks). TD typically develops after months or years of exposure."
             },
             {
-                statement: "Tardive Dyskinesia (TD) is primarily caused by **acute** dopamine $\\text{D}_2$ receptor blockade in the nigrostriatal pathway.",
+                statement: "Tardive Dyskinesia (TD) is primarily caused by **acute** dopamine D2 receptor blockade.",
                 answer: false, // Fiction
-                explanation: "FICTION. **$\\text{EPS}$** is due to acute blockade. $\\text{TD}$ is thought to result from **chronic** blockade causing receptor supersensitivity."
+                explanation: "FICTION. **EPS** is due to acute blockade. TD is thought to result from **chronic** blockade causing receptor supersensitivity."
             },
             {
-                statement: "Akathisia is an $\\text{EPS}$ symptom characterized by subjective and objective restlessness.",
+                statement: "Akathisia is an EPS symptom characterized by subjective and objective restlessness.",
                 answer: true, // Fact
-                explanation: "FACT. Akathisia is a common $\\text{EPS}$. It may respond to **beta-blockers** (e.g., propranolol) or benzodiazepines."
+                explanation: "FACT. Akathisia is a common EPS. It may respond to **beta-blockers** (e.g., propranolol) or benzodiazepines."
             },
             {
-                statement: "Involuntary, repetitive movements, most often affecting the mouth, face, and tongue, are characteristic of $\\text{Tardive Dyskinesia (TD)}$.",
+                statement: "Involuntary, repetitive movements, most often affecting the mouth, face, and tongue, are characteristic of **Tardive Dyskinesia (TD)**.",
                 answer: true, // Fact
-                explanation: "FACT. These involuntary movements are the hallmark of $\\text{TD}$. $\\text{EPS}$ symptoms are different (e.g., tremor, rigidity, sustained contractions)."
+                explanation: "FACT. These involuntary movements are the hallmark of TD. EPS symptoms are different (e.g., tremor, rigidity, sustained contractions)."
             },
             {
-                statement: "The first-line management for acute dystonia (a type of $\\text{EPS}$) is switching the patient to an $\\text{SGA}$ like clozapine.",
+                statement: "The first-line management for acute dystonia (a type of EPS) is switching the patient to an SGA like clozapine.",
                 answer: false, // Fiction
-                explanation: "FICTION. First-line is often dose reduction or switching to a lower risk agent. For acute dystonia, **anticholinergic agents** (e.g., benztropine) are immediately effective."
+                explanation: "FICTION. For acute dystonia, **anticholinergic agents** (e.g., benztropine) are immediately effective. Dose reduction is often the first step."
             },
             {
-                statement: "VMAT2 inhibitors (e.g., valbenazine) are the recommended first-line pharmacological treatment for moderate to severe $\\text{TD}$.",
+                statement: "VMAT2 inhibitors (e.g., valbenazine) are the recommended first-line pharmacological treatment for moderate to severe TD.",
                 answer: true, // Fact
-                explanation: "FACT. $\\text{VMAT2}$ inhibitors are the gold standard pharmacological treatment for $\\text{TD}$. "
+                explanation: "FACT. VMAT2 inhibitors are the gold standard pharmacological treatment for TD. "
             },
             {
-                statement: "Parkinsonism (tremor, rigidity, bradykinesia) is classified as an $\\text{EPS}$.",
+                statement: "Parkinsonism (tremor, rigidity, bradykinesia) is classified as an EPS.",
                 answer: true, // Fact
-                explanation: "FACT. Parkinsonism is a classic $\\text{EPS}$ resulting from dopamine blockade, which creates a syndrome similar to idiopathic Parkinson's disease."
+                explanation: "FACT. Parkinsonism is a classic EPS resulting from dopamine blockade, which creates a syndrome similar to idiopathic Parkinson's disease."
             },
             {
-                statement: "Anticholinergic agents (e.g., benztropine) can be used as a primary treatment to reduce the symptoms of $\\text{Tardive Dyskinesia}$.",
+                statement: "Anticholinergic agents (e.g., benztropine) can be used as a primary treatment to reduce the symptoms of Tardive Dyskinesia.",
                 answer: false, // Fiction
-                explanation: "FICTION. Anticholinergics should be **avoided** in $\\text{TD}$ as they can potentially worsen the symptoms."
+                explanation: "FICTION. Anticholinergics should be **avoided** in TD as they can potentially worsen the symptoms."
             },
             {
-                statement: "Vitamin $\\text{E}$ is considered the most robust and highly recommended first-line agent for $\\text{TD}$.",
+                statement: "Vitamin E is considered the most robust and highly recommended first-line agent for TD.",
                 answer: false, // Fiction
-                explanation: "FICTION. $\\text{VMAT2}$ inhibitors are first-line. Vitamin $\\text{E}$ may have modest benefit but evidence is less robust."
+                explanation: "FICTION. VMAT2 inhibitors are first-line. Vitamin E may have modest benefit but evidence is less robust."
             }
         ];
 
@@ -272,14 +326,16 @@
         const team2NameDisplay = document.getElementById('team2-name');
         const team1PointsDisplay = document.getElementById('team1-points');
         const team2PointsDisplay = document.getElementById('team2-points');
-        const scoreTeam1NameHeader = document.getElementById('score-team1-name');
-        const scoreTeam2NameHeader = document.getElementById('score-team2-name');
+        
+        const teamToggle1Label = document.querySelector('label[for="team1"]');
+        const teamToggle2Label = document.querySelector('label[for="team2"]');
 
         const questionBox = document.getElementById('question-box');
         const timerDisplay = document.getElementById('timer-display');
         const readyBtn = document.getElementById('ready-btn');
         const nextBtn = document.getElementById('next-btn');
         const scoringControls = document.getElementById('scoring-controls');
+        const submitBtn = document.getElementById('submit-btn');
         const feedbackBox = document.getElementById('feedback-box');
 
 
@@ -288,8 +344,10 @@
             team2NameDisplay.textContent = teams[1].name;
             team1PointsDisplay.textContent = teams[0].score;
             team2PointsDisplay.textContent = teams[1].score;
-            scoreTeam1NameHeader.textContent = teams[0].name;
-            scoreTeam2NameHeader.textContent = teams[1].name;
+            
+            // Update labels in scoring controls
+            teamToggle1Label.textContent = teams[0].name;
+            teamToggle2Label.textContent = teams[1].name;
         }
 
         function setupGame() {
@@ -311,6 +369,7 @@
             timerDisplay.textContent = "Game started!";
             feedbackBox.textContent = '';
             feedbackBox.className = '';
+            scoringControls.style.display = 'none';
 
             updateScoreboard();
         }
@@ -332,6 +391,10 @@
             feedbackBox.textContent = '';
             feedbackBox.className = '';
             
+            // Clear radio selections
+            document.querySelectorAll('input[name="scoringTeam"]').forEach(radio => radio.checked = false);
+            document.querySelectorAll('input[name="scoringOutcome"]').forEach(radio => radio.checked = false);
+            
             // PHASE 1: Reading Timer (5 seconds)
             let readTimeLeft = READ_TIME;
             questionBox.textContent = q.statement;
@@ -351,16 +414,14 @@
         }
 
         function startAnswerPhase() {
-            const q = quizQuestions[currentQuestionIndex];
             questionBox.textContent = "FACT or FICTION?"; // Show the prompt
-            scoringControls.style.display = 'flex';
+            scoringControls.style.display = 'block';
             
             let answerTimeLeft = ANSWER_TIME;
             
             const answerCountdown = () => {
                 if (answerTimeLeft < 0) {
                     timerDisplay.textContent = "TIME'S UP! Score the answer.";
-                    // Time up, but keep controls visible for scoring
                     return;
                 }
                 timerDisplay.textContent = `Time to Answer: ${answerTimeLeft} seconds`;
@@ -371,27 +432,30 @@
             answerCountdown();
         }
 
-        function scoreAnswer(teamId, isCorrectAnswer) {
+        function submitScore() {
             clearTimeout(timerId); // Stop the timer
 
-            const q = quizQuestions[currentQuestionIndex];
-            const team = teams[teamId - 1];
+            const selectedTeamValue = document.querySelector('input[name="scoringTeam"]:checked')?.value;
+            const selectedOutcome = document.querySelector('input[name="scoringOutcome"]:checked')?.value;
             
-            // Check if the stated answer (Fact/Fiction) matches the actual answer
-            const isCorrect = isCorrectAnswer === q.answer;
+            if (!selectedTeamValue || !selectedOutcome) {
+                alert("Please select both a Team and an Answer Outcome before submitting.");
+                return;
+            }
 
-            if (isCorrectAnswer === null) {
-                // Incorrect: Just show feedback, no score change
-                feedbackBox.textContent = `❌ Incorrect. The correct answer is ${q.answer ? 'FACT' : 'FICTION'}. ${q.explanation}`;
-                feedbackBox.className = 'incorrect-fb';
-            } else if (isCorrect) {
-                // Correct Answer
+            const teamId = parseInt(selectedTeamValue);
+            const team = teams[teamId - 1];
+            const q = quizQuestions[currentQuestionIndex];
+            
+            // Determine the result based on your click
+            const isCorrect = selectedOutcome === 'correct';
+
+            if (isCorrect) {
                 team.score++;
-                feedbackBox.textContent = `✅ ${team.name} scores a point! The answer is ${q.answer ? 'FACT' : 'FICTION'}. ${q.explanation}`;
+                feedbackBox.textContent = `✅ ${team.name} scores a point! The correct answer is ${q.answer ? 'FACT' : 'FICTION'}. ${q.explanation}`;
                 feedbackBox.className = 'correct-fb';
             } else {
-                // Wrong Answer (but points awarded based on click)
-                feedbackBox.textContent = `❌ ${team.name} answered with the wrong choice! The correct answer is ${q.answer ? 'FACT' : 'FICTION'}. ${q.explanation}`;
+                feedbackBox.textContent = `❌ Incorrect. No point awarded. The correct answer is ${q.answer ? 'FACT' : 'FICTION'}. ${q.explanation}`;
                 feedbackBox.className = 'incorrect-fb';
             }
             
