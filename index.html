@@ -3,499 +3,254 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geriatric Differential Diagnosis Challenge</title>
+    <title>EPS vs. TD: Fact or Fiction Quiz</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f7f9;
         }
 
-        .game-container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 900px;
-            width: 100%;
-            padding: 40px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .game-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
-            animation: shimmer 3s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
         }
 
         h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            color: #2c3e50;
+            margin-bottom: 20px;
         }
 
-        .patient-info {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        #question-box {
+            background-color: #ecf0f1;
             padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .patient-info h2 {
-            margin-bottom: 10px;
-            font-size: 1.5em;
-        }
-
-        .symptoms {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .symptom-tag {
-            background: rgba(255,255,255,0.2);
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            text-align: center;
-            animation: fadeIn 0.5s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .differential-section {
-            margin-bottom: 30px;
-        }
-
-        .differential-section h3 {
-            color: #667eea;
+            border-radius: 8px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             margin-bottom: 20px;
-            font-size: 1.3em;
-        }
-
-        .diagnosis-options {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .diagnosis-card {
-            background: white;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            padding: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .diagnosis-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-
-        .diagnosis-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            border-color: #667eea;
-        }
-
-        .diagnosis-card.selected {
-            border-color: #667eea;
-            background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1));
-        }
-
-        .diagnosis-card.correct {
-            border-color: #4caf50;
-            background: rgba(76, 175, 80, 0.1);
-            animation: pulse 0.5s;
-        }
-
-        .diagnosis-card.incorrect {
-            border-color: #f44336;
-            background: rgba(244, 67, 54, 0.1);
-            animation: shake 0.5s;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-
-        .diagnosis-name {
+            font-size: 1.2em;
             font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
+            text-align: left;
         }
 
-        .diagnosis-hint {
-            font-size: 0.85em;
-            color: #666;
-            font-style: italic;
+        .buttons-container {
+            display: flex;
+            justify-content: space-around;
         }
 
         button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 25px;
-            font-size: 1em;
-            font-weight: bold;
+            padding: 12px 25px;
+            font-size: 1.1em;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
-        }
-
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .controls {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .feedback {
-            background: #f5f5f5;
-            border-left: 4px solid #667eea;
-            padding: 20px;
+            border: none;
             border-radius: 5px;
+            transition: background-color 0.3s ease;
+            width: 45%;
+        }
+
+        #fact-btn {
+            background-color: #2ecc71; /* Green */
+            color: white;
+        }
+
+        #fact-btn:hover {
+            background-color: #27ad60;
+        }
+
+        #fiction-btn {
+            background-color: #e74c3c; /* Red */
+            color: white;
+        }
+
+        #fiction-btn:hover {
+            background-color: #c0392b;
+        }
+
+        #feedback-box {
             margin-top: 20px;
-            display: none;
-            animation: slideIn 0.5s ease;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        .feedback.show {
-            display: block;
-        }
-
-        .score {
-            text-align: center;
-            font-size: 1.2em;
-            color: #667eea;
-            margin-top: 20px;
-            font-weight: bold;
-        }
-
-        .explanation {
-            background: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: 10px;
             padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            min-height: 50px;
+        }
+
+        .correct {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        #next-btn {
+            background-color: #3498db; /* Blue */
+            color: white;
+            margin-top: 15px;
+            padding: 10px 20px;
+            display: none; /* Hidden until a question is answered */
+            width: 100%;
+        }
+        #next-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        #score-display {
             margin-top: 10px;
-            font-size: 0.9em;
-            line-height: 1.6;
-        }
-
-        .phase-indicator {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-
-        .phase-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #e0e0e0;
-            transition: all 0.3s ease;
-        }
-
-        .phase-dot.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            transform: scale(1.3);
-        }
-
-        .phase-dot.completed {
-            background: #4caf50;
-        }
-
-        @media (max-width: 768px) {
-            h1 { font-size: 2em; }
-            .game-container { padding: 20px; }
-            .diagnosis-options { grid-template-columns: 1fr; }
+            font-size: 1.1em;
+            color: #34495e;
         }
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <h1>🏥 Geriatric Differential Diagnosis Challenge</h1>
-        
-        <div class="patient-info">
-            <h2>Patient: Mrs. Nancy Davidson, 80 years old</h2>
-            <p><strong>Chief Complaint:</strong> "I don't feel very well and I've lost my appetite"</p>
-            <div class="symptoms">
-                <div class="symptom-tag">Weakness (6 months)</div>
-                <div class="symptom-tag">Loss of appetite</div>
-                <div class="symptom-tag">Confusion</div>
-                <div class="symptom-tag">Forgetfulness</div>
-                <div class="symptom-tag">Weight loss</div>
-                <div class="symptom-tag">Feeling cold</div>
-                <div class="symptom-tag">Dizziness</div>
-                <div class="symptom-tag">Multiple falls</div>
-            </div>
+
+    <div class="container">
+        <h1>🧠 EPS vs. TD: Fact or Fiction Quiz</h1>
+
+        <div id="question-box">Click 'Start Quiz' to begin!</div>
+
+        <div id="score-display">Score: 0 / 0</div>
+
+        <div class="buttons-container">
+            <button id="fact-btn" onclick="checkAnswer(true)" disabled>FACT</button>
+            <button id="fiction-btn" onclick="checkAnswer(false)" disabled>FICTION</button>
         </div>
 
-        <div class="phase-indicator">
-            <div class="phase-dot active" data-phase="0"></div>
-            <div class="phase-dot" data-phase="1"></div>
-            <div class="phase-dot" data-phase="2"></div>
-        </div>
+        <button id="next-btn" onclick="nextQuestion()">Next Question</button>
+        <div id="feedback-box"></div>
+        <button id="start-btn" onclick="startQuiz()">Start Quiz</button>
 
-        <div class="differential-section">
-            <h3 id="phase-title">Phase 1: Initial Differential - Common Causes</h3>
-            <p id="phase-instruction">Select all conditions that should be on your initial differential diagnosis list:</p>
-            <div class="diagnosis-options" id="diagnosis-options"></div>
-        </div>
-
-        <div class="feedback" id="feedback"></div>
-
-        <div class="controls">
-            <button id="submit-btn" onclick="submitAnswers()">Submit Selections</button>
-            <button id="next-btn" onclick="nextPhase()" style="display: none;">Next Phase →</button>
-        </div>
-
-        <div class="score" id="score"></div>
     </div>
 
     <script>
-        let currentPhase = 0;
-        let selectedDiagnoses = new Set();
-        let totalScore = 0;
-        let phaseScores = [];
-
-        const phases = [
+        const questions = [
             {
-                title: "Phase 1: Initial Differential - Common Causes",
-                instruction: "Select all conditions that should be on your initial differential diagnosis list:",
-                diagnoses: [
-                    { name: "Depression", hint: "Mood disorder common in elderly", correct: true, explanation: "Depression is very common in elderly patients and can cause appetite loss, weakness, and cognitive symptoms." },
-                    { name: "Malnutrition", hint: "Nutritional deficiency", correct: true, explanation: "Malnutrition can cause weakness, confusion, and multiple vitamin deficiencies as seen in this case." },
-                    { name: "Dementia", hint: "Cognitive decline", correct: true, explanation: "Early dementia should be considered with memory problems and confusion in elderly patients." },
-                    { name: "Hypothyroidism", hint: "Endocrine disorder", correct: true, explanation: "Hypothyroidism can cause fatigue, cold intolerance, and cognitive slowing." },
-                    { name: "Acute MI", hint: "Cardiac emergency", correct: false, explanation: "While possible, the 6-month timeline makes acute MI less likely as primary cause." },
-                    { name: "Medication effects", hint: "Drug-related", correct: true, explanation: "Polypharmacy and medication side effects are common causes of symptoms in elderly." },
-                    { name: "Pneumonia", hint: "Respiratory infection", correct: false, explanation: "No fever or respiratory symptoms make pneumonia less likely." },
-                    { name: "Dehydration", hint: "Fluid deficit", correct: true, explanation: "Dehydration is common in elderly and can cause weakness, dizziness, and confusion." }
-                ]
+                statement: "EPS (e.g., dystonia, parkinsonism) is primarily due to chronic dopamine receptor supersensitivity.",
+                answer: false, // Fiction
+                explanation: "FICTION. EPS is due to **acute** $\\text{D}_2$ receptor blockade. $\\text{TD}$ is linked to chronic blockade causing supersensitivity."
             },
             {
-                title: "Phase 2: Specific Deficiencies & Anemias",
-                instruction: "Based on the lab findings, which specific deficiencies should be considered?",
-                diagnoses: [
-                    { name: "Vitamin B12 deficiency", hint: "Cobalamin deficiency", correct: true, explanation: "Lab shows low B12, elevated MMA and homocysteine, plus neurological symptoms." },
-                    { name: "Iron deficiency anemia", hint: "Low iron stores", correct: true, explanation: "Low ferritin, low iron saturation, and microcytic cells on blood smear confirm this." },
-                    { name: "Folate deficiency", hint: "Folic acid deficiency", correct: true, explanation: "Low serum and RBC folate levels are present." },
-                    { name: "Vitamin D deficiency", hint: "Calciferol deficiency", correct: false, explanation: "While possible, not specifically indicated by presented labs." },
-                    { name: "Hypokalemia", hint: "Low potassium", correct: true, explanation: "K+ of 2.3 with U waves on ECG confirms significant hypokalemia." },
-                    { name: "Hypomagnesemia", hint: "Low magnesium", correct: true, explanation: "Mg of 1.0 (low) can contribute to weakness and cardiac issues." },
-                    { name: "Hypercalcemia", hint: "High calcium", correct: false, explanation: "Calcium is normal at 8.9 mg/dL." },
-                    { name: "Thiamine deficiency", hint: "Vitamin B1 deficiency", correct: false, explanation: "While possible in malnourished patients, no specific evidence presented." }
-                ]
+                statement: "Tardive Dyskinesia (TD) is characterized by a subjective feeling of restlessness (akathisia).",
+                answer: false, // Fiction
+                explanation: "FICTION. **Akathisia** is an $\\text{EPS}$. $\\text{TD}$ is characterized by involuntary, repetitive movements, often of the mouth/face."
             },
             {
-                title: "Phase 3: Contributing Factors",
-                instruction: "Which factors likely contributed to this patient's presentation?",
-                diagnoses: [
-                    { name: "Social isolation", hint: "Living alone, no family nearby", correct: true, explanation: "Widowed, no children, no family in state increases risk for self-neglect." },
-                    { name: "PPI use (Omeprazole)", hint: "Reduces B12 absorption", correct: true, explanation: "Long-term PPI use can impair B12 and iron absorption." },
-                    { name: "Poor oral intake", hint: "Difficulty shopping/cooking", correct: true, explanation: "Patient reports difficulty with meal preparation and often forgets to eat." },
-                    { name: "High-dose statin", hint: "Simvastatin 80mg", correct: true, explanation: "High-dose statins can cause muscle weakness and cognitive effects." },
-                    { name: "Alcohol abuse", hint: "Substance use", correct: false, explanation: "Patient denies alcohol use, ETOH level negative." },
-                    { name: "Recent grief", hint: "Widowed 2 years ago", correct: true, explanation: "Loss of spouse after 55 years can trigger depression and self-neglect." },
-                    { name: "Hyperthyroidism", hint: "Overactive thyroid", correct: false, explanation: "TSH and free T4 are normal, ruling out thyroid dysfunction." },
-                    { name: "Chronic diarrhea", hint: "GI losses", correct: true, explanation: "Intermittent diarrhea since hospitalizations can worsen electrolyte losses." }
-                ]
+                statement: "The first-line treatment for acute dystonia (a type of EPS) includes anticholinergic agents like benztropine.",
+                answer: true, // Fact
+                explanation: "FACT. Anticholinergics are effective for acute $\\text{dystonia}$ and $\\text{parkinsonism}$ (both $\\text{EPS}$). "
+            },
+            {
+                statement: "Anticholinergic agents should be avoided in the treatment of Tardive Dyskinesia as they can potentially worsen symptoms.",
+                answer: true, // Fact
+                explanation: "FACT. Anticholinergics are $\\text{contraindicated}$ in $\\text{TD}$ and should be avoided."
+            },
+            {
+                statement: "VMAT2 inhibitors (e.g., valbenazine) are the recommended first-line pharmacological treatment for moderate to severe TD.",
+                answer: true, // Fact
+                explanation: "FACT. $\\text{VMAT2}$ inhibitors are the gold standard pharmacological treatment for $\\text{TD}$."
             }
         ];
 
-        function initPhase() {
-            const phase = phases[currentPhase];
-            document.getElementById('phase-title').textContent = phase.title;
-            document.getElementById('phase-instruction').textContent = phase.instruction;
-            
-            const optionsContainer = document.getElementById('diagnosis-options');
-            optionsContainer.innerHTML = '';
-            
-            phase.diagnoses.forEach((diagnosis, index) => {
-                const card = document.createElement('div');
-                card.className = 'diagnosis-card';
-                card.dataset.index = index;
-                card.onclick = () => toggleSelection(index);
-                
-                card.innerHTML = `
-                    <div class="diagnosis-name">${diagnosis.name}</div>
-                    <div class="diagnosis-hint">${diagnosis.hint}</div>
-                `;
-                
-                optionsContainer.appendChild(card);
-            });
-            
-            selectedDiagnoses.clear();
-            document.getElementById('feedback').classList.remove('show');
-            document.getElementById('submit-btn').style.display = 'block';
-            document.getElementById('next-btn').style.display = 'none';
-            
-            updatePhaseIndicator();
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let totalAnswered = 0;
+        let quizActive = false;
+
+        const questionBox = document.getElementById('question-box');
+        const factBtn = document.getElementById('fact-btn');
+        const fictionBtn = document.getElementById('fiction-btn');
+        const feedbackBox = document.getElementById('feedback-box');
+        const nextBtn = document.getElementById('next-btn');
+        const scoreDisplay = document.getElementById('score-display');
+        const startBtn = document.getElementById('start-btn');
+
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            totalAnswered = 0;
+            quizActive = true;
+            startBtn.style.display = 'none';
+            factBtn.disabled = false;
+            fictionBtn.disabled = false;
+            nextBtn.style.display = 'none';
+            feedbackBox.textContent = '';
+            feedbackBox.className = '';
+            updateScoreDisplay();
+            showQuestion();
         }
 
-        function toggleSelection(index) {
-            const card = document.querySelector(`[data-index="${index}"]`);
-            
-            if (selectedDiagnoses.has(index)) {
-                selectedDiagnoses.delete(index);
-                card.classList.remove('selected');
+        function showQuestion() {
+            if (currentQuestionIndex < questions.length) {
+                const q = questions[currentQuestionIndex];
+                questionBox.textContent = q.statement;
+                factBtn.disabled = false;
+                fictionBtn.disabled = false;
+                nextBtn.style.display = 'none';
+                feedbackBox.textContent = '';
+                feedbackBox.className = '';
             } else {
-                selectedDiagnoses.add(index);
-                card.classList.add('selected');
+                questionBox.textContent = `Quiz Finished! Your final score is ${score} out of ${questions.length}.`;
+                factBtn.disabled = true;
+                fictionBtn.disabled = true;
+                nextBtn.style.display = 'none';
+                feedbackBox.textContent = 'Well done! Click Start Quiz to play again.';
+                feedbackBox.className = 'correct';
+                startBtn.textContent = 'Play Again';
+                startBtn.style.display = 'block';
+                quizActive = false;
             }
         }
 
-        function submitAnswers() {
-            const phase = phases[currentPhase];
-            let correct = 0;
-            let total = 0;
-            let feedback = '<h4>Results:</h4>';
-            
-            phase.diagnoses.forEach((diagnosis, index) => {
-                const card = document.querySelector(`[data-index="${index}"]`);
-                const isSelected = selectedDiagnoses.has(index);
-                
-                if (diagnosis.correct) total++;
-                
-                if (diagnosis.correct && isSelected) {
-                    card.classList.add('correct');
-                    correct++;
-                } else if (!diagnosis.correct && isSelected) {
-                    card.classList.add('incorrect');
-                } else if (diagnosis.correct && !isSelected) {
-                    card.style.border = '2px dashed #ff9800';
-                }
-                
-                if (diagnosis.correct) {
-                    feedback += `<div class="explanation"><strong>${diagnosis.name}:</strong> ${diagnosis.explanation}</div>`;
-                }
-            });
-            
-            const phaseScore = Math.round((correct / total) * 100);
-            phaseScores.push(phaseScore);
-            
-            feedback = `<p><strong>You identified ${correct} out of ${total} correct diagnoses (${phaseScore}%)</strong></p>` + feedback;
-            
-            document.getElementById('feedback').innerHTML = feedback;
-            document.getElementById('feedback').classList.add('show');
-            
-            document.getElementById('submit-btn').style.display = 'none';
-            
-            if (currentPhase < phases.length - 1) {
-                document.getElementById('next-btn').style.display = 'block';
+        function checkAnswer(userAnswer) {
+            if (!quizActive) return;
+
+            const q = questions[currentQuestionIndex];
+            const isCorrect = (userAnswer === q.answer);
+
+            factBtn.disabled = true;
+            fictionBtn.disabled = true;
+            nextBtn.style.display = 'block';
+            totalAnswered++;
+
+            if (isCorrect) {
+                score++;
+                feedbackBox.textContent = `✅ Correct! ${q.explanation}`;
+                feedbackBox.className = 'correct';
             } else {
-                showFinalScore();
+                const correctText = q.answer ? 'FACT' : 'FICTION';
+                feedbackBox.textContent = `❌ Incorrect. The correct answer is ${correctText}. ${q.explanation}`;
+                feedbackBox.className = 'incorrect';
             }
-            
-            document.querySelectorAll('.diagnosis-card').forEach(card => {
-                card.onclick = null;
-            });
+            updateScoreDisplay();
         }
 
-        function nextPhase() {
-            document.querySelector(`.phase-dot[data-phase="${currentPhase}"]`).classList.add('completed');
-            currentPhase++;
-            initPhase();
+        function nextQuestion() {
+            currentQuestionIndex++;
+            showQuestion();
         }
 
-        function updatePhaseIndicator() {
-            document.querySelectorAll('.phase-dot').forEach((dot, index) => {
-                dot.classList.remove('active');
-                if (index === currentPhase) {
-                    dot.classList.add('active');
-                }
-            });
+        function updateScoreDisplay() {
+            scoreDisplay.textContent = `Score: ${score} / ${questions.length}`;
         }
 
-        function showFinalScore() {
-            const avgScore = Math.round(phaseScores.reduce((a, b) => a + b, 0) / phaseScores.length);
-            let message = '';
-            
-            if (avgScore >= 90) {
-                message = '🏆 Excellent! You have strong clinical reasoning skills!';
-            } else if (avgScore >= 70) {
-                message = '👏 Good work! You identified most key diagnoses.';
-            } else if (avgScore >= 50) {
-                message = '💪 Keep practicing! Review the explanations to improve.';
-            } else {
-                message = '📚 Consider reviewing geriatric syndromes and nutritional deficiencies.';
-            }
-            
-            document.getElementById('score').innerHTML = `
-                <h3>Final Score: ${avgScore}%</h3>
-                <p>${message}</p>
-                <button onclick="location.reload()">Play Again</button>
-            `;
-        }
-
-        // Initialize the game
-        initPhase();
+        // Initial state
+        questionBox.textContent = "Welcome to the EPS vs. TD Quiz! Test your knowledge on movement disorders. Click 'Start Quiz' to begin.";
+        scoreDisplay.textContent = "Score: 0 / 5";
     </script>
+
 </body>
 </html>
