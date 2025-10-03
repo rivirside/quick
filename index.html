@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EPS vs. TD: Team Competition (Simplified Scoring)</title>
+    <title>EPS vs. TD: Team Showdown (Final)</title>
     <style>
         :root {
             --team1-color: #3498db; /* Blue */
             --team2-color: #e74c3c; /* Red */
-            --success-color: #2ecc71; /* Green */
+            --fact-color: #2ecc71; /* Green */
+            --fiction-color: #e74c3c; /* Red */
             --danger-color: #f39c12; /* Yellow/Orange */
         }
         body {
@@ -69,7 +70,7 @@
         }
         
         #setup-box button {
-            background-color: var(--success-color);
+            background-color: var(--fact-color);
             color: white;
             padding: 10px 20px;
             border: none;
@@ -138,6 +139,7 @@
             transition: background-color 0.2s;
             display: inline-block;
             font-weight: bold;
+            border: 2px solid transparent;
         }
 
         .radio-buttons input[type="radio"] {
@@ -146,34 +148,35 @@
         
         /* Team Toggle */
         #team-toggles input:checked + label {
-            background-color: var(--team1-color);
-            color: white;
+            border-color: #2c3e50;
             box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
         }
-        #team-toggles label:hover { background-color: #d0d7de; }
-        #team-toggles input:checked + label[for="team2"] {
-            background-color: var(--team2-color);
-            color: white;
-        }
         
-        /* Outcome Toggle */
-        #outcome-toggles input:checked + label.correct-label {
-            background-color: var(--success-color);
+        #team-toggles input[value="1"] + label { background-color: var(--team1-color); color: white; }
+        #team-toggles input[value="2"] + label { background-color: var(--team2-color); color: white; }
+
+        /* Answer Toggle */
+        #answer-toggles input:checked + label.fact-label {
+            background-color: var(--fact-color);
             color: white;
+            border-color: #2c3e50;
         }
-        #outcome-toggles input:checked + label.incorrect-label {
-            background-color: var(--danger-color);
+        #answer-toggles input:checked + label.fiction-label {
+            background-color: var(--fiction-color);
             color: white;
+            border-color: #2c3e50;
         }
+        #answer-toggles label.fact-label { background-color: #d4edda; color: #155724; }
+        #answer-toggles label.fiction-label { background-color: #f8d7da; color: #721c24; }
 
         #submit-btn {
-            background-color: var(--success-color);
+            background-color: #3498db;
             color: white;
             width: 100%;
             margin-top: 15px;
             padding: 15px;
         }
-        #submit-btn:hover { background-color: #27ad60; }
+        #submit-btn:hover { background-color: #2980b9; }
         
         /* Next Button */
         #next-btn {
@@ -230,7 +233,7 @@
         
         <div id="scoring-controls">
             <div class="scoring-group">
-                <h3>Award Point to:</h3>
+                <h3>Team That Responded:</h3>
                 <div class="radio-buttons" id="team-toggles">
                     <input type="radio" id="team1" name="scoringTeam" value="1" required>
                     <label for="team1">Team Alpha</label>
@@ -240,16 +243,16 @@
             </div>
 
             <div class="scoring-group">
-                <h3>Answer Outcome:</h3>
-                <div class="radio-buttons" id="outcome-toggles">
-                    <input type="radio" id="correct" name="scoringOutcome" value="correct" required>
-                    <label for="correct" class="correct-label">Correct Answer</label>
-                    <input type="radio" id="incorrect" name="scoringOutcome" value="incorrect">
-                    <label for="incorrect" class="incorrect-label">Incorrect Answer</label>
+                <h3>Team's Stated Answer:</h3>
+                <div class="radio-buttons" id="answer-toggles">
+                    <input type="radio" id="fact" name="statedAnswer" value="fact" required>
+                    <label for="fact" class="fact-label">FACT</label>
+                    <input type="radio" id="fiction" name="statedAnswer" value="fiction">
+                    <label for="fiction" class="fiction-label">FICTION</label>
                 </div>
             </div>
 
-            <button id="submit-btn" onclick="submitScore()">SUBMIT ANSWER</button>
+            <button id="submit-btn" onclick="submitScore()">SUBMIT ANSWER & SCORE</button>
         </div>
         
         <button id="next-btn" onclick="nextQuestion()">Next Question</button>
@@ -258,7 +261,6 @@
     </div>
 
     <script>
-        // Use standard text for the explanations to avoid LaTeX formatting issues
         const quizQuestions = [
             {
                 statement: "Extrapyramidal side effects (EPS) typically develop after months or years of medication exposure.",
@@ -340,6 +342,9 @@
 
 
         function updateScoreboard() {
+            teams[0].name = team1NameInput.value || "Team Alpha";
+            teams[1].name = team2NameInput.value || "Team Beta";
+            
             team1NameDisplay.textContent = teams[0].name;
             team2NameDisplay.textContent = teams[1].name;
             team1PointsDisplay.textContent = teams[0].score;
@@ -351,10 +356,6 @@
         }
 
         function setupGame() {
-            // Set team names from input
-            teams[0].name = team1NameInput.value || "Team Alpha";
-            teams[1].name = team2NameInput.value || "Team Beta";
-            
             // Hide setup, show game elements
             setupBox.style.display = 'none';
             scoreboard.style.display = 'flex';
@@ -393,7 +394,7 @@
             
             // Clear radio selections
             document.querySelectorAll('input[name="scoringTeam"]').forEach(radio => radio.checked = false);
-            document.querySelectorAll('input[name="scoringOutcome"]').forEach(radio => radio.checked = false);
+            document.querySelectorAll('input[name="statedAnswer"]').forEach(radio => radio.checked = false);
             
             // PHASE 1: Reading Timer (5 seconds)
             let readTimeLeft = READ_TIME;
@@ -414,8 +415,6 @@
         }
 
         function startAnswerPhase() {
-            // NOTE: The questionBox content is deliberately NOT changed here.
-            // It remains showing the question statement.
             scoringControls.style.display = 'block';
             
             let answerTimeLeft = ANSWER_TIME;
@@ -437,10 +436,10 @@
             clearTimeout(timerId); // Stop the timer
 
             const selectedTeamValue = document.querySelector('input[name="scoringTeam"]:checked')?.value;
-            const selectedOutcome = document.querySelector('input[name="scoringOutcome"]:checked')?.value;
+            const statedAnswer = document.querySelector('input[name="statedAnswer"]:checked')?.value;
             
-            if (!selectedTeamValue || !selectedOutcome) {
-                alert("Please select both a Team and an Answer Outcome before submitting.");
+            if (!selectedTeamValue || !statedAnswer) {
+                alert("Please select both a Team and their Stated Answer before submitting.");
                 return;
             }
 
@@ -448,20 +447,19 @@
             const team = teams[teamId - 1];
             const q = quizQuestions[currentQuestionIndex];
             
-            // Determine the result based on your click
-            const isCorrect = selectedOutcome === 'correct';
+            // Check if the team's stated answer (string 'fact' or 'fiction') matches the actual answer (boolean true or false)
+            const actualAnswerString = q.answer ? 'fact' : 'fiction';
+            const isCorrect = statedAnswer === actualAnswerString;
 
             if (isCorrect) {
                 team.score++;
-                feedbackBox.textContent = `✅ ${team.name} scores a point! The correct answer is ${q.answer ? 'FACT' : 'FICTION'}. ${q.explanation}`;
+                feedbackBox.textContent = `✅ CORRECT! ${team.name} scores a point. The statement is ${actualAnswerString.toUpperCase()}. ${q.explanation}`;
                 feedbackBox.className = 'correct-fb';
             } else {
-                // If you click 'Incorrect Answer', the full explanation is still shown
-                feedbackBox.textContent = `❌ Incorrect. No point awarded. The correct answer is ${q.answer ? 'FACT' : 'FICTION'}. ${q.explanation}`;
+                feedbackBox.textContent = `❌ INCORRECT. No point awarded. The correct answer is ${actualAnswerString.toUpperCase()}. ${q.explanation}`;
                 feedbackBox.className = 'incorrect-fb';
             }
             
-            // questionBox content remains the question
             timerDisplay.textContent = "Answer Scored. Click Next Question.";
             scoringControls.style.display = 'none';
             nextBtn.style.display = 'block';
@@ -492,7 +490,7 @@
             
             questionBox.innerHTML = `GAME OVER! ${winner === "It's a tie!" ? winner : winner + ' wins!'} <br>Final Score: ${teams[0].score} - ${teams[1].score}`;
             timerDisplay.textContent = "Final Results";
-            feedbackBox.textContent = 'Thank you for playing! Click "Start Game" above to play again.';
+            feedbackBox.textContent = 'Thank you for playing! Click "Start New Game" above to play again.';
             feedbackBox.className = 'correct-fb';
             
             // Show setup button again to allow replay
