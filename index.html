@@ -150,7 +150,7 @@
             color: white;
             box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
         }
-        #team-toggles label[for="team2"]:hover { background-color: var(--team2-color); }
+        #team-toggles label:hover { background-color: #d0d7de; }
         #team-toggles input:checked + label[for="team2"] {
             background-color: var(--team2-color);
             color: white;
@@ -414,7 +414,8 @@
         }
 
         function startAnswerPhase() {
-            questionBox.textContent = "FACT or FICTION?"; // Show the prompt
+            // NOTE: The questionBox content is deliberately NOT changed here.
+            // It remains showing the question statement.
             scoringControls.style.display = 'block';
             
             let answerTimeLeft = ANSWER_TIME;
@@ -424,7 +425,7 @@
                     timerDisplay.textContent = "TIME'S UP! Score the answer.";
                     return;
                 }
-                timerDisplay.textContent = `Time to Answer: ${answerTimeLeft} seconds`;
+                timerDisplay.textContent = `FACT or FICTION? Time remaining: ${answerTimeLeft} seconds`;
                 answerTimeLeft--;
                 timerId = setTimeout(answerCountdown, 1000);
             };
@@ -455,11 +456,12 @@
                 feedbackBox.textContent = `✅ ${team.name} scores a point! The correct answer is ${q.answer ? 'FACT' : 'FICTION'}. ${q.explanation}`;
                 feedbackBox.className = 'correct-fb';
             } else {
+                // If you click 'Incorrect Answer', the full explanation is still shown
                 feedbackBox.textContent = `❌ Incorrect. No point awarded. The correct answer is ${q.answer ? 'FACT' : 'FICTION'}. ${q.explanation}`;
                 feedbackBox.className = 'incorrect-fb';
             }
             
-            questionBox.textContent = q.statement; // Redisplay the full question
+            // questionBox content remains the question
             timerDisplay.textContent = "Answer Scored. Click Next Question.";
             scoringControls.style.display = 'none';
             nextBtn.style.display = 'block';
