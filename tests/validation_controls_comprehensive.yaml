@@ -1,0 +1,682 @@
+# Comprehensive Validation Controls for eTrial
+# 72 systematic test cases covering all validation dimensions
+
+# ==============================================================================
+# CATEGORY 1: INPUT FORMAT TESTS (6 controls)
+# ==============================================================================
+
+input_format_tests:
+  - name: "Input_PlainSequence"
+    modality: "peptide"
+    type: "format_test"
+    target: "test"
+    sequence: "MKTAYIAKQRQISSQRKRK"
+    expected_decision: ["PASS", "REVISE"]
+    notes: "Test plain sequence input"
+
+  - name: "Input_AntibodyPair"
+    modality: "antibody"
+    type: "format_test"
+    target: "test"
+    heavy_chain: "EVQLVESGGGLVQPGGSLRLSCAASGFTFSSYAMSWVRQAPGKGLEWVS"
+    light_chain: "DIQMTQSPSSLSASVGDRVTITCRASQDVNTAVAWYQQKPGKAPKLLIY"
+    expected_decision: ["PASS", "REVISE"]
+    notes: "Test heavy+light chain pair input"
+
+  - name: "Input_SMILES"
+    modality: "small_molecule"
+    type: "format_test"
+    target: "BCR-ABL"
+    smiles: "CCN(CC)CCNC(=O)c1c(C)[nH]c(/C=C/2\\C(=O)Nc3ccc(F)cc32)c1C"
+    expected_decision: ["PASS", "REVISE"]
+    notes: "Test SMILES string input for small molecules"
+
+  - name: "Input_ProteinTherapeutic"
+    modality: "protein"
+    type: "format_test"
+    target: "test"
+    sequence: "MKTAYIAKQRQISSQRKRKMKTAYIAKQRQISSQRKRKMKTAYIAKQRQISSQRKRK"
+    expected_decision: ["PASS", "REVISE"]
+    notes: "Test protein therapeutic (longer than peptide)"
+
+  - name: "Input_Nanobody"
+    modality: "nanobody"
+    type: "format_test"
+    target: "test"
+    sequence: "QVQLQESGGGLVQAGGSLRLSCAAS"
+    expected_decision: ["PASS", "REVISE"]
+    notes: "Test nanobody (single-domain antibody)"
+
+  - name: "Input_Bispecific"
+    modality: "bispecific"
+    type: "format_test"
+    target: "CD3_CD19"
+    heavy_chain: "EVQLVESGGGLVQPGGSLRLSCAASGFTFSSYAMSWVRQAPGKGLEWVS"
+    light_chain: "DIQMTQSPSSLSASVGDRVTITCRASQDVNTAVAWYQQKPGKAPKLLIY"
+    expected_decision: ["PASS", "REVISE"]
+    notes: "Test bispecific antibody format"
+
+
+# ==============================================================================
+# CATEGORY 2: POSITIVE CONTROLS - Approved Drugs (6 controls)
+# ==============================================================================
+
+positive_controls:
+  - name: "Pembrolizumab"
+    modality: "antibody"
+    type: "positive"
+    approved: true
+    target: "PD-1"
+    heavy_chain: "QVQLVQSGVEVKKPGASVKVSCKASGYTFTNYYMYWVRQAPGQGLEWMGGINPSNGGTNFNEKFKNRVTLTTDSSTTTAYMELKSLQFDDTAVYYCARRDYRFDMGFDYWGQGTTVTVSS"
+    light_chain: "EIVLTQSPATLSLSPGERATLSCRASQSVSSYLAWYQQKPGQAPRLLIYDASNRATGIPARFSGSGSGTDFTLTISSLEPEDFAVYYCQQSSNWPRTFGQGTKVEIK"
+    known_kd_nm: 29
+    expected_decision: ["PASS", "REVISE"]
+    notes: "Keytruda - humanized IgG4, approved cancer immunotherapy"
+
+  - name: "Trastuzumab"
+    modality: "antibody"
+    type: "positive"
+    approved: true
+    target: "HER2"
+    heavy_chain: "EVQLVESGGGLVQPGGSLRLSCAASGFNIKDTYIHWVRQAPGKGLEWVARIYPTNGYTRYADSVKGRFTISADTSKNTAYLQMNSLRAEDTAVYYCSRWGGDGFYAMDYWGQGTLVTVSS"
+    light_chain: "DIQMTQSPSSLSASVGDRVTITCRASQDVNTAVAWYQQKPGKAPKLLIYSASFLYSGVPSRFSGSRSGTDFTLTISSLQPEDFATYYCQQHYTTPPTFGQGTKVEIK"
+    known_kd_nm: 5
+    expected_decision: ["PASS"]
+    notes: "Herceptin - HER2+ breast cancer, benchmark for high affinity"
+
+  - name: "Adalimumab"
+    modality: "antibody"
+    type: "positive"
+    approved: true
+    target: "TNF-alpha"
+    heavy_chain: "EVQLVESGGGLVQPGRSLRLSCAASGFTFDDYAMHWVRQAPGKGLEWVSAITWNSGHIDYADSVEGRFTISRDNAKNSLYLQMNSLRAEDTAVYYCAKVSYLSTASSLDYWGQGTLVTVSS"
+    light_chain: "DIQMTQSPSSLSASVGDRVTITCRASQGIRNYLAWYQQKPGKAPKLLIYAASTLQSGVPSRFSGSGSGTDFTLTISSLQPEDFATYYCQRYNRAPYTFGQGTKVEIK"
+    known_kd_nm: 0.1
+    expected_decision: ["PASS"]
+    notes: "Humira - fully human, gold standard for developability"
+
+  - name: "Exenatide"
+    modality: "peptide"
+    type: "positive"
+    approved: true
+    target: "GLP-1R"
+    sequence: "HGEGTFTSDLSKQMEEEAVRLFIEWLKNGGPSSGAPPPS"
+    expected_decision: ["PASS", "REVISE"]
+    notes: "Byetta - GLP-1 peptide for diabetes"
+
+  - name: "Octreotide"
+    modality: "peptide"
+    type: "positive"
+    approved: true
+    target: "Somatostatin receptor"
+    sequence: "FCFWKTCT"
+    expected_decision: ["PASS", "REVISE"]
+    notes: "Cyclic peptide for acromegaly"
+
+  - name: "Imatinib"
+    modality: "small_molecule"
+    type: "positive"
+    approved: true
+    target: "BCR-ABL"
+    smiles: "CCN(CC)CCNC(=O)c1c(C)[nH]c(/C=C/2\\C(=O)Nc3ccc(F)cc32)c1C"
+    expected_decision: ["PASS", "REVISE"]
+    notes: "Gleevec - small molecule benchmark"
+
+
+# ==============================================================================
+# CATEGORY 3: DEVELOPABILITY TESTS (20 controls)
+# ==============================================================================
+
+developability_tests:
+  # Hydrophobicity - 6 graduated tests
+  - name: "Hydrophobic_Mild"
+    modality: "peptide"
+    type: "negative"
+    severity: "mild"
+    target: "test"
+    sequence: "MKTAYIAKQRQISSQRILVFGKRK"
+    expected_decision: ["REVISE"]
+    notes: "3 hydrophobic residues clustered - mild aggregation risk"
+
+  - name: "Hydrophobic_Moderate_NTerm"
+    modality: "peptide"
+    type: "negative"
+    severity: "moderate"
+    target: "test"
+    sequence: "VVIILFGKTAYIAKQRQISSQRKRK"
+    expected_decision: ["REVISE"]
+    notes: "6 hydrophobic residues at N-terminus"
+
+  - name: "Hydrophobic_Moderate_CTerm"
+    modality: "peptide"
+    type: "negative"
+    severity: "moderate"
+    target: "test"
+    sequence: "MKTAYIAKQRQISSQRKVVIILFG"
+    expected_decision: ["REVISE"]
+    notes: "6 hydrophobic residues at C-terminus"
+
+  - name: "Hydrophobic_Moderate_Internal"
+    modality: "peptide"
+    type: "negative"
+    severity: "moderate"
+    target: "test"
+    sequence: "MKTAYIAVVIILFGQRQISSQRKRK"
+    expected_decision: ["REVISE"]
+    notes: "6 hydrophobic residues internal"
+
+  - name: "Hydrophobic_Severe"
+    modality: "peptide"
+    type: "negative"
+    severity: "severe"
+    target: "test"
+    sequence: "VVVVVVIIIIILLLLLLFFFFVVVVVIIIIILLLLLFFFFFF"
+    expected_decision: ["KILL"]
+    notes: "42 residue extreme hydrophobic sequence"
+
+  - name: "Hydrophobic_Scattered"
+    modality: "peptide"
+    type: "neutral"
+    target: "test"
+    sequence: "MVKTVAYVIAKVQRVIVSSKVRKVR"
+    expected_decision: ["PASS", "REVISE"]
+    notes: "Hydrophobic residues scattered (not clustered) - should PASS"
+
+  # N-glycosylation - 4 graduated tests
+  - name: "NGlycosylation_None"
+    modality: "antibody"
+    type: "neutral"
+    target: "test"
+    sequence: "EVQLVESGGGLVQPGGSLRLSCAASGFTFSSYAMSWVRQAPGKGLEWVS"
+    expected_decision: ["PASS"]
+    notes: "No N-glycosylation sites (no NXS/NXT)"
+
+  - name: "NGlycosylation_One"
+    modality: "antibody"
+    type: "neutral"
+    target: "test"
+    sequence: "EVQLVESGGGLVQPGGSLRLSCAASGFTFSNYTAMSWVRQAPGKGLEWVS"
+    expected_decision: ["PASS"]
+    notes: "1 N-glycosylation site (normal for antibodies)"
+
+  - name: "NGlycosylation_Three"
+    modality: "antibody"
+    type: "negative"
+    severity: "moderate"
+    target: "test"
+    sequence: "EVQLVESGGGLVQPGGSLRLSCAASGFTFSNYTAMSWVRQAPGKGLEWVSNSTQNVS"
+    expected_decision: ["REVISE"]
+    notes: "3 N-glycosylation sites (high, needs optimization)"
+
+  - name: "NGlycosylation_Excessive"
+    modality: "antibody"
+    type: "negative"
+    severity: "high"
+    target: "test"
+    sequence: "NSTEVQLNYSVESGGNLTVQPGGSLRNTSSCAASGFTFSNYTAMSWVRQAPGKGLEWVS"
+    expected_decision: ["KILL", "REVISE"]
+    notes: "5+ N-glycosylation sites (excessive, manufacturability issues)"
+
+  # Deamidation - 3 graduated tests
+  - name: "Deamidation_Low"
+    modality: "peptide"
+    type: "neutral"
+    target: "test"
+    sequence: "MKTAYIAKQRQISSQRKRK"
+    expected_decision: ["PASS"]
+    notes: "No deamidation hotspots (no NG/NN/NS)"
+
+  - name: "Deamidation_Moderate"
+    modality: "peptide"
+    type: "negative"
+    severity: "moderate"
+    target: "test"
+    sequence: "MKTAYIAKQRNGSQRKNNKR"
+    expected_decision: ["REVISE"]
+    notes: "2 deamidation sites (NG, NN)"
+
+  - name: "Deamidation_High"
+    modality: "peptide"
+    type: "negative"
+    severity: "high"
+    target: "test"
+    sequence: "MKTNGAYIAKQRNGSQRKNNKRNSAKRNS"
+    expected_decision: ["REVISE", "KILL"]
+    notes: "6+ deamidation sites - stability issues"
+
+  # Methionine oxidation - 3 tests
+  - name: "MetOxidation_None"
+    modality: "peptide"
+    type: "neutral"
+    target: "test"
+    sequence: "AKTAYIAKQRQISSQRKRK"
+    expected_decision: ["PASS"]
+    notes: "No methionine - no oxidation risk"
+
+  - name: "MetOxidation_Low"
+    modality: "peptide"
+    type: "neutral"
+    target: "test"
+    sequence: "MKTAYIAKQRQISSQRKRK"
+    expected_decision: ["PASS"]
+    notes: "1 Met - acceptable oxidation risk"
+
+  - name: "MetOxidation_High"
+    modality: "peptide"
+    type: "negative"
+    severity: "moderate"
+    target: "test"
+    sequence: "MKTMYIAMQRMISSQRMRMK"
+    expected_decision: ["REVISE"]
+    notes: "6 Met - high oxidation risk"
+
+  # Free cysteines - 3 critical tests
+  - name: "FreeCys_None"
+    modality: "peptide"
+    type: "neutral"
+    target: "test"
+    sequence: "MKTAYIAKQRQISSQRKRK"
+    expected_decision: ["PASS"]
+    notes: "No cysteines"
+
+  - name: "FreeCys_Paired"
+    modality: "peptide"
+    type: "neutral"
+    target: "test"
+    sequence: "MKTAYIAKCQRQISSCQRKRK"
+    expected_decision: ["PASS", "REVISE"]
+    notes: "2 Cys (even number, could form disulfide)"
+
+  - name: "FreeCys_Unpaired"
+    modality: "peptide"
+    type: "negative"
+    severity: "critical"
+    target: "test"
+    sequence: "MKTAYIAKCRQISSQRKRK"
+    expected_decision: ["KILL"]
+    notes: "1 unpaired Cys - CRITICAL failure (aggregation)"
+
+  # Isomerization liability - 1 test
+  - name: "Isomerization_DGMotifs"
+    modality: "peptide"
+    type: "negative"
+    severity: "moderate"
+    target: "test"
+    sequence: "MKTAYIADGKQRDGISSQDGRKRK"
+    expected_decision: ["REVISE"]
+    notes: "3 DG motifs - isomerization liability (aspartic acid)"
+
+
+# ==============================================================================
+# CATEGORY 4: AFFINITY TESTS (5 controls)
+# ==============================================================================
+
+affinity_tests:
+  - name: "Binding_VeryStrong"
+    modality: "antibody"
+    type: "positive"
+    target: "TNF-alpha"
+    known_kd_nm: 0.1
+    sequence: "EVQLVESGGGLVQPGRSLRLSCAASGFTFDDYAMHWVRQAPGKGLEWVSAITWNSGHIDYADSVEGRFTISRDNAKNSLYLQMNSLRAEDTAVYYCAKVSYLSTASSLDYWGQGTLVTVSS"
+    expected_decision: ["PASS"]
+    notes: "Picomolar affinity - excellent"
+
+  - name: "Binding_Strong"
+    modality: "peptide"
+    type: "positive"
+    target: "test"
+    known_kd_nm: 15
+    sequence: "MKTAYIAKQRQISSQRKRK"
+    expected_decision: ["PASS"]
+    notes: "Low nanomolar - good affinity"
+
+  - name: "Binding_Moderate"
+    modality: "peptide"
+    type: "neutral"
+    target: "test"
+    known_kd_nm: 150
+    sequence: "AKTAYIAQRQISSQRKRK"
+    expected_decision: ["REVISE"]
+    notes: "Mid nanomolar - may be improvable"
+
+  - name: "Binding_Weak"
+    modality: "peptide"
+    type: "negative"
+    target: "test"
+    known_kd_nm: 2000
+    sequence: "AAAAAAAAKKKKKKKK"
+    expected_decision: ["KILL"]
+    notes: "Micromolar - too weak for therapeutic use"
+
+  - name: "Binding_None"
+    modality: "peptide"
+    type: "negative"
+    severity: "critical"
+    target: "test"
+    sequence: "GGGGGGGGGGGGGGGG"
+    expected_decision: ["KILL"]
+    notes: "Poly-glycine - no binding expected"
+
+
+# ==============================================================================
+# CATEGORY 5: IMMUNOGENICITY TESTS (4 controls)
+# ==============================================================================
+
+immunogenicity_tests:
+  - name: "Immuno_FullyHuman"
+    modality: "antibody"
+    type: "positive"
+    target: "TNF-alpha"
+    humanness: "100%"
+    sequence: "EVQLVESGGGLVQPGRSLRLSCAASGFTFDDYAMHWVRQAPGKGLEWVSAITWNSGHIDYADSVEGRFTISRDNAKNSLYLQMNSLRAEDTAVYYCAKVSYLSTASSLDYWGQGTLVTVSS"
+    expected_decision: ["PASS"]
+    notes: "Adalimumab - fully human, low immunogenicity"
+
+  - name: "Immuno_Humanized"
+    modality: "antibody"
+    type: "positive"
+    target: "PD-1"
+    humanness: "95%"
+    sequence: "QVQLVQSGVEVKKPGASVKVSCKASGYTFTNYYMYWVRQAPGQGLEWMGGINPSNGGTNFNEKFKNRVTLTTDSSTTTAYMELKSLQFDDTAVYYCARRDYRFDMGFDYWGQGTTVTVSS"
+    expected_decision: ["PASS", "REVISE"]
+    notes: "Pembrolizumab - humanized, acceptable immunogenicity"
+
+  - name: "Immuno_Chimeric"
+    modality: "antibody"
+    type: "negative"
+    severity: "moderate"
+    target: "test"
+    humanness: "70%"
+    sequence: "QVQLQQSGPGLVKPSETLSLTCTVSGGSITSGYYWSWIRQPPGKGLEWIGEIHYSGITDYNPSLKSRVTMSVDTSKNQFSLKLSSVTAADTAVYYCTRYDGSWFAYWGQGTLVTVSS"
+    expected_decision: ["REVISE"]
+    notes: "Mouse variable regions - higher ADA risk"
+
+  - name: "Immuno_Murine"
+    modality: "antibody"
+    type: "negative"
+    severity: "high"
+    target: "test"
+    humanness: "0%"
+    sequence: "QVQLQQSGAELARPGASVKMSCKASGYTFTRYTMHWVKQRPGQGLEWIGYINPSRGYTNYNQKFKDKATLTTDKSSSTAYMQLSSLTSEDSAVYYCARYYDDHYCLDYWGQGTTLTVSS"
+    expected_decision: ["KILL", "REVISE"]
+    notes: "Fully mouse - unacceptable immunogenicity"
+
+
+# ==============================================================================
+# CATEGORY 6: SPECIFICITY TESTS (4 controls)
+# ==============================================================================
+
+specificity_tests:
+  - name: "Specificity_Unique"
+    modality: "peptide"
+    type: "positive"
+    target: "test"
+    sequence: "WQFNRRATALKQ"
+    expected_decision: ["PASS"]
+    notes: "Unique sequence - no significant proteome homology"
+
+  - name: "Specificity_LowHomology"
+    modality: "peptide"
+    type: "positive"
+    target: "test"
+    sequence: "MKTAYIAKQRQISSQRKRK"
+    expected_decision: ["PASS", "REVISE"]
+    notes: "Common motifs but low overall homology"
+
+  - name: "Specificity_Promiscuous"
+    modality: "peptide"
+    type: "negative"
+    severity: "high"
+    target: "test"
+    sequence: "KKKKKKKKKKKKKKKK"
+    expected_decision: ["REVISE", "KILL"]
+    notes: "Poly-lysine - binds many acidic proteins"
+
+  - name: "Specificity_ConservedMotif"
+    modality: "peptide"
+    type: "negative"
+    severity: "critical"
+    target: "test"
+    sequence: "GRGDSPGRGDSPGRGDSP"
+    expected_decision: ["KILL"]
+    notes: "RGD motif - binds integrins (known off-target)"
+
+
+# ==============================================================================
+# CATEGORY 7: SMALL MOLECULE TESTS (4 controls)
+# ==============================================================================
+
+small_molecule_tests:
+  - name: "SmallMol_DrugLike"
+    modality: "small_molecule"
+    type: "positive"
+    target: "BCR-ABL"
+    smiles: "CCN(CC)CCNC(=O)c1c(C)[nH]c(/C=C/2\\C(=O)Nc3ccc(F)cc32)c1C"
+    expected_decision: ["PASS"]
+    lipinski_violations: 0
+    notes: "Imatinib - approved drug, passes Lipinski"
+
+  - name: "SmallMol_OneViolation"
+    modality: "small_molecule"
+    type: "neutral"
+    target: "test"
+    smiles: "CC(C)Cc1ccc(cc1)C(C)C(=O)O"
+    expected_decision: ["PASS", "REVISE"]
+    lipinski_violations: 1
+    notes: "Ibuprofen - one violation acceptable"
+
+  - name: "SmallMol_MultipleViolations"
+    modality: "small_molecule"
+    type: "negative"
+    target: "test"
+    smiles: "CC(=O)OC1C(SC2C(NC(=O)C(C3=CC=CC=C3)N)C(=O)N2C1C(=O)O)C"
+    expected_decision: ["REVISE", "KILL"]
+    lipinski_violations: 3
+    notes: "3 violations - poor oral bioavailability"
+
+  - name: "SmallMol_PAINS"
+    modality: "small_molecule"
+    type: "negative"
+    severity: "critical"
+    target: "test"
+    smiles: "c1ccc2c(c1)c(=O)c1ccccc1o2"
+    expected_decision: ["KILL"]
+    notes: "Rhodanine - PAINS alert, promiscuous binder"
+
+
+# ==============================================================================
+# CATEGORY 8: EDGE CASES (8 controls)
+# ==============================================================================
+
+edge_cases:
+  - name: "Edge_VeryShort"
+    modality: "peptide"
+    type: "edge_case"
+    target: "test"
+    sequence: "RGD"
+    expected_decision: ["KILL", "REVISE"]
+    notes: "3 AA - too short for drug-like properties"
+
+  - name: "Edge_VeryLong"
+    modality: "protein"
+    type: "edge_case"
+    target: "test"
+    sequence: "MKTAYIAKQRQISSQRKRKMKTAYIAKQRQISSQRKRKMKTAYIAKQRQISSQRKRKMKTAYIAKQRQISSQRKRKMKTAYIAKQRQISSQRKRKMKTAYIAKQRQISSQRKRKMKTAYIAKQRQISSQRKRKMKTAYIAKQRQISSQRKRKMKTAYIAKQRQISSQRKRKMKTAYIAKQRQISSQRKRKMKTAYIAKQRQISSQRKRKMKTAYIAKQRQISSQRKRKMKTAYIAKQRQISSQRKRKMKTAYIAKQRQISSQRKRKMKTAYIAKQRQISSQRKRKMKTAYIAKQRQISSQRKRKMKTAYIAKQRQISSQRKRKMKTAYIAKQRQISSQRKRKMKTAYIAKQRQISSQRKRKMKTAYIAKQRQISSQRKRK"
+    expected_decision: ["REVISE"]
+    notes: "380 AA - large protein, manufacturability challenges"
+
+  - name: "Edge_UnusualAA"
+    modality: "peptide"
+    type: "edge_case"
+    target: "test"
+    sequence: "MKTAYIAXQRQISSQRKRK"
+    expected_decision: ["KILL"]
+    notes: "Contains X (unknown AA) - should reject"
+
+  - name: "Edge_PolyAlanine"
+    modality: "peptide"
+    type: "negative"
+    target: "test"
+    sequence: "AAAAAAAAAAAAAAAAAAAA"
+    expected_decision: ["KILL"]
+    notes: "Homopolymer - no sequence diversity"
+
+  - name: "Edge_ExtremePositiveCharge"
+    modality: "peptide"
+    type: "negative"
+    target: "test"
+    sequence: "KKKKKKKKKKKKKKKKKKKK"
+    expected_decision: ["KILL"]
+    notes: "Poly-lysine +20 charge - aggregation, promiscuous binding"
+
+  - name: "Edge_ExtremeNegativeCharge"
+    modality: "peptide"
+    type: "negative"
+    target: "test"
+    sequence: "EEEEEEEEEEEEEEEEEEEE"
+    expected_decision: ["KILL"]
+    notes: "Poly-glutamate -20 charge - aggregation issues"
+
+  - name: "Edge_BalancedCharge"
+    modality: "peptide"
+    type: "neutral"
+    target: "test"
+    sequence: "MKTDYEAKQRRISESQRKRK"
+    expected_decision: ["PASS", "REVISE"]
+    notes: "Balanced charged residues - should be acceptable"
+
+  - name: "Edge_MixedModality"
+    modality: "peptide"
+    type: "edge_case"
+    target: "test"
+    sequence: "MKTAYIAKQRQISSQRKRK"
+    expected_decision: ["PASS", "REVISE"]
+    notes: "Borderline peptide/protein length"
+
+
+# ==============================================================================
+# NEGATIVE CONTROLS - Known Failures (15 controls to reach 72 total)
+# ==============================================================================
+
+negative_controls:
+  - name: "TGN1412"
+    modality: "antibody"
+    type: "negative"
+    approved: false
+    failure_mode: "safety"
+    target: "CD28"
+    sequence: "EVQLVESGGGLVQPGGSLRLSCAASGFTFSSYGMHWVRQAPGKGLEWVAVIWYDGSNKYYADSVKGRFTISRDNSKNTLYLQMNSLRAEDTAVYYCARDGNYYYYGMDVWGQGTTVTVSS"
+    expected_decision: ["KILL", "REVISE"]
+    notes: "Phase I disaster - cytokine release syndrome (2006)"
+
+  - name: "HighAggregation_Test1"
+    modality: "peptide"
+    type: "negative"
+    target: "test"
+    sequence: "VVVVVVIIIIIILLLLLLFFFFFF"
+    expected_decision: ["KILL"]
+    notes: "Extreme hydrophobic - aggregation"
+
+  - name: "WeakBinder_Test1"
+    modality: "peptide"
+    type: "negative"
+    target: "test"
+    sequence: "GGGGGGAAAAAAGGGGGGG"
+    expected_decision: ["KILL"]
+    notes: "No binding motifs - insufficient affinity"
+
+  - name: "HighImmunogenic_Test1"
+    modality: "antibody"
+    type: "negative"
+    target: "test"
+    sequence: "QVQLQQSGAELARPGASVKMSCKASGYTFTRYTMHWVKQRPGQGLEWIGYINPSRGYTNYNQKFKDKATLTTDKSSSTAYMQLSSLTSEDSAVYYCARYYDDHYCLDYWGQGTTLTVSS"
+    expected_decision: ["KILL", "REVISE"]
+    notes: "Murine sequence - high immunogenicity"
+
+  - name: "OffTarget_Promiscuous"
+    modality: "peptide"
+    type: "negative"
+    target: "test"
+    sequence: "RRRRRRRRRRRRRRRRRRR"
+    expected_decision: ["KILL"]
+    notes: "Poly-arginine - binds nucleic acids"
+
+  - name: "PTM_MultipleIssues"
+    modality: "peptide"
+    type: "negative"
+    target: "test"
+    sequence: "MKTMNGAYIAKCQRNGSQRKNNKRNSCAKRNS"
+    expected_decision: ["KILL", "REVISE"]
+    notes: "Multiple PTM liabilities: Met, NG, NN, NS, unpaired Cys"
+
+  - name: "LowSolubility_Test1"
+    modality: "peptide"
+    type: "negative"
+    target: "test"
+    sequence: "VIILFVIILFVIILFVIILF"
+    expected_decision: ["KILL"]
+    notes: "Hydrophobic repeats - poor solubility"
+
+  - name: "LowExpression_Test1"
+    modality: "peptide"
+    type: "negative"
+    target: "test"
+    sequence: "CCCCCCCCCCCCCCCCCCCC"
+    expected_decision: ["KILL"]
+    notes: "Poly-cysteine - expression failure"
+
+  - name: "UnstableFold_Test1"
+    modality: "peptide"
+    type: "negative"
+    target: "test"
+    sequence: "PPPPPPPPPPPPPPPPPPPP"
+    expected_decision: ["KILL", "REVISE"]
+    notes: "Poly-proline - unusual structure"
+
+  - name: "HighViscosity_Test1"
+    modality: "antibody"
+    type: "negative"
+    target: "test"
+    sequence: "EVQLVESGGGLVQPGGSLRLSCAASGFTFSSYAMSWVRQAPGKGLEWVSGGGGGGGGGGGGGGGGGGGGGGGGGG"
+    expected_decision: ["REVISE"]
+    notes: "Poly-glycine tail - formulation issues"
+
+  - name: "ChargedPatch_Test1"
+    modality: "peptide"
+    type: "negative"
+    target: "test"
+    sequence: "MKTAYIAKKKKKKKKKQRQISSQRKRK"
+    expected_decision: ["REVISE", "KILL"]
+    notes: "Large positive patch - aggregation risk"
+
+  - name: "AcidPatch_Test1"
+    modality: "peptide"
+    type: "negative"
+    target: "test"
+    sequence: "MKTAYIAKEEEEEEEEQRQISSQRKRK"
+    expected_decision: ["REVISE", "KILL"]
+    notes: "Large acidic patch - aggregation risk"
+
+  - name: "StructuralInstability_Test1"
+    modality: "peptide"
+    type: "negative"
+    target: "test"
+    sequence: "MGSGSGSGSGSGSGSGSGSG"
+    expected_decision: ["KILL", "REVISE"]
+    notes: "GS repeats - likely unstructured"
+
+  - name: "PoorPharmacokinetics_Test1"
+    modality: "peptide"
+    type: "negative"
+    target: "test"
+    sequence: "KRK"
+    expected_decision: ["KILL"]
+    notes: "Too short - rapid clearance expected"
+
+  - name: "Manufacturing_Test1"
+    modality: "antibody"
+    type: "negative"
+    target: "test"
+    sequence: "NSTEVQLNYSVESGGNLTVQPGGSLRNTSSCAASGFTFSNYTAMSWVRQAPGKGLEWVSNNTNNTNNT"
+    expected_decision: ["KILL", "REVISE"]
+    notes: "Excessive glycosylation - manufacturability issues"

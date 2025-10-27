@@ -1,0 +1,14 @@
+{
+  "entry_id": "cdc30b67-0a7b-4393-bc10-15caf330e230",
+  "timestamp": "2025-10-25T22:29:52.413026",
+  "event_type": "validation_started",
+  "module_name": null,
+  "candidate_hash": "cf000dd647bcd5e3",
+  "data": {
+    "candidate_name": "StructuralInstability_Test1",
+    "modality": "peptide",
+    "target": "test"
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

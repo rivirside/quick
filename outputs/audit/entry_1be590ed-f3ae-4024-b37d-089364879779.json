@@ -1,0 +1,10 @@
+{
+  "entry_id": "1be590ed-f3ae-4024-b37d-089364879779",
+  "timestamp": "2025-10-26T17:51:20.145784",
+  "event_type": "module_started",
+  "module_name": "pkpd_prefilter",
+  "candidate_hash": "bc476a22b4b2f8a9",
+  "data": {},
+  "input_hashes": {},
+  "metadata": {}
+}

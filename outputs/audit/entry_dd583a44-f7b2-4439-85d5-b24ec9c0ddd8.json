@@ -1,0 +1,14 @@
+{
+  "entry_id": "dd583a44-f7b2-4439-85d5-b24ec9c0ddd8",
+  "timestamp": "2025-10-25T22:36:21.383307",
+  "event_type": "validation_completed",
+  "module_name": null,
+  "candidate_hash": "d11e094e0a454d45",
+  "data": {
+    "overall_decision": "PASS",
+    "total_runtime_seconds": 0.0008060932159423828,
+    "modules_run": 2
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

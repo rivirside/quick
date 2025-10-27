@@ -1,0 +1,14 @@
+{
+  "entry_id": "f396fe0a-a5a8-4bf1-8e66-a5ea5dd69e68",
+  "timestamp": "2025-10-25T21:56:22.306393",
+  "event_type": "validation_started",
+  "module_name": null,
+  "candidate_hash": "ccd8e7905740b10c",
+  "data": {
+    "candidate_name": "NGlycosylation_None",
+    "modality": "antibody",
+    "target": "test"
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

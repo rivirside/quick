@@ -1,0 +1,14 @@
+{
+  "entry_id": "aaf7f909-a135-4adf-bf69-277722fff8f3",
+  "timestamp": "2025-10-26T17:51:20.155912",
+  "event_type": "module_completed",
+  "module_name": "localization_signals",
+  "candidate_hash": "f8617ec4a086d3c2",
+  "data": {
+    "decision": "PASS",
+    "runtime_seconds": 0.00021123886108398438,
+    "n_metrics": 4
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

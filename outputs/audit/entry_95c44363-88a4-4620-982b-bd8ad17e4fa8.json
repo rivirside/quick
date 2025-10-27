@@ -1,0 +1,13 @@
+{
+  "entry_id": "95c44363-88a4-4620-982b-bd8ad17e4fa8",
+  "timestamp": "2025-10-26T17:02:26.212704",
+  "event_type": "model_registered",
+  "module_name": null,
+  "candidate_hash": null,
+  "data": {
+    "model_name": "ClinicalToxicityModule",
+    "version": "0.1.0"
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

@@ -1,0 +1,14 @@
+{
+  "entry_id": "70ea0a15-5d4a-4de9-a409-d37ed0061623",
+  "timestamp": "2025-10-25T23:02:10.774576",
+  "event_type": "validation_started",
+  "module_name": null,
+  "candidate_hash": "c816a6bc5ac808b4",
+  "data": {
+    "candidate_name": "Edge_UnusualAA",
+    "modality": "peptide",
+    "target": "test"
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

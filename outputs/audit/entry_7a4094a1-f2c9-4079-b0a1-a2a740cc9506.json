@@ -1,0 +1,14 @@
+{
+  "entry_id": "7a4094a1-f2c9-4079-b0a1-a2a740cc9506",
+  "timestamp": "2025-10-26T18:05:53.729935",
+  "event_type": "module_completed",
+  "module_name": "pkpd_prefilter",
+  "candidate_hash": "d5e4dfdf03278227",
+  "data": {
+    "decision": "REVISE",
+    "runtime_seconds": 4.410743713378906e-05,
+    "n_metrics": 2
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

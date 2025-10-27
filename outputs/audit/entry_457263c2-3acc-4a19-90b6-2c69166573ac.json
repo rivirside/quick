@@ -1,0 +1,14 @@
+{
+  "entry_id": "457263c2-3acc-4a19-90b6-2c69166573ac",
+  "timestamp": "2025-10-25T23:00:26.951772",
+  "event_type": "validation_started",
+  "module_name": null,
+  "candidate_hash": "b2519356d471904a",
+  "data": {
+    "candidate_name": "UnstableFold_Test1",
+    "modality": "peptide",
+    "target": "test"
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

@@ -1,0 +1,14 @@
+{
+  "entry_id": "c04bdd32-148d-4b13-beb1-8e48b9d8baff",
+  "timestamp": "2025-10-26T17:51:20.231509",
+  "event_type": "validation_started",
+  "module_name": null,
+  "candidate_hash": "f8617ec4a086d3c2",
+  "data": {
+    "candidate_name": "Trastuzumab",
+    "modality": "antibody",
+    "target": "HER2"
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

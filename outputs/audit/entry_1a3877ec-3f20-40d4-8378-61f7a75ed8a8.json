@@ -1,0 +1,14 @@
+{
+  "entry_id": "1a3877ec-3f20-40d4-8378-61f7a75ed8a8",
+  "timestamp": "2025-10-26T17:51:20.259480",
+  "event_type": "module_completed",
+  "module_name": "ClinicalToxicityModule",
+  "candidate_hash": "00bd07685d569ca3",
+  "data": {
+    "decision": "PASS",
+    "runtime_seconds": 8.296966552734375e-05,
+    "n_metrics": 1
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

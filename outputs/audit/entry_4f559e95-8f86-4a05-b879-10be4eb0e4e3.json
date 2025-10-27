@@ -1,0 +1,14 @@
+{
+  "entry_id": "4f559e95-8f86-4a05-b879-10be4eb0e4e3",
+  "timestamp": "2025-10-25T21:29:11.065334",
+  "event_type": "module_completed",
+  "module_name": "structure_affinity",
+  "candidate_hash": "1fe1835a9054c50a",
+  "data": {
+    "decision": "PASS",
+    "runtime_seconds": 8.702278137207031e-05,
+    "n_metrics": 6
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

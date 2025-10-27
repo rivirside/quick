@@ -1,0 +1,14 @@
+{
+  "entry_id": "2dfcff89-cd7e-4980-ab51-cdd270153652",
+  "timestamp": "2025-10-25T23:02:10.591772",
+  "event_type": "validation_started",
+  "module_name": null,
+  "candidate_hash": "61fb8791b989b0ed",
+  "data": {
+    "candidate_name": "Input_AntibodyPair",
+    "modality": "antibody",
+    "target": "test"
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

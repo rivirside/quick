@@ -1,0 +1,14 @@
+{
+  "entry_id": "c737ddeb-de3a-420f-baa5-8a75d40920ea",
+  "timestamp": "2025-10-25T22:29:41.249052",
+  "event_type": "validation_started",
+  "module_name": null,
+  "candidate_hash": "ac751ae3300a057d",
+  "data": {
+    "candidate_name": "Immuno_FullyHuman",
+    "modality": "antibody",
+    "target": "TNF-alpha"
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

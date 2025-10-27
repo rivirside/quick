@@ -1,0 +1,13 @@
+{
+  "entry_id": "1874c3a1-c1be-49e5-b183-0ea13e9eff2d",
+  "timestamp": "2025-10-26T18:05:47.513673",
+  "event_type": "model_registered",
+  "module_name": null,
+  "candidate_hash": null,
+  "data": {
+    "model_name": "sequence_complexity",
+    "version": "1.0.0"
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

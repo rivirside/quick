@@ -1,0 +1,14 @@
+{
+  "entry_id": "1d743584-cd1a-495c-96bb-8c598b2feff6",
+  "timestamp": "2025-10-26T18:05:53.728197",
+  "event_type": "module_completed",
+  "module_name": "advanced_aggregation",
+  "candidate_hash": "d5e4dfdf03278227",
+  "data": {
+    "decision": "KILL",
+    "runtime_seconds": 0.0014159679412841797,
+    "n_metrics": 5
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

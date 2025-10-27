@@ -1,0 +1,10 @@
+{
+  "entry_id": "0d5f91d3-1627-4e3e-b233-6680f98a0869",
+  "timestamp": "2025-10-26T18:00:45.002722",
+  "event_type": "module_started",
+  "module_name": "ClinicalSpecificityModule",
+  "candidate_hash": "f8617ec4a086d3c2",
+  "data": {},
+  "input_hashes": {},
+  "metadata": {}
+}

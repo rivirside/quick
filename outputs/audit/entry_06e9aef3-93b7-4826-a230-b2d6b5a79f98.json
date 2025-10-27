@@ -1,0 +1,14 @@
+{
+  "entry_id": "06e9aef3-93b7-4826-a230-b2d6b5a79f98",
+  "timestamp": "2025-10-25T23:02:10.785745",
+  "event_type": "validation_started",
+  "module_name": null,
+  "candidate_hash": "c2551cbb84803a90",
+  "data": {
+    "candidate_name": "Edge_PolyAlanine",
+    "modality": "peptide",
+    "target": "test"
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

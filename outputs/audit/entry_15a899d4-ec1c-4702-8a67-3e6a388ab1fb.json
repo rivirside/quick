@@ -1,0 +1,14 @@
+{
+  "entry_id": "15a899d4-ec1c-4702-8a67-3e6a388ab1fb",
+  "timestamp": "2025-10-26T18:00:44.948332",
+  "event_type": "module_completed",
+  "module_name": "sequence_complexity",
+  "candidate_hash": "988d6e9b09251cd0",
+  "data": {
+    "decision": "KILL",
+    "runtime_seconds": 0.002671957015991211,
+    "n_metrics": 7
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

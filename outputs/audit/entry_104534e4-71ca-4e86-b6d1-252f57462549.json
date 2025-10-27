@@ -1,0 +1,14 @@
+{
+  "entry_id": "104534e4-71ca-4e86-b6d1-252f57462549",
+  "timestamp": "2025-10-25T21:28:59.121565",
+  "event_type": "validation_started",
+  "module_name": null,
+  "candidate_hash": "5ecfe44dd303f8e9",
+  "data": {
+    "candidate_name": "Hydrophobic_Moderate_Internal",
+    "modality": "peptide",
+    "target": "test"
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

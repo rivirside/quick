@@ -1,0 +1,14 @@
+{
+  "entry_id": "9ac2acfa-a3b4-49f5-876e-05241809fb0a",
+  "timestamp": "2025-10-25T22:03:09.044056",
+  "event_type": "validation_started",
+  "module_name": null,
+  "candidate_hash": "26f3b4c956b1dc84",
+  "data": {
+    "candidate_name": "Edge_MixedModality",
+    "modality": "peptide",
+    "target": "test"
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

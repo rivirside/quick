@@ -1,0 +1,14 @@
+{
+  "entry_id": "e9495777-1383-42a8-b248-1be6f80e06b0",
+  "timestamp": "2025-10-25T22:57:39.456859",
+  "event_type": "validation_started",
+  "module_name": null,
+  "candidate_hash": "b81c7fa8b16fd031",
+  "data": {
+    "candidate_name": "Octreotide",
+    "modality": "peptide",
+    "target": "Somatostatin receptor"
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

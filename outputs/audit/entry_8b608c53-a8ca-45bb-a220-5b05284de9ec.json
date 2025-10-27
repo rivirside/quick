@@ -1,0 +1,10 @@
+{
+  "entry_id": "8b608c53-a8ca-45bb-a220-5b05284de9ec",
+  "timestamp": "2025-10-26T17:02:26.289697",
+  "event_type": "module_started",
+  "module_name": "ToxicityPrefilterModule",
+  "candidate_hash": "bc476a22b4b2f8a9",
+  "data": {},
+  "input_hashes": {},
+  "metadata": {}
+}

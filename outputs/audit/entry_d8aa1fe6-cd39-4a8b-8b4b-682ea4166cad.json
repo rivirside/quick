@@ -1,0 +1,14 @@
+{
+  "entry_id": "d8aa1fe6-cd39-4a8b-8b4b-682ea4166cad",
+  "timestamp": "2025-10-25T22:36:21.420233",
+  "event_type": "module_completed",
+  "module_name": "developability",
+  "candidate_hash": "c50e142936b0f4ce",
+  "data": {
+    "decision": "PASS",
+    "runtime_seconds": 0.00011587142944335938,
+    "n_metrics": 11
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

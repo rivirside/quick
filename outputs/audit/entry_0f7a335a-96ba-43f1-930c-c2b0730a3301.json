@@ -1,0 +1,14 @@
+{
+  "entry_id": "0f7a335a-96ba-43f1-930c-c2b0730a3301",
+  "timestamp": "2025-10-26T17:07:59.519232",
+  "event_type": "module_completed",
+  "module_name": "ClinicalSolubilityModule",
+  "candidate_hash": "00bd07685d569ca3",
+  "data": {
+    "decision": "KILL",
+    "runtime_seconds": 4.7206878662109375e-05,
+    "n_metrics": 1
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

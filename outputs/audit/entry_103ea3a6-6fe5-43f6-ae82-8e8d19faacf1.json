@@ -1,0 +1,14 @@
+{
+  "entry_id": "103ea3a6-6fe5-43f6-ae82-8e8d19faacf1",
+  "timestamp": "2025-10-25T23:00:26.960716",
+  "event_type": "validation_started",
+  "module_name": null,
+  "candidate_hash": "123af06bf4702c34",
+  "data": {
+    "candidate_name": "ChargedPatch_Test1",
+    "modality": "peptide",
+    "target": "test"
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

@@ -1,0 +1,14 @@
+{
+  "entry_id": "0b9b2484-656d-479f-b419-11bc347bd4fb",
+  "timestamp": "2025-10-25T21:28:59.331710",
+  "event_type": "validation_started",
+  "module_name": null,
+  "candidate_hash": "ca3ca20d9c76f708",
+  "data": {
+    "candidate_name": "SmallMol_OneViolation",
+    "modality": "small_molecule",
+    "target": "test"
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

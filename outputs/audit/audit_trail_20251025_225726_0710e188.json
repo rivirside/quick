@@ -1,0 +1,139 @@
+{
+  "trail_id": "0710e188-bcb9-4fd6-9d16-3b6a40a737c2",
+  "created_at": "2025-10-25T22:57:26.784775",
+  "config_hash": "ea55392e60b412ca",
+  "model_versions": {
+    "structure_affinity": "0.1.0",
+    "developability": "0.1.0"
+  },
+  "environment": {
+    "python_version": "3.12.11 (main, Jun  3 2025, 15:41:47) [Clang 17.0.0 (clang-1700.0.13.3)]",
+    "platform": "macOS-15.1-arm64-arm-64bit",
+    "platform_version": "Darwin Kernel Version 24.1.0: Thu Oct 10 21:02:45 PDT 2024; root:xnu-11215.41.3~2/RELEASE_ARM64_T8112",
+    "processor": "arm",
+    "hostname": "Tomers-MacBook-Air.local",
+    "etrial_version": "0.1.0",
+    "installed_packages": {},
+    "gpu_info": {
+      "available": false,
+      "reason": "torch not installed"
+    },
+    "timestamp": "2025-10-25T22:57:26.796801"
+  },
+  "entries": [
+    {
+      "entry_id": "aaf7a163-b616-4a1a-a810-2093d359ee8d",
+      "timestamp": "2025-10-25T22:57:26.797287",
+      "event_type": "config_set",
+      "module_name": null,
+      "candidate_hash": null,
+      "data": {
+        "config_hash": "ea55392e60b412ca"
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "1882f911-9ef3-4bd2-bdf3-f6f5ea5149c0",
+      "timestamp": "2025-10-25T22:57:26.797688",
+      "event_type": "model_registered",
+      "module_name": null,
+      "candidate_hash": null,
+      "data": {
+        "model_name": "structure_affinity",
+        "version": "0.1.0"
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "8f4d1e4e-9609-4471-b0c0-e2b9e2c996ce",
+      "timestamp": "2025-10-25T22:57:26.797861",
+      "event_type": "model_registered",
+      "module_name": null,
+      "candidate_hash": null,
+      "data": {
+        "model_name": "developability",
+        "version": "0.1.0"
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "96d45712-f979-47df-b48e-8ccba63c97a5",
+      "timestamp": "2025-10-25T22:57:26.798020",
+      "event_type": "validation_started",
+      "module_name": null,
+      "candidate_hash": "dbf276ad0bb53947",
+      "data": {
+        "candidate_name": "Adalimumab",
+        "modality": "antibody",
+        "target": "TNF-alpha"
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "3b5e9a52-25b7-42df-9d35-ee789b44d222",
+      "timestamp": "2025-10-25T22:57:26.798172",
+      "event_type": "module_started",
+      "module_name": "structure_affinity",
+      "candidate_hash": "dbf276ad0bb53947",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "aa9339eb-d28a-42d8-b64d-b9ad296f2a77",
+      "timestamp": "2025-10-25T22:57:26.798513",
+      "event_type": "module_completed",
+      "module_name": "structure_affinity",
+      "candidate_hash": "dbf276ad0bb53947",
+      "data": {
+        "decision": "PASS",
+        "runtime_seconds": 0.00021696090698242188,
+        "n_metrics": 6
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "b5358e51-e01b-4ae5-8b5d-11a7c8084be4",
+      "timestamp": "2025-10-25T22:57:26.798693",
+      "event_type": "module_started",
+      "module_name": "developability",
+      "candidate_hash": "dbf276ad0bb53947",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "7e4910c1-2a70-4023-815a-821bedce13c1",
+      "timestamp": "2025-10-25T22:57:26.799184",
+      "event_type": "module_completed",
+      "module_name": "developability",
+      "candidate_hash": "dbf276ad0bb53947",
+      "data": {
+        "decision": "REVISE",
+        "runtime_seconds": 0.00036406517028808594,
+        "n_metrics": 11
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "08ac0898-7df9-4bb9-9a04-b4ac073b1940",
+      "timestamp": "2025-10-25T22:57:26.799397",
+      "event_type": "validation_completed",
+      "module_name": null,
+      "candidate_hash": "dbf276ad0bb53947",
+      "data": {
+        "overall_decision": "REVISE",
+        "total_runtime_seconds": 0.0013339519500732422,
+        "modules_run": 2
+      },
+      "input_hashes": {},
+      "metadata": {}
+    }
+  ]
+}

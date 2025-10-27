@@ -1,0 +1,14 @@
+{
+  "entry_id": "0abf663f-4878-4569-b811-0c12c2d93418",
+  "timestamp": "2025-10-25T21:28:59.303482",
+  "event_type": "validation_started",
+  "module_name": null,
+  "candidate_hash": "2b24cb3c220d6a4a",
+  "data": {
+    "candidate_name": "Specificity_LowHomology",
+    "modality": "peptide",
+    "target": "test"
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

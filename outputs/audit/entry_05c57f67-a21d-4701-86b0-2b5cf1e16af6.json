@@ -1,0 +1,14 @@
+{
+  "entry_id": "05c57f67-a21d-4701-86b0-2b5cf1e16af6",
+  "timestamp": "2025-10-25T23:02:10.760646",
+  "event_type": "validation_started",
+  "module_name": null,
+  "candidate_hash": "58bbe2dea21f3219",
+  "data": {
+    "candidate_name": "SmallMol_PAINS",
+    "modality": "small_molecule",
+    "target": "test"
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

@@ -1,0 +1,463 @@
+{
+  "trail_id": "70c434a5-92de-4785-9d4e-43bd4fb63aaf",
+  "created_at": "2025-10-26T17:51:20.182899",
+  "config_hash": "ea55392e60b412ca",
+  "model_versions": {
+    "ClinicalStructureModule": "0.1.0",
+    "ClinicalSolubilityModule": "0.1.0",
+    "ClinicalImmunogenicityModule": "0.1.0",
+    "ClinicalSpecificityModule": "0.1.0",
+    "ClinicalToxicityModule": "0.1.0",
+    "pkpd_clinical": "1.0.0"
+  },
+  "environment": {
+    "python_version": "3.12.11 (main, Jun  3 2025, 15:41:47) [Clang 17.0.0 (clang-1700.0.13.3)]",
+    "platform": "macOS-15.1-arm64-arm-64bit",
+    "platform_version": "Darwin Kernel Version 24.1.0: Thu Oct 10 21:02:45 PDT 2024; root:xnu-11215.41.3~2/RELEASE_ARM64_T8112",
+    "processor": "arm",
+    "hostname": "Tomers-MacBook-Air.local",
+    "etrial_version": "0.1.0",
+    "installed_packages": {},
+    "gpu_info": {
+      "available": false,
+      "reason": "torch not installed"
+    },
+    "timestamp": "2025-10-26T17:51:20.182912"
+  },
+  "entries": [
+    {
+      "entry_id": "889d6dd0-b98d-4e3e-8f8d-df5e7561bd77",
+      "timestamp": "2025-10-26T17:51:20.183049",
+      "event_type": "config_set",
+      "module_name": null,
+      "candidate_hash": null,
+      "data": {
+        "config_hash": "ea55392e60b412ca"
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "8b311c4f-da99-44c6-8a48-4f54d977bb3e",
+      "timestamp": "2025-10-26T17:51:20.190460",
+      "event_type": "model_registered",
+      "module_name": null,
+      "candidate_hash": null,
+      "data": {
+        "model_name": "ClinicalStructureModule",
+        "version": "0.1.0"
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "8bbb20c2-f007-40b6-b472-3dfc7ce45772",
+      "timestamp": "2025-10-26T17:51:20.190825",
+      "event_type": "model_registered",
+      "module_name": null,
+      "candidate_hash": null,
+      "data": {
+        "model_name": "ClinicalSolubilityModule",
+        "version": "0.1.0"
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "84db1dce-57a7-43dd-ba56-3e66d15cdfff",
+      "timestamp": "2025-10-26T17:51:20.191070",
+      "event_type": "model_registered",
+      "module_name": null,
+      "candidate_hash": null,
+      "data": {
+        "model_name": "ClinicalImmunogenicityModule",
+        "version": "0.1.0"
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "31cc8fd0-825a-4a44-b0af-dccba6f7b4e7",
+      "timestamp": "2025-10-26T17:51:20.193043",
+      "event_type": "model_registered",
+      "module_name": null,
+      "candidate_hash": null,
+      "data": {
+        "model_name": "ClinicalSpecificityModule",
+        "version": "0.1.0"
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "9a7fb5ef-3a61-4682-84aa-b846c06d1789",
+      "timestamp": "2025-10-26T17:51:20.193336",
+      "event_type": "model_registered",
+      "module_name": null,
+      "candidate_hash": null,
+      "data": {
+        "model_name": "ClinicalToxicityModule",
+        "version": "0.1.0"
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "d260bc49-16eb-4c3a-b084-2a5cb5ffe0e4",
+      "timestamp": "2025-10-26T17:51:20.193775",
+      "event_type": "model_registered",
+      "module_name": null,
+      "candidate_hash": null,
+      "data": {
+        "model_name": "pkpd_clinical",
+        "version": "1.0.0"
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "d482ba60-068c-4880-a2a5-778ae6870932",
+      "timestamp": "2025-10-26T17:51:20.257678",
+      "event_type": "validation_started",
+      "module_name": null,
+      "candidate_hash": "00bd07685d569ca3",
+      "data": {
+        "candidate_name": "Good_Antibody",
+        "modality": "antibody",
+        "target": "HER2"
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "8072e873-0060-491c-b36c-9b0ed4121ea1",
+      "timestamp": "2025-10-26T17:51:20.257820",
+      "event_type": "module_started",
+      "module_name": "ClinicalStructureModule",
+      "candidate_hash": "00bd07685d569ca3",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "35d50d23-23d4-4f8f-adfb-bf6e884defc0",
+      "timestamp": "2025-10-26T17:51:20.257966",
+      "event_type": "module_completed",
+      "module_name": "ClinicalStructureModule",
+      "candidate_hash": "00bd07685d569ca3",
+      "data": {
+        "decision": "REVISE",
+        "runtime_seconds": 3.528594970703125e-05,
+        "n_metrics": 1
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "e118b237-bd8d-4d18-8aba-28014a798f8b",
+      "timestamp": "2025-10-26T17:51:20.258242",
+      "event_type": "module_started",
+      "module_name": "ClinicalSolubilityModule",
+      "candidate_hash": "00bd07685d569ca3",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "81688d1e-3480-46da-bf9e-c35292134c5f",
+      "timestamp": "2025-10-26T17:51:20.258402",
+      "event_type": "module_completed",
+      "module_name": "ClinicalSolubilityModule",
+      "candidate_hash": "00bd07685d569ca3",
+      "data": {
+        "decision": "KILL",
+        "runtime_seconds": 5.1021575927734375e-05,
+        "n_metrics": 1
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "6636473b-5328-44c3-8d92-31902ba90b87",
+      "timestamp": "2025-10-26T17:51:20.258645",
+      "event_type": "module_started",
+      "module_name": "ClinicalImmunogenicityModule",
+      "candidate_hash": "00bd07685d569ca3",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "3ddf58d5-f565-43e5-99eb-d0361415ca96",
+      "timestamp": "2025-10-26T17:51:20.258789",
+      "event_type": "module_completed",
+      "module_name": "ClinicalImmunogenicityModule",
+      "candidate_hash": "00bd07685d569ca3",
+      "data": {
+        "decision": "REVISE",
+        "runtime_seconds": 3.314018249511719e-05,
+        "n_metrics": 2
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "67d421b0-017d-45cb-9cf2-b9cd789663dd",
+      "timestamp": "2025-10-26T17:51:20.258928",
+      "event_type": "module_started",
+      "module_name": "ClinicalSpecificityModule",
+      "candidate_hash": "00bd07685d569ca3",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "a8794e83-cfc7-4fdd-90f9-d837700f4b59",
+      "timestamp": "2025-10-26T17:51:20.259131",
+      "event_type": "module_completed",
+      "module_name": "ClinicalSpecificityModule",
+      "candidate_hash": "00bd07685d569ca3",
+      "data": {
+        "decision": "PASS",
+        "runtime_seconds": 9.608268737792969e-05,
+        "n_metrics": 2
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "7d2db863-0fc9-42d0-bf0f-79b8ee7f6fe1",
+      "timestamp": "2025-10-26T17:51:20.259285",
+      "event_type": "module_started",
+      "module_name": "ClinicalToxicityModule",
+      "candidate_hash": "00bd07685d569ca3",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "1a3877ec-3f20-40d4-8378-61f7a75ed8a8",
+      "timestamp": "2025-10-26T17:51:20.259480",
+      "event_type": "module_completed",
+      "module_name": "ClinicalToxicityModule",
+      "candidate_hash": "00bd07685d569ca3",
+      "data": {
+        "decision": "PASS",
+        "runtime_seconds": 8.296966552734375e-05,
+        "n_metrics": 1
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "9bcf795a-2958-4ecd-b4dc-f0db8c49b76e",
+      "timestamp": "2025-10-26T17:51:20.259756",
+      "event_type": "module_started",
+      "module_name": "pkpd_clinical",
+      "candidate_hash": "00bd07685d569ca3",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "5900aac9-0814-48e2-974d-926239b5d4b0",
+      "timestamp": "2025-10-26T17:51:20.259965",
+      "event_type": "module_completed",
+      "module_name": "pkpd_clinical",
+      "candidate_hash": "00bd07685d569ca3",
+      "data": {
+        "decision": "REVISE",
+        "runtime_seconds": 0.00010275840759277344,
+        "n_metrics": 3
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "590d610f-5fdd-435d-95d8-3d78988d0adf",
+      "timestamp": "2025-10-26T17:51:20.260413",
+      "event_type": "validation_completed",
+      "module_name": null,
+      "candidate_hash": "00bd07685d569ca3",
+      "data": {
+        "overall_decision": "KILL",
+        "total_runtime_seconds": 0.0026819705963134766,
+        "modules_run": 6
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "01f5c30c-af1c-4f0e-87aa-9ae73b3a9b2d",
+      "timestamp": "2025-10-26T17:51:20.261036",
+      "event_type": "validation_started",
+      "module_name": null,
+      "candidate_hash": "f8617ec4a086d3c2",
+      "data": {
+        "candidate_name": "Trastuzumab",
+        "modality": "antibody",
+        "target": "HER2"
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "04cc4cd7-5291-45e1-9aff-75afb7230043",
+      "timestamp": "2025-10-26T17:51:20.261175",
+      "event_type": "module_started",
+      "module_name": "ClinicalStructureModule",
+      "candidate_hash": "f8617ec4a086d3c2",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "76ee4f92-6b87-42f4-8df7-6eabf64ef47d",
+      "timestamp": "2025-10-26T17:51:20.261310",
+      "event_type": "module_completed",
+      "module_name": "ClinicalStructureModule",
+      "candidate_hash": "f8617ec4a086d3c2",
+      "data": {
+        "decision": "REVISE",
+        "runtime_seconds": 2.8848648071289062e-05,
+        "n_metrics": 1
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "ec0e0d1f-a954-4f13-8a05-733fad3821a0",
+      "timestamp": "2025-10-26T17:51:20.261548",
+      "event_type": "module_started",
+      "module_name": "ClinicalSolubilityModule",
+      "candidate_hash": "f8617ec4a086d3c2",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "d0b2a1d4-b942-47c0-b9d7-bba9db97ca21",
+      "timestamp": "2025-10-26T17:51:20.261699",
+      "event_type": "module_completed",
+      "module_name": "ClinicalSolubilityModule",
+      "candidate_hash": "f8617ec4a086d3c2",
+      "data": {
+        "decision": "KILL",
+        "runtime_seconds": 4.982948303222656e-05,
+        "n_metrics": 1
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "6c8c6043-793a-4d17-a129-c20577f1f45e",
+      "timestamp": "2025-10-26T17:51:20.261979",
+      "event_type": "module_started",
+      "module_name": "ClinicalImmunogenicityModule",
+      "candidate_hash": "f8617ec4a086d3c2",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "47d85daf-5320-4d49-b0db-2f9b231c03cd",
+      "timestamp": "2025-10-26T17:51:20.262244",
+      "event_type": "module_completed",
+      "module_name": "ClinicalImmunogenicityModule",
+      "candidate_hash": "f8617ec4a086d3c2",
+      "data": {
+        "decision": "REVISE",
+        "runtime_seconds": 3.3855438232421875e-05,
+        "n_metrics": 2
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "74c31ad0-7506-463a-843e-96f7fdb6b746",
+      "timestamp": "2025-10-26T17:51:20.262384",
+      "event_type": "module_started",
+      "module_name": "ClinicalSpecificityModule",
+      "candidate_hash": "f8617ec4a086d3c2",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "2568971d-f30e-44d2-b979-385719dcb088",
+      "timestamp": "2025-10-26T17:51:20.262531",
+      "event_type": "module_completed",
+      "module_name": "ClinicalSpecificityModule",
+      "candidate_hash": "f8617ec4a086d3c2",
+      "data": {
+        "decision": "PASS",
+        "runtime_seconds": 3.695487976074219e-05,
+        "n_metrics": 2
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "a72d92cc-cbe7-4e53-a37b-d7064328e484",
+      "timestamp": "2025-10-26T17:51:20.262668",
+      "event_type": "module_started",
+      "module_name": "ClinicalToxicityModule",
+      "candidate_hash": "f8617ec4a086d3c2",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "1c982815-5d69-4a8c-af63-61e26163a6bc",
+      "timestamp": "2025-10-26T17:51:20.262855",
+      "event_type": "module_completed",
+      "module_name": "ClinicalToxicityModule",
+      "candidate_hash": "f8617ec4a086d3c2",
+      "data": {
+        "decision": "PASS",
+        "runtime_seconds": 8.392333984375e-05,
+        "n_metrics": 1
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "0f960cdd-1656-4b01-b775-7be543ec959c",
+      "timestamp": "2025-10-26T17:51:20.263005",
+      "event_type": "module_started",
+      "module_name": "pkpd_clinical",
+      "candidate_hash": "f8617ec4a086d3c2",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "61190f69-58c6-4803-82ab-18cf96aa218b",
+      "timestamp": "2025-10-26T17:51:20.263286",
+      "event_type": "module_completed",
+      "module_name": "pkpd_clinical",
+      "candidate_hash": "f8617ec4a086d3c2",
+      "data": {
+        "decision": "REVISE",
+        "runtime_seconds": 5.1975250244140625e-05,
+        "n_metrics": 3
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "cbef2747-0258-466f-a05c-3593a73e6282",
+      "timestamp": "2025-10-26T17:51:20.263458",
+      "event_type": "validation_completed",
+      "module_name": null,
+      "candidate_hash": "f8617ec4a086d3c2",
+      "data": {
+        "overall_decision": "KILL",
+        "total_runtime_seconds": 0.0023779869079589844,
+        "modules_run": 6
+      },
+      "input_hashes": {},
+      "metadata": {}
+    }
+  ]
+}

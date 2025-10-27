@@ -1,0 +1,14 @@
+{
+  "entry_id": "43385e21-9264-4005-a8df-7f16ef913f96",
+  "timestamp": "2025-10-25T21:56:22.454210",
+  "event_type": "validation_started",
+  "module_name": null,
+  "candidate_hash": "83a9b722c6c41900",
+  "data": {
+    "candidate_name": "Specificity_Unique",
+    "modality": "peptide",
+    "target": "test"
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

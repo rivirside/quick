@@ -1,0 +1,14 @@
+{
+  "entry_id": "8c928b5e-c5cf-490f-9cb5-54fbac9e58ff",
+  "timestamp": "2025-10-25T23:02:10.697897",
+  "event_type": "validation_started",
+  "module_name": null,
+  "candidate_hash": "7b34529ec96d5ea7",
+  "data": {
+    "candidate_name": "Binding_VeryStrong",
+    "modality": "antibody",
+    "target": "TNF-alpha"
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

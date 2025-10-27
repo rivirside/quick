@@ -1,0 +1,13 @@
+{
+  "entry_id": "749a2840-850c-48bc-b6f8-838a660e765d",
+  "timestamp": "2025-10-25T23:35:20.763216",
+  "event_type": "model_registered",
+  "module_name": null,
+  "candidate_hash": null,
+  "data": {
+    "model_name": "structure_affinity",
+    "version": "0.1.0"
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

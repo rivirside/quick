@@ -1,0 +1,577 @@
+{
+  "trail_id": "08a604e8-bc18-4b82-8405-ec97e9da59eb",
+  "created_at": "2025-10-26T17:02:26.313071",
+  "config_hash": "ea55392e60b412ca",
+  "model_versions": {
+    "structure_affinity": "0.1.0",
+    "developability": "0.1.0",
+    "ToxicityPrefilterModule": "0.1.0"
+  },
+  "environment": {
+    "python_version": "3.12.11 (main, Jun  3 2025, 15:41:47) [Clang 17.0.0 (clang-1700.0.13.3)]",
+    "platform": "macOS-15.1-arm64-arm-64bit",
+    "platform_version": "Darwin Kernel Version 24.1.0: Thu Oct 10 21:02:45 PDT 2024; root:xnu-11215.41.3~2/RELEASE_ARM64_T8112",
+    "processor": "arm",
+    "hostname": "Tomers-MacBook-Air.local",
+    "etrial_version": "0.1.0",
+    "installed_packages": {},
+    "gpu_info": {
+      "available": false,
+      "reason": "torch not installed"
+    },
+    "timestamp": "2025-10-26T17:02:26.313090"
+  },
+  "entries": [
+    {
+      "entry_id": "840c1895-dd2a-4b39-a776-c7225cbcab6a",
+      "timestamp": "2025-10-26T17:02:26.313280",
+      "event_type": "config_set",
+      "module_name": null,
+      "candidate_hash": null,
+      "data": {
+        "config_hash": "ea55392e60b412ca"
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "cf142bbe-8fb3-4e9e-8046-3e10b23f97f3",
+      "timestamp": "2025-10-26T17:02:26.315527",
+      "event_type": "model_registered",
+      "module_name": null,
+      "candidate_hash": null,
+      "data": {
+        "model_name": "structure_affinity",
+        "version": "0.1.0"
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "804f29a1-22f0-4f47-bf6b-ac5994ea5a74",
+      "timestamp": "2025-10-26T17:02:26.315697",
+      "event_type": "model_registered",
+      "module_name": null,
+      "candidate_hash": null,
+      "data": {
+        "model_name": "developability",
+        "version": "0.1.0"
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "6ad64d54-5a53-482d-9b2c-d66c6cbfdebf",
+      "timestamp": "2025-10-26T17:02:26.316167",
+      "event_type": "model_registered",
+      "module_name": null,
+      "candidate_hash": null,
+      "data": {
+        "model_name": "ToxicityPrefilterModule",
+        "version": "0.1.0"
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "a4dcb1f6-e9b2-45a0-932b-d2ed29ca83d8",
+      "timestamp": "2025-10-26T17:02:26.320549",
+      "event_type": "validation_started",
+      "module_name": null,
+      "candidate_hash": "00bd07685d569ca3",
+      "data": {
+        "candidate_name": "Good_Antibody",
+        "modality": "antibody",
+        "target": "HER2"
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "a26b0bf5-6dc4-4458-9000-57a602cf6dc3",
+      "timestamp": "2025-10-26T17:02:26.320837",
+      "event_type": "module_started",
+      "module_name": "structure_affinity",
+      "candidate_hash": "00bd07685d569ca3",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "a2384a45-21f0-4d0e-b987-a926f0811994",
+      "timestamp": "2025-10-26T17:02:26.321714",
+      "event_type": "module_completed",
+      "module_name": "structure_affinity",
+      "candidate_hash": "00bd07685d569ca3",
+      "data": {
+        "decision": "PASS",
+        "runtime_seconds": 0.00011968612670898438,
+        "n_metrics": 6
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "a1afc467-4f85-4752-8101-a37262782908",
+      "timestamp": "2025-10-26T17:02:26.321861",
+      "event_type": "module_started",
+      "module_name": "developability",
+      "candidate_hash": "00bd07685d569ca3",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "b4f6b864-3e39-4750-a27e-97b29f102695",
+      "timestamp": "2025-10-26T17:02:26.323671",
+      "event_type": "module_completed",
+      "module_name": "developability",
+      "candidate_hash": "00bd07685d569ca3",
+      "data": {
+        "decision": "PASS",
+        "runtime_seconds": 0.0001621246337890625,
+        "n_metrics": 11
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "aa88b14d-b16e-496c-af51-31d7d6552ddc",
+      "timestamp": "2025-10-26T17:02:26.323988",
+      "event_type": "module_started",
+      "module_name": "ToxicityPrefilterModule",
+      "candidate_hash": "00bd07685d569ca3",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "150bf34c-4e42-41c9-9076-c7f526b48236",
+      "timestamp": "2025-10-26T17:02:26.324162",
+      "event_type": "module_completed",
+      "module_name": "ToxicityPrefilterModule",
+      "candidate_hash": "00bd07685d569ca3",
+      "data": {
+        "decision": "PASS",
+        "runtime_seconds": 6.103515625e-05,
+        "n_metrics": 0
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "bcb994c7-8003-4c8e-9027-d0890aff2074",
+      "timestamp": "2025-10-26T17:02:26.324862",
+      "event_type": "validation_completed",
+      "module_name": null,
+      "candidate_hash": "00bd07685d569ca3",
+      "data": {
+        "overall_decision": "PASS",
+        "total_runtime_seconds": 0.0042607784271240234,
+        "modules_run": 3
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "daa8046b-8f19-4f1e-b16c-4729575836e0",
+      "timestamp": "2025-10-26T17:02:26.325376",
+      "event_type": "validation_started",
+      "module_name": null,
+      "candidate_hash": "988d6e9b09251cd0",
+      "data": {
+        "candidate_name": "Aggregation_Risk",
+        "modality": "peptide",
+        "target": "test"
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "17b9039d-79b0-46d6-b86b-38a60377f4ba",
+      "timestamp": "2025-10-26T17:02:26.325516",
+      "event_type": "module_started",
+      "module_name": "structure_affinity",
+      "candidate_hash": "988d6e9b09251cd0",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "a639000e-700c-4d82-9566-36167928640b",
+      "timestamp": "2025-10-26T17:02:26.325731",
+      "event_type": "module_completed",
+      "module_name": "structure_affinity",
+      "candidate_hash": "988d6e9b09251cd0",
+      "data": {
+        "decision": "PASS",
+        "runtime_seconds": 8.58306884765625e-05,
+        "n_metrics": 6
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "51994148-b682-454a-80ec-4697606b9c86",
+      "timestamp": "2025-10-26T17:02:26.325878",
+      "event_type": "module_started",
+      "module_name": "developability",
+      "candidate_hash": "988d6e9b09251cd0",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "04b34cd8-00eb-4a3d-a66c-6ed7646f47e2",
+      "timestamp": "2025-10-26T17:02:26.326107",
+      "event_type": "module_completed",
+      "module_name": "developability",
+      "candidate_hash": "988d6e9b09251cd0",
+      "data": {
+        "decision": "KILL",
+        "runtime_seconds": 0.00012183189392089844,
+        "n_metrics": 11
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "b8c55e0d-15d2-4491-a8e3-451fbad455b6",
+      "timestamp": "2025-10-26T17:02:26.326432",
+      "event_type": "module_started",
+      "module_name": "ToxicityPrefilterModule",
+      "candidate_hash": "988d6e9b09251cd0",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "92ed8a54-2c94-49b0-a4ec-31d4e7be332a",
+      "timestamp": "2025-10-26T17:02:26.328691",
+      "event_type": "module_completed",
+      "module_name": "ToxicityPrefilterModule",
+      "candidate_hash": "988d6e9b09251cd0",
+      "data": {
+        "decision": "REVISE",
+        "runtime_seconds": 4.982948303222656e-05,
+        "n_metrics": 1
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "eb5500e8-479d-4a26-8989-0945b4922019",
+      "timestamp": "2025-10-26T17:02:26.333289",
+      "event_type": "validation_completed",
+      "module_name": null,
+      "candidate_hash": "988d6e9b09251cd0",
+      "data": {
+        "overall_decision": "KILL",
+        "total_runtime_seconds": 0.007865190505981445,
+        "modules_run": 3
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "3d3e3c13-cb38-4441-981c-982e7a5dea2e",
+      "timestamp": "2025-10-26T17:02:26.334238",
+      "event_type": "validation_started",
+      "module_name": null,
+      "candidate_hash": "bc476a22b4b2f8a9",
+      "data": {
+        "candidate_name": "Free_Cysteine",
+        "modality": "peptide",
+        "target": "test"
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "1eb909d8-1330-4bb1-8d98-2badcf28365d",
+      "timestamp": "2025-10-26T17:02:26.334443",
+      "event_type": "module_started",
+      "module_name": "structure_affinity",
+      "candidate_hash": "bc476a22b4b2f8a9",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "99b97464-e1d0-471c-93a8-b158f9eac1c6",
+      "timestamp": "2025-10-26T17:02:26.335707",
+      "event_type": "module_completed",
+      "module_name": "structure_affinity",
+      "candidate_hash": "bc476a22b4b2f8a9",
+      "data": {
+        "decision": "PASS",
+        "runtime_seconds": 9.489059448242188e-05,
+        "n_metrics": 6
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "e7eb6d9f-1f62-47c7-b916-73421003376a",
+      "timestamp": "2025-10-26T17:02:26.335846",
+      "event_type": "module_started",
+      "module_name": "developability",
+      "candidate_hash": "bc476a22b4b2f8a9",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "c5a82f7c-5b97-4bfe-9882-afc43d7b3d56",
+      "timestamp": "2025-10-26T17:02:26.336068",
+      "event_type": "module_completed",
+      "module_name": "developability",
+      "candidate_hash": "bc476a22b4b2f8a9",
+      "data": {
+        "decision": "KILL",
+        "runtime_seconds": 0.00011491775512695312,
+        "n_metrics": 11
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "e4a26dae-8564-4879-bbb4-51ca27653f2e",
+      "timestamp": "2025-10-26T17:02:26.344322",
+      "event_type": "module_started",
+      "module_name": "ToxicityPrefilterModule",
+      "candidate_hash": "bc476a22b4b2f8a9",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "bd8c1536-5256-4c4f-b725-d3ad4d37df91",
+      "timestamp": "2025-10-26T17:02:26.345152",
+      "event_type": "module_completed",
+      "module_name": "ToxicityPrefilterModule",
+      "candidate_hash": "bc476a22b4b2f8a9",
+      "data": {
+        "decision": "PASS",
+        "runtime_seconds": 4.100799560546875e-05,
+        "n_metrics": 0
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "572aed7a-788d-470c-b8bb-43c36f280920",
+      "timestamp": "2025-10-26T17:02:26.350442",
+      "event_type": "validation_completed",
+      "module_name": null,
+      "candidate_hash": "bc476a22b4b2f8a9",
+      "data": {
+        "overall_decision": "KILL",
+        "total_runtime_seconds": 0.016154766082763672,
+        "modules_run": 3
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "44266cf1-8d11-4545-ae0f-793331125cb6",
+      "timestamp": "2025-10-26T17:02:26.351170",
+      "event_type": "validation_started",
+      "module_name": null,
+      "candidate_hash": "65a06829fbfffd13",
+      "data": {
+        "candidate_name": "PTM_Issues",
+        "modality": "peptide",
+        "target": "test"
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "f26f3eb0-1149-489a-b1b0-6526896b13c6",
+      "timestamp": "2025-10-26T17:02:26.353879",
+      "event_type": "module_started",
+      "module_name": "structure_affinity",
+      "candidate_hash": "65a06829fbfffd13",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "0a8439ab-3e00-4860-90c2-eea56d869e7c",
+      "timestamp": "2025-10-26T17:02:26.354089",
+      "event_type": "module_completed",
+      "module_name": "structure_affinity",
+      "candidate_hash": "65a06829fbfffd13",
+      "data": {
+        "decision": "PASS",
+        "runtime_seconds": 9.179115295410156e-05,
+        "n_metrics": 6
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "31fac538-cd6a-4417-8ce4-b3594d9672bc",
+      "timestamp": "2025-10-26T17:02:26.354868",
+      "event_type": "module_started",
+      "module_name": "developability",
+      "candidate_hash": "65a06829fbfffd13",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "c11de6ed-6933-4173-a21f-3ea2028efd38",
+      "timestamp": "2025-10-26T17:02:26.355121",
+      "event_type": "module_completed",
+      "module_name": "developability",
+      "candidate_hash": "65a06829fbfffd13",
+      "data": {
+        "decision": "REVISE",
+        "runtime_seconds": 0.0001399517059326172,
+        "n_metrics": 11
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "c6421b2d-550e-4dd6-8aca-38a752fca9c2",
+      "timestamp": "2025-10-26T17:02:26.355267",
+      "event_type": "module_started",
+      "module_name": "ToxicityPrefilterModule",
+      "candidate_hash": "65a06829fbfffd13",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "fd5f1f46-82c3-4a14-9ff7-bdf84ed0f420",
+      "timestamp": "2025-10-26T17:02:26.358570",
+      "event_type": "module_completed",
+      "module_name": "ToxicityPrefilterModule",
+      "candidate_hash": "65a06829fbfffd13",
+      "data": {
+        "decision": "PASS",
+        "runtime_seconds": 3.600120544433594e-05,
+        "n_metrics": 0
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "821f56e5-3bb5-4075-b9df-8531c2bb2c72",
+      "timestamp": "2025-10-26T17:02:26.358770",
+      "event_type": "validation_completed",
+      "module_name": null,
+      "candidate_hash": "65a06829fbfffd13",
+      "data": {
+        "overall_decision": "REVISE",
+        "total_runtime_seconds": 0.007555961608886719,
+        "modules_run": 3
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "5e805bb0-6d2d-42a6-ba00-960d79c00c50",
+      "timestamp": "2025-10-26T17:02:26.365746",
+      "event_type": "validation_started",
+      "module_name": null,
+      "candidate_hash": "f8617ec4a086d3c2",
+      "data": {
+        "candidate_name": "Trastuzumab",
+        "modality": "antibody",
+        "target": "HER2"
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "426aaf4c-cb26-4d9b-a48d-28c6a934deac",
+      "timestamp": "2025-10-26T17:02:26.366134",
+      "event_type": "module_started",
+      "module_name": "structure_affinity",
+      "candidate_hash": "f8617ec4a086d3c2",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "2ce55499-3275-4462-8fd4-364dd3014c87",
+      "timestamp": "2025-10-26T17:02:26.369160",
+      "event_type": "module_completed",
+      "module_name": "structure_affinity",
+      "candidate_hash": "f8617ec4a086d3c2",
+      "data": {
+        "decision": "PASS",
+        "runtime_seconds": 9.274482727050781e-05,
+        "n_metrics": 6
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "f00b0e40-b2d4-494a-99db-7de9f2cd6261",
+      "timestamp": "2025-10-26T17:02:26.369300",
+      "event_type": "module_started",
+      "module_name": "developability",
+      "candidate_hash": "f8617ec4a086d3c2",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "eb4f7d66-abcd-4364-b28c-09a746f1e157",
+      "timestamp": "2025-10-26T17:02:26.372000",
+      "event_type": "module_completed",
+      "module_name": "developability",
+      "candidate_hash": "f8617ec4a086d3c2",
+      "data": {
+        "decision": "REVISE",
+        "runtime_seconds": 0.00013518333435058594,
+        "n_metrics": 11
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "3d38f3f4-f46c-4769-942f-09b8eb564f67",
+      "timestamp": "2025-10-26T17:02:26.372153",
+      "event_type": "module_started",
+      "module_name": "ToxicityPrefilterModule",
+      "candidate_hash": "f8617ec4a086d3c2",
+      "data": {},
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "054dabba-9c07-4983-a29d-672553cf10f9",
+      "timestamp": "2025-10-26T17:02:26.372347",
+      "event_type": "module_completed",
+      "module_name": "ToxicityPrefilterModule",
+      "candidate_hash": "f8617ec4a086d3c2",
+      "data": {
+        "decision": "PASS",
+        "runtime_seconds": 7.987022399902344e-05,
+        "n_metrics": 0
+      },
+      "input_hashes": {},
+      "metadata": {}
+    },
+    {
+      "entry_id": "fae2134a-1024-4ae6-a84c-9990b63d1521",
+      "timestamp": "2025-10-26T17:02:26.375147",
+      "event_type": "validation_completed",
+      "module_name": null,
+      "candidate_hash": "f8617ec4a086d3c2",
+      "data": {
+        "overall_decision": "REVISE",
+        "total_runtime_seconds": 0.00935983657836914,
+        "modules_run": 3
+      },
+      "input_hashes": {},
+      "metadata": {}
+    }
+  ]
+}

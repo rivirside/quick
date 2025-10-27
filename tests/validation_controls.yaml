@@ -1,0 +1,142 @@
+# Validation Controls for eTrial
+# Known therapeutics to test pipeline decisions
+
+positive_controls:
+  # These are APPROVED therapeutics - should generally PASS or REVISE (not KILL)
+
+  - name: "Pembrolizumab"
+    type: "antibody"
+    description: "Keytruda - Approved anti-PD-1 mAb"
+    approved: true
+    indication: "NSCLC, melanoma, multiple cancers"
+    target: "PD-1"
+    modality: "antibody"
+    heavy_chain: "QVQLVQSGVEVKKPGASVKVSCKASGYTFTNYYMYWVRQAPGQGLEWMGGINPSNGGTNFNEKFKNRVTLTTDSSTTTAYMELKSLQFDDTAVYYCARRDYRFDMGFDYWGQGTTVTVSS"
+    light_chain: "EIVLTQSPATLSLSPGERATLSCRASQSVSSYLAWYQQKPGQAPRLLIYDASNRATGIPARFSGSGSGTDFTLTISSLEPEDFAVYYCQQSSNWPRTFGQGTKVEIK"
+    expected_issues:
+      - "Possible N-glycosylation sites"
+      - "Some deamidation risk"
+    expected_decision: ["PASS", "REVISE"]
+    known_kd_nm: 29  # Actual measured KD
+
+  - name: "Trastuzumab"
+    type: "antibody"
+    description: "Herceptin - Approved anti-HER2 mAb"
+    approved: true
+    indication: "HER2+ breast cancer"
+    target: "HER2"
+    modality: "antibody"
+    heavy_chain: "EVQLVESGGGLVQPGGSLRLSCAASGFNIKDTYIHWVRQAPGKGLEWVARIYPTNGYTRYADSVKGRFTISADTSKNTAYLQMNSLRAEDTAVYYCSRWGGDGFYAMDYWGQGTLVTVSS"
+    light_chain: "DIQMTQSPSSLSASVGDRVTITCRASQDVNTAVAWYQQKPGKAPKLLIYSASFLYSGVPSRFSGSRSGTDFTLTISSLQPEDFATYYCQQHYTTPPTFGQGTKVEIK"
+    expected_decision: ["PASS", "REVISE"]
+    known_kd_nm: 5  # Very strong binder
+
+  - name: "Exenatide"
+    type: "peptide"
+    description: "Byetta - Approved GLP-1 receptor agonist peptide"
+    approved: true
+    indication: "Type 2 diabetes"
+    target: "GLP-1R"
+    modality: "peptide"
+    sequence: "HGEGTFTSDLSKQMEEEAVRLFIEWLKNGGPSSGAPPPS"
+    expected_issues:
+      - "Peptide stability"
+      - "Potential aggregation"
+    expected_decision: ["PASS", "REVISE"]
+
+  - name: "Adalimumab"
+    type: "antibody"
+    description: "Humira - Approved anti-TNF-α mAb (fully human)"
+    approved: true
+    indication: "Rheumatoid arthritis, Crohn's disease"
+    target: "TNF-alpha"
+    modality: "antibody"
+    heavy_chain: "EVQLVESGGGLVQPGRSLRLSCAASGFTFDDYAMHWVRQAPGKGLEWVSAITWNSGHIDYADSVEGRFTISRDNAKNSLYLQMNSLRAEDTAVYYCAKVSYLSTASSLDYWGQGTLVTVSS"
+    light_chain: "DIQMTQSPSSLSASVGDRVTITCRASQGIRNYLAWYQQKPGKAPKLLIYAASTLQSGVPSRFSGSGSGTDFTLTISSLQPEDFATYYCQRYNRAPYTFGQGTKVEIK"
+    expected_decision: ["PASS"]  # Fully human, should have low immunogenicity
+    known_kd_nm: 0.1  # Picomolar affinity
+    notes: "Fully human - excellent developability benchmark"
+
+negative_controls:
+  # These have KNOWN issues - should REVISE or KILL
+
+  - name: "TGN1412"
+    type: "antibody"
+    description: "Failed anti-CD28 superagonist - caused cytokine storm"
+    approved: false
+    reason_failed: "Severe cytokine release syndrome in Phase I"
+    target: "CD28"
+    modality: "antibody"
+    sequence: "EVQLVESGGGLVQPGGSLRLSCAASGFTFSSYGMHWVRQAPGKGLEWVAVIWYDGSNKYYADSVKGRFTISRDNSKNTLYLQMNSLRAEDTAVYYCARDGNYYYYGMDVWGQGTTVTVSS"
+    expected_issues:
+      - "Agonist activity - CRS risk"
+      - "Lack of species cross-reactivity (not predicted in animal models)"
+    expected_decision: ["KILL", "REVISE"]
+    critical_failure: "safety"
+    notes: "Should flag high CRS risk in safety module"
+
+  - name: "Aggregation-Prone-Test"
+    type: "antibody"
+    description: "Synthetic sequence with known aggregation issues"
+    approved: false
+    reason_failed: "High aggregation propensity"
+    target: "test"
+    modality: "antibody"
+    sequence: "VVVVVVIIIIILLLLLLFFFFVVVVVIIIIILLLLLFFFFFF"  # Hydrophobic stretch
+    expected_issues:
+      - "Extreme aggregation propensity"
+      - "Very low solubility"
+      - "Poor expression"
+    expected_decision: ["KILL"]
+    critical_failure: "developability"
+    notes: "Should fail developability - extreme hydrophobicity"
+
+  - name: "Weak-Binder-Test"
+    type: "peptide"
+    description: "Synthetic peptide with weak binding"
+    approved: false
+    reason_failed: "Insufficient affinity"
+    target: "test"
+    modality: "peptide"
+    sequence: "AAAAAAAAAAAAAAAAAAAAA"  # Poly-alanine (no specific binding)
+    expected_issues:
+      - "Weak/no binding affinity"
+      - "No specific interactions"
+    expected_decision: ["KILL"]
+    critical_failure: "affinity"
+    notes: "Should fail affinity validation"
+
+  - name: "Immunogenic-Test"
+    type: "antibody"
+    description: "Murine antibody (non-humanized) - high immunogenicity"
+    approved: false
+    reason_failed: "High immunogenicity (murine origin)"
+    target: "test"
+    modality: "antibody"
+    # This would be a murine sequence - high non-human content
+    heavy_chain: "QVQLQQSGAELARPGASVKMSCKASGYTFTRYTMHWVKQRPGQGLEWIGYINPSRGYTNYNQKFKDKATLTTDKSSSTAYMQLSSLTSEDSAVYYCARYYDDHYCLDYWGQGTTLTVSS"
+    expected_issues:
+      - "Non-human sequence"
+      - "High T-cell epitope content"
+      - "ADA risk"
+    expected_decision: ["KILL", "REVISE"]
+    critical_failure: "immunogenicity"
+    notes: "Should flag high immunogenicity - murine framework"
+
+mixed_controls:
+  # Real candidates with known trade-offs
+
+  - name: "Natalizumab"
+    type: "antibody"
+    description: "Tysabri - Approved but with black box warning (PML risk)"
+    approved: true
+    indication: "Multiple sclerosis"
+    target: "alpha-4-integrin"
+    modality: "antibody"
+    heavy_chain: "QVQLQESGPGLVKPSQTLSLTCAISGDSVSSNSAAWNWIRQSPSRGLEWLGRTYYRSKWYNDYAVSVKSRITINPDTSKNQFSLQLNSVTPEDTAVYYCATGYSYFLDFWGQGTLVTVSS"
+    light_chain: "DIQMTQSPSSLSASVGDRVTITCKASQNIDKYVAWYQQKPGKAPKLLIYNTNNLQTGVPSRFSGSGSGTDFTFTISSLQPEDIATYYCLQHISRPRTFGQGTKVEIK"
+    expected_decision: ["PASS", "REVISE"]
+    expected_issues:
+      - "Target expression in immune privileged sites (CNS)"
+      - "PML risk (not predictable from sequence)"
+    notes: "Demonstrates limitations - clinical risk not always computable"

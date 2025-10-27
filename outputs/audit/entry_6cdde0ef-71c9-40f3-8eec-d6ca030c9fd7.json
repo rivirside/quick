@@ -1,0 +1,14 @@
+{
+  "entry_id": "6cdde0ef-71c9-40f3-8eec-d6ca030c9fd7",
+  "timestamp": "2025-10-26T17:02:26.290694",
+  "event_type": "validation_started",
+  "module_name": null,
+  "candidate_hash": "65a06829fbfffd13",
+  "data": {
+    "candidate_name": "PTM_Issues",
+    "modality": "peptide",
+    "target": "test"
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

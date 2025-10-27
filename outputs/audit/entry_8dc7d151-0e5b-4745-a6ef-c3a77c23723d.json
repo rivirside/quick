@@ -1,0 +1,14 @@
+{
+  "entry_id": "8dc7d151-0e5b-4745-a6ef-c3a77c23723d",
+  "timestamp": "2025-10-25T21:22:05.374494",
+  "event_type": "validation_started",
+  "module_name": null,
+  "candidate_hash": "fb3f10f60029db51",
+  "data": {
+    "candidate_name": "Adalimumab",
+    "modality": "antibody",
+    "target": "TNF-alpha"
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

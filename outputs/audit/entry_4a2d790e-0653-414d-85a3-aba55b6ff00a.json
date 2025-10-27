@@ -1,0 +1,14 @@
+{
+  "entry_id": "4a2d790e-0653-414d-85a3-aba55b6ff00a",
+  "timestamp": "2025-10-25T21:29:11.064969",
+  "event_type": "validation_started",
+  "module_name": null,
+  "candidate_hash": "1fe1835a9054c50a",
+  "data": {
+    "candidate_name": "Deamidation_Moderate",
+    "modality": "peptide",
+    "target": "test"
+  },
+  "input_hashes": {},
+  "metadata": {}
+}

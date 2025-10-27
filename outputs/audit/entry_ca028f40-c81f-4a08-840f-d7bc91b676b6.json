@@ -1,0 +1,10 @@
+{
+  "entry_id": "ca028f40-c81f-4a08-840f-d7bc91b676b6",
+  "timestamp": "2025-10-26T18:05:47.941807",
+  "event_type": "module_started",
+  "module_name": "sequence_complexity",
+  "candidate_hash": "ed5894af9770a58a",
+  "data": {},
+  "input_hashes": {},
+  "metadata": {}
+}
