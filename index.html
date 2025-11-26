@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NeuroLink OS v9.7 - Neural Ribbon</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background-color: #000;
+            color: #0ff;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            touch-action: none;
+            user-select: none;
+        }
+
+        /* Cinematic Effects */
+        .scanline {
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0,0,0,0.2) 50%,
+                rgba(0,0,0,0.2)
+            );
+            background-size: 100% 4px;
+            position: absolute;
+            pointer-events: none;
+            z-index: 40;
+            opacity: 0.6;
+        }
+
+        .glow-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, transparent 0%, #000 120%);
+            z-index: 30;
+            pointer-events: none;
+        }
+
+        /* CRT Flicker */
+        .crt-flicker {
+            animation: flicker 0.1s infinite;
+            opacity: 1;
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 45;
+            background: rgba(255,255,255,0.02);
+            mix-blend-mode: overlay;
+        }
+        @keyframes flicker {
+            0% { opacity: 0.9; }
+            50% { opacity: 1.0; }
+            100% { opacity: 0.9; }
+        }
+
+        .blink { animation: blinker 0.5s infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
+    </style>
+</head>
+<body id="appBody" class="h-screen w-screen bg-black relative">
+
+    <div class="scanline"></div>
+    <div class="glow-overlay"></div>
+    <div class="crt-flicker"></div>
+    
+    <!-- HUD -->
+    <div class="absolute top-6 left-6 z-50 pointer-events-none">
+        <div class="flex items-center gap-2">
+            <div id="statusDot" class="w-3 h-3 rounded-full bg-cyan-500 shadow-[0_0_10px_#06b6d4]"></div>
+            <div id="statusText" class="text-cyan-500 text-sm tracking-[0.2em] font-bold">NEURAL_BRIDGE: ACTIVE</div>
+        </div>
+        <div class="text-[10px] text-cyan-800 mt-1 tracking-widest">
+            LATENCY: <span id="latency">12</span>ms
+        </div>
+    </div>
+
+    <!-- Bottom Data -->
+    <div class="absolute bottom-6 right-6 z-50 text-right pointer-events-none">
+        <div class="text-4xl text-cyan-500 font-bold tracking-tighter" style="text-shadow: 0 0 20px rgba(6,182,212,0.5)">
+            <span id="loadVal">42</span>%
+        </div>
+        <div class="text-[10px] text-cyan-700 uppercase tracking-widest">Cortex Load</div>
+    </div>
+
+    <!-- Canvas -->
+    <canvas id="ribbonCanvas" class="absolute inset-0 z-10 block"></canvas>
+    
+    <!-- Interaction -->
+    <div id="interactionLayer" class="absolute inset-0 z-50 cursor-pointer"></div>
+
+    <script>
+        /* --- STATE --- */
+        let isActive = false;
+        let chaos = 0;
+        
+        // UI Elements
+        const appBody = document.getElementById('appBody');
+        const statusText = document.getElementById('statusText');
+        const statusDot = document.getElementById('statusDot');
+        const loadVal = document.getElementById('loadVal');
+        const latency = document.getElementById('latency');
+
+        // Interaction
+        document.getElementById('interactionLayer').addEventListener('click', () => {
+            isActive = !isActive;
+            if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+            
+            // UI Updates
+            if (isActive) {
+                statusText.innerText = "SYNAPTIC SURGE";
+                statusText.classList.add('text-red-500', 'blink');
+                statusText.classList.remove('text-cyan-500');
+                statusDot.classList.replace('bg-cyan-500', 'bg-red-500');
+                statusDot.classList.replace('shadow-[0_0_10px_#06b6d4]', 'shadow-[0_0_20px_#ef4444]');
+            } else {
+                statusText.innerText = "NEURAL_BRIDGE: ACTIVE";
+                statusText.classList.remove('text-red-500', 'blink');
+                statusText.classList.add('text-cyan-500');
+                statusDot.classList.replace('bg-red-500', 'bg-cyan-500');
+                statusDot.classList.replace('shadow-[0_0_20px_#ef4444]', 'shadow-[0_0_10px_#06b6d4]');
+            }
+        });
+
+        /* --- RENDERING --- */
+        const canvas = document.getElementById('ribbonCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let time = 0;
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function draw() {
+            // Logic Update
+            if (isActive) chaos = Math.min(chaos + 0.04, 1.0);
+            else chaos = Math.max(chaos - 0.05, 0);
+
+            // Clear with deep fade for "glow" trails
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+
+            // Parameters
+            const strandCount = 12; // Number of lines in the ribbon
+            const speed = 0.02 + (chaos * 0.05);
+            const baseAmp = height / 5;
+            
+            // Loop for strands
+            for (let i = 0; i < strandCount; i++) {
+                ctx.beginPath();
+                
+                // Offset calculation (creates the 3D ribbon effect)
+                // If chaos is high, the offset becomes random (unraveling)
+                let offset = (i - strandCount/2) * 15;
+                if (chaos > 0) {
+                    offset += (Math.random() - 0.5) * chaos * 50;
+                }
+
+                // Dynamic Color
+                // Fade opacity based on distance from center strand
+                let opacity = 1 - (Math.abs(i - strandCount/2) / (strandCount/2 + 2));
+                
+                if (isActive || chaos > 0.5) {
+                    ctx.strokeStyle = `rgba(255, ${50 + Math.random()*100}, 50, ${opacity})`;
+                    ctx.lineWidth = 2 + Math.random() * 2;
+                } else {
+                    // Cyan/Blue mix
+                    let g = 200 + i * 5;
+                    let b = 255;
+                    ctx.strokeStyle = `rgba(0, ${g}, ${b}, ${opacity})`;
+                    ctx.lineWidth = 2;
+                }
+
+                // Draw Strand
+                for (let x = 0; x <= width; x += 5) {
+                    // 1. Main Sine
+                    let y = height / 2 + Math.sin(x * 0.01 + time + (i * 0.1)) * baseAmp;
+                    
+                    // 2. Secondary Harmonic (adds complexity)
+                    y += Math.sin(x * 0.02 - time * 1.5) * (baseAmp * 0.3);
+
+                    // 3. Noise (only during chaos)
+                    if (chaos > 0) {
+                        y += (Math.random() - 0.5) * chaos * 30;
+                    }
+
+                    // Apply Ribbon Offset
+                    y += offset;
+
+                    // Tilt the ribbon slightly for perspective
+                    y += (x / width) * (i * 10); 
+
+                    if (x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            }
+
+            // HUD Randomizer
+            if (Math.random() > 0.9) {
+                let load = 42 + Math.floor(Math.sin(time) * 10);
+                if (isActive) load = 85 + Math.floor(Math.random() * 14);
+                loadVal.innerText = load;
+                latency.innerText = isActive ? Math.floor(Math.random() * 100) : 12;
+            }
+
+            time += speed;
+            requestAnimationFrame(draw);
+        }
+        draw();
+    </script>
+</body>
+</html>
