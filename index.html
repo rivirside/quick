@@ -2,227 +2,488 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NeuroLink OS v9.7 - Neural Ribbon</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The FERNANDO Index | Pediatric Hydration Assessment</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=Inter:wght@300;400;500;600&display=swap');
 
         body {
-            font-family: 'Share Tech Mono', monospace;
-            background-color: #000;
-            color: #0ff;
-            overflow: hidden;
-            margin: 0;
-            padding: 0;
-            touch-action: none;
-            user-select: none;
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            color: #1a202c;
         }
 
-        /* Cinematic Effects */
-        .scanline {
-            width: 100%;
-            height: 100vh;
-            background: linear-gradient(
-                to bottom,
-                rgba(255,255,255,0),
-                rgba(255,255,255,0) 50%,
-                rgba(0,0,0,0.2) 50%,
-                rgba(0,0,0,0.2)
-            );
-            background-size: 100% 4px;
-            position: absolute;
-            pointer-events: none;
-            z-index: 40;
-            opacity: 0.6;
+        h1, h2, h3, .academic-font {
+            font-family: 'Merriweather', serif;
         }
 
-        .glow-overlay {
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at center, transparent 0%, #000 120%);
-            z-index: 30;
-            pointer-events: none;
+        .radio-label {
+            transition: all 0.2s;
         }
 
-        /* CRT Flicker */
-        .crt-flicker {
-            animation: flicker 0.1s infinite;
+        input[type="radio"]:checked + .radio-label {
+            background-color: #ebf8ff;
+            border-color: #3182ce;
+            color: #2c5282;
+        }
+        
+        input[type="radio"]:checked + .radio-label .check-icon {
             opacity: 1;
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            z-index: 45;
-            background: rgba(255,255,255,0.02);
-            mix-blend-mode: overlay;
-        }
-        @keyframes flicker {
-            0% { opacity: 0.9; }
-            50% { opacity: 1.0; }
-            100% { opacity: 0.9; }
         }
 
-        .blink { animation: blinker 0.5s infinite; }
-        @keyframes blinker { 50% { opacity: 0; } }
+        .score-box {
+            background: linear-gradient(135deg, #2b6cb0 0%, #2c5282 100%);
+        }
+        
+        @media print {
+            .no-print { display: none; }
+            body { background-color: white; }
+            .shadow-xl { box-shadow: none; }
+        }
     </style>
 </head>
-<body id="appBody" class="h-screen w-screen bg-black relative">
+<body class="min-h-screen flex flex-col">
 
-    <div class="scanline"></div>
-    <div class="glow-overlay"></div>
-    <div class="crt-flicker"></div>
-    
-    <!-- HUD -->
-    <div class="absolute top-6 left-6 z-50 pointer-events-none">
-        <div class="flex items-center gap-2">
-            <div id="statusDot" class="w-3 h-3 rounded-full bg-cyan-500 shadow-[0_0_10px_#06b6d4]"></div>
-            <div id="statusText" class="text-cyan-500 text-sm tracking-[0.2em] font-bold">NEURAL_BRIDGE: ACTIVE</div>
+    <!-- Academic Header -->
+    <header class="bg-white border-b border-gray-300 py-4 px-6 shadow-sm">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-900 text-white w-10 h-10 flex items-center justify-center font-bold serif rounded text-xl">F</div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900 leading-tight">The FERNANDO Index</h1>
+                    <p class="text-xs text-gray-500 uppercase tracking-wider">Clinical Pediatric Hydration Assessment Tool v1.0</p>
+                </div>
+            </div>
+            <div class="hidden md:block text-right">
+                <p class="text-sm text-gray-600 italic">Department of Pediatrics</p>
+                <p class="text-xs text-gray-400">Reference: Fernando et al., 2025</p>
+            </div>
         </div>
-        <div class="text-[10px] text-cyan-800 mt-1 tracking-widest">
-            LATENCY: <span id="latency">12</span>ms
-        </div>
-    </div>
+    </header>
 
-    <!-- Bottom Data -->
-    <div class="absolute bottom-6 right-6 z-50 text-right pointer-events-none">
-        <div class="text-4xl text-cyan-500 font-bold tracking-tighter" style="text-shadow: 0 0 20px rgba(6,182,212,0.5)">
-            <span id="loadVal">42</span>%
-        </div>
-        <div class="text-[10px] text-cyan-700 uppercase tracking-widest">Cortex Load</div>
-    </div>
+    <main class="flex-grow p-4 md:p-8">
+        <div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Left Column: The Tool -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Abstract/Info -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border-l-4 border-blue-800">
+                    <h2 class="text-lg font-bold mb-2">Clinical Indication</h2>
+                    <p class="text-sm text-gray-700 leading-relaxed">
+                        The FERNANDO Index is a standardized scoring system designed to objectively stratify dehydration severity in pediatric patients presenting with acute gastroenteritis. Similar to the APGAR score, a <strong>higher score indicates better patient status</strong>.
+                    </p>
+                </div>
 
-    <!-- Canvas -->
-    <canvas id="ribbonCanvas" class="absolute inset-0 z-10 block"></canvas>
-    
-    <!-- Interaction -->
-    <div id="interactionLayer" class="absolute inset-0 z-50 cursor-pointer"></div>
+                <!-- Calculator Form -->
+                <form id="fernandoForm" class="bg-white shadow-xl rounded-lg overflow-hidden border border-gray-200">
+                    <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                        <h3 class="font-bold text-gray-800">Assessment Criteria</h3>
+                        <button type="button" onclick="resetForm()" class="text-xs text-blue-600 hover:text-blue-800 font-medium no-print">
+                            Reset Form
+                        </button>
+                    </div>
+
+                    <div class="divide-y divide-gray-100">
+                        <!-- F: Fluid Intake -->
+                        <div class="p-6 hover:bg-gray-50 transition-colors">
+                            <div class="flex items-baseline mb-3">
+                                <span class="text-2xl font-bold text-blue-900 mr-3 w-6">F</span>
+                                <h4 class="font-bold text-gray-700">Fluid Intake</h4>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="fluid" value="2" class="peer sr-only" onchange="calculateScore()">
+                                    <div class="radio-label p-3 rounded border border-gray-200 hover:border-blue-300 h-full flex flex-col justify-center">
+                                        <div class="font-bold text-sm mb-1">Normal / Avid</div>
+                                        <div class="text-xs text-gray-500">Drinks eagerly, normal thirst</div>
+                                        <i class="check-icon fa-solid fa-circle-check absolute top-2 right-2 text-blue-600 opacity-0 transition-opacity"></i>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="fluid" value="1" class="peer sr-only" onchange="calculateScore()">
+                                    <div class="radio-label p-3 rounded border border-gray-200 hover:border-blue-300 h-full flex flex-col justify-center">
+                                        <div class="font-bold text-sm mb-1">Decreased</div>
+                                        <div class="text-xs text-gray-500">Drinks poorly or only small sips</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="fluid" value="0" class="peer sr-only" onchange="calculateScore()">
+                                    <div class="radio-label p-3 rounded border border-gray-200 hover:border-blue-300 h-full flex flex-col justify-center">
+                                        <div class="font-bold text-sm mb-1">Unable to Drink</div>
+                                        <div class="text-xs text-gray-500">Refusal or immediate emesis</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- E: Eyes -->
+                        <div class="p-6 hover:bg-gray-50 transition-colors">
+                            <div class="flex items-baseline mb-3">
+                                <span class="text-2xl font-bold text-blue-900 mr-3 w-6">E</span>
+                                <h4 class="font-bold text-gray-700">Eyes (Appearance)</h4>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="eyes" value="2" class="peer sr-only" onchange="calculateScore()">
+                                    <div class="radio-label p-3 rounded border border-gray-200 hover:border-blue-300 h-full">
+                                        <div class="font-bold text-sm">Normal</div>
+                                        <div class="text-xs text-gray-500">Tears present, not sunken</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="eyes" value="1" class="peer sr-only" onchange="calculateScore()">
+                                    <div class="radio-label p-3 rounded border border-gray-200 hover:border-blue-300 h-full">
+                                        <div class="font-bold text-sm">Slightly Sunken</div>
+                                        <div class="text-xs text-gray-500">Decreased tears</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="eyes" value="0" class="peer sr-only" onchange="calculateScore()">
+                                    <div class="radio-label p-3 rounded border border-gray-200 hover:border-blue-300 h-full">
+                                        <div class="font-bold text-sm">Deeply Sunken</div>
+                                        <div class="text-xs text-gray-500">Dry eyes, no tears</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- R: Refill -->
+                        <div class="p-6 hover:bg-gray-50 transition-colors">
+                            <div class="flex items-baseline mb-3">
+                                <span class="text-2xl font-bold text-blue-900 mr-3 w-6">R</span>
+                                <h4 class="font-bold text-gray-700">Refill (Capillary)</h4>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="refill" value="2" class="peer sr-only" onchange="calculateScore()">
+                                    <div class="radio-label p-3 rounded border border-gray-200 hover:border-blue-300 h-full">
+                                        <div class="font-bold text-sm">&lt; 2 Seconds</div>
+                                        <div class="text-xs text-gray-500">Immediate brisk return</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="refill" value="1" class="peer sr-only" onchange="calculateScore()">
+                                    <div class="radio-label p-3 rounded border border-gray-200 hover:border-blue-300 h-full">
+                                        <div class="font-bold text-sm">2 - 3 Seconds</div>
+                                        <div class="text-xs text-gray-500">Slightly delayed</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="refill" value="0" class="peer sr-only" onchange="calculateScore()">
+                                    <div class="radio-label p-3 rounded border border-gray-200 hover:border-blue-300 h-full">
+                                        <div class="font-bold text-sm">&gt; 3 Seconds</div>
+                                        <div class="text-xs text-gray-500">Markedly delayed / Mottled</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- N: Number of Wet Diapers -->
+                        <div class="p-6 hover:bg-gray-50 transition-colors">
+                            <div class="flex items-baseline mb-3">
+                                <span class="text-2xl font-bold text-blue-900 mr-3 w-6">N</span>
+                                <h4 class="font-bold text-gray-700">Number of Wet Diapers (Urine Output)</h4>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="number" value="2" class="peer sr-only" onchange="calculateScore()">
+                                    <div class="radio-label p-3 rounded border border-gray-200 hover:border-blue-300 h-full">
+                                        <div class="font-bold text-sm">Normal</div>
+                                        <div class="text-xs text-gray-500">&gt;4 wet diapers/day</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="number" value="1" class="peer sr-only" onchange="calculateScore()">
+                                    <div class="radio-label p-3 rounded border border-gray-200 hover:border-blue-300 h-full">
+                                        <div class="font-bold text-sm">Reduced</div>
+                                        <div class="text-xs text-gray-500">2-3 wet diapers/day</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="number" value="0" class="peer sr-only" onchange="calculateScore()">
+                                    <div class="radio-label p-3 rounded border border-gray-200 hover:border-blue-300 h-full">
+                                        <div class="font-bold text-sm">Anuric / Oliguric</div>
+                                        <div class="text-xs text-gray-500">&lt;1 in 12 hours</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- A: Activity -->
+                        <div class="p-6 hover:bg-gray-50 transition-colors">
+                            <div class="flex items-baseline mb-3">
+                                <span class="text-2xl font-bold text-blue-900 mr-3 w-6">A</span>
+                                <h4 class="font-bold text-gray-700">Activity Level</h4>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="activity" value="2" class="peer sr-only" onchange="calculateScore()">
+                                    <div class="radio-label p-3 rounded border border-gray-200 hover:border-blue-300 h-full">
+                                        <div class="font-bold text-sm">Alert & Playful</div>
+                                        <div class="text-xs text-gray-500">Appropriate for age</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="activity" value="1" class="peer sr-only" onchange="calculateScore()">
+                                    <div class="radio-label p-3 rounded border border-gray-200 hover:border-blue-300 h-full">
+                                        <div class="font-bold text-sm">Irritable / Lethargic</div>
+                                        <div class="text-xs text-gray-500">Consolable but fussy</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="activity" value="0" class="peer sr-only" onchange="calculateScore()">
+                                    <div class="radio-label p-3 rounded border border-gray-200 hover:border-blue-300 h-full">
+                                        <div class="font-bold text-sm">Unresponsive / Limp</div>
+                                        <div class="text-xs text-gray-500">Difficult to arouse</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- N: Nausea -->
+                        <div class="p-6 hover:bg-gray-50 transition-colors">
+                            <div class="flex items-baseline mb-3">
+                                <span class="text-2xl font-bold text-blue-900 mr-3 w-6">N</span>
+                                <h4 class="font-bold text-gray-700">Nausea & Vomiting</h4>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="nausea" value="2" class="peer sr-only" onchange="calculateScore()">
+                                    <div class="radio-label p-3 rounded border border-gray-200 hover:border-blue-300 h-full">
+                                        <div class="font-bold text-sm">None / Resolved</div>
+                                        <div class="text-xs text-gray-500">Tolerating PO</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="nausea" value="1" class="peer sr-only" onchange="calculateScore()">
+                                    <div class="radio-label p-3 rounded border border-gray-200 hover:border-blue-300 h-full">
+                                        <div class="font-bold text-sm">Intermittent</div>
+                                        <div class="text-xs text-gray-500">1-2 episodes per day</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="nausea" value="0" class="peer sr-only" onchange="calculateScore()">
+                                    <div class="radio-label p-3 rounded border border-gray-200 hover:border-blue-300 h-full">
+                                        <div class="font-bold text-sm">Frequent / Bilious</div>
+                                        <div class="text-xs text-gray-500">Intractable emesis</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- D: Dry Mucosa -->
+                        <div class="p-6 hover:bg-gray-50 transition-colors">
+                            <div class="flex items-baseline mb-3">
+                                <span class="text-2xl font-bold text-blue-900 mr-3 w-6">D</span>
+                                <h4 class="font-bold text-gray-700">Dry Mucous Membranes</h4>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="dry" value="2" class="peer sr-only" onchange="calculateScore()">
+                                    <div class="radio-label p-3 rounded border border-gray-200 hover:border-blue-300 h-full">
+                                        <div class="font-bold text-sm">Moist</div>
+                                        <div class="text-xs text-gray-500">Saliva present</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="dry" value="1" class="peer sr-only" onchange="calculateScore()">
+                                    <div class="radio-label p-3 rounded border border-gray-200 hover:border-blue-300 h-full">
+                                        <div class="font-bold text-sm">Tacky</div>
+                                        <div class="text-xs text-gray-500">Sticky oral mucosa</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="dry" value="0" class="peer sr-only" onchange="calculateScore()">
+                                    <div class="radio-label p-3 rounded border border-gray-200 hover:border-blue-300 h-full">
+                                        <div class="font-bold text-sm">Parched</div>
+                                        <div class="text-xs text-gray-500">Cracked lips, dry tongue</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                         <!-- O: Overall -->
+                         <div class="p-6 hover:bg-gray-50 transition-colors">
+                            <div class="flex items-baseline mb-3">
+                                <span class="text-2xl font-bold text-blue-900 mr-3 w-6">O</span>
+                                <h4 class="font-bold text-gray-700">Overall Appearance</h4>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="overall" value="2" class="peer sr-only" onchange="calculateScore()">
+                                    <div class="radio-label p-3 rounded border border-gray-200 hover:border-blue-300 h-full">
+                                        <div class="font-bold text-sm">Well Appearing</div>
+                                        <div class="text-xs text-gray-500">Vital signs stable</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="overall" value="1" class="peer sr-only" onchange="calculateScore()">
+                                    <div class="radio-label p-3 rounded border border-gray-200 hover:border-blue-300 h-full">
+                                        <div class="font-bold text-sm">Ill Appearing</div>
+                                        <div class="text-xs text-gray-500">Tachycardia, mild distress</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="overall" value="0" class="peer sr-only" onchange="calculateScore()">
+                                    <div class="radio-label p-3 rounded border border-gray-200 hover:border-blue-300 h-full">
+                                        <div class="font-bold text-sm">Toxic / Shocky</div>
+                                        <div class="text-xs text-gray-500">Hypotensive, rapid breathing</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+
+            <!-- Right Column: Results sticky -->
+            <div class="lg:col-span-1">
+                <div class="sticky top-6">
+                    <div id="resultCard" class="bg-white rounded-lg shadow-xl overflow-hidden border border-gray-200">
+                        <div class="score-box p-6 text-center text-white">
+                            <h3 class="text-sm uppercase tracking-widest opacity-80 mb-2">Total Score</h3>
+                            <div id="scoreDisplay" class="text-6xl font-black font-serif mb-2">--</div>
+                            <div class="text-sm opacity-80">Out of 16 Points</div>
+                        </div>
+                        
+                        <div class="p-6">
+                            <div id="interpretationBox" class="hidden">
+                                <h4 class="text-xs uppercase text-gray-500 font-bold tracking-wide mb-1">Interpretation</h4>
+                                <div id="statusText" class="text-xl font-bold text-gray-800 mb-4">Awaiting Data</div>
+                                
+                                <h4 class="text-xs uppercase text-gray-500 font-bold tracking-wide mb-1">Recommendation</h4>
+                                <div id="recommendationText" class="text-sm text-gray-600 leading-relaxed bg-gray-50 p-3 rounded border border-gray-200">
+                                    Please complete all 8 sections of the FERNANDO assessment to generate a clinical recommendation.
+                                </div>
+                            </div>
+
+                            <div id="incompleteBox" class="block text-center py-4">
+                                <p class="text-gray-400 italic text-sm">Select options to calculate</p>
+                            </div>
+
+                            <button onclick="copyResults()" class="mt-6 w-full py-2 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded text-sm font-medium transition-colors flex items-center justify-center gap-2 no-print">
+                                <i class="fa-regular fa-copy"></i> Copy Clinical Note
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Citation Box -->
+                    <div class="mt-6 bg-white p-4 rounded border border-gray-200 text-xs text-gray-500">
+                        <p class="font-bold text-gray-700 mb-1">Suggested Citation:</p>
+                        <p class="italic mb-2">Fernando, J., et al. "The FERNANDO Index for Rapid Dehydration Assessment in Pediatric Gastroenteritis." Journal of Clinical Mnemonics, 2025; 12(4): 112-118.</p>
+                        <button class="text-blue-600 hover:underline" onclick="alert('Citation copied!')">Export to EndNote</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-gray-400 py-8 text-center text-sm no-print">
+        <div class="max-w-4xl mx-auto px-4">
+            <p class="mb-2"><strong>Disclaimer:</strong> The FERNANDO Index is a clinical decision aid and should not replace clinical judgment. This tool is fictional and for demonstration purposes only.</p>
+            <p>&copy; 2025 Fernando Medical Systems. All rights reserved.</p>
+        </div>
+    </footer>
 
     <script>
-        /* --- STATE --- */
-        let isActive = false;
-        let chaos = 0;
-        
-        // UI Elements
-        const appBody = document.getElementById('appBody');
-        const statusText = document.getElementById('statusText');
-        const statusDot = document.getElementById('statusDot');
-        const loadVal = document.getElementById('loadVal');
-        const latency = document.getElementById('latency');
+        function calculateScore() {
+            const criteria = ['fluid', 'eyes', 'refill', 'number', 'activity', 'nausea', 'dry', 'overall'];
+            let totalScore = 0;
+            let answeredCount = 0;
 
-        // Interaction
-        document.getElementById('interactionLayer').addEventListener('click', () => {
-            isActive = !isActive;
-            if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
-            
-            // UI Updates
-            if (isActive) {
-                statusText.innerText = "SYNAPTIC SURGE";
-                statusText.classList.add('text-red-500', 'blink');
-                statusText.classList.remove('text-cyan-500');
-                statusDot.classList.replace('bg-cyan-500', 'bg-red-500');
-                statusDot.classList.replace('shadow-[0_0_10px_#06b6d4]', 'shadow-[0_0_20px_#ef4444]');
-            } else {
-                statusText.innerText = "NEURAL_BRIDGE: ACTIVE";
-                statusText.classList.remove('text-red-500', 'blink');
-                statusText.classList.add('text-cyan-500');
-                statusDot.classList.replace('bg-red-500', 'bg-cyan-500');
-                statusDot.classList.replace('shadow-[0_0_20px_#ef4444]', 'shadow-[0_0_10px_#06b6d4]');
-            }
-        });
-
-        /* --- RENDERING --- */
-        const canvas = document.getElementById('ribbonCanvas');
-        const ctx = canvas.getContext('2d');
-        let width, height;
-        let time = 0;
-
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resize);
-        resize();
-
-        function draw() {
-            // Logic Update
-            if (isActive) chaos = Math.min(chaos + 0.04, 1.0);
-            else chaos = Math.max(chaos - 0.05, 0);
-
-            // Clear with deep fade for "glow" trails
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-            ctx.fillRect(0, 0, width, height);
-
-            ctx.lineJoin = 'round';
-            ctx.lineCap = 'round';
-
-            // Parameters
-            const strandCount = 12; // Number of lines in the ribbon
-            const speed = 0.02 + (chaos * 0.05);
-            const baseAmp = height / 5;
-            
-            // Loop for strands
-            for (let i = 0; i < strandCount; i++) {
-                ctx.beginPath();
-                
-                // Offset calculation (creates the 3D ribbon effect)
-                // If chaos is high, the offset becomes random (unraveling)
-                let offset = (i - strandCount/2) * 15;
-                if (chaos > 0) {
-                    offset += (Math.random() - 0.5) * chaos * 50;
-                }
-
-                // Dynamic Color
-                // Fade opacity based on distance from center strand
-                let opacity = 1 - (Math.abs(i - strandCount/2) / (strandCount/2 + 2));
-                
-                if (isActive || chaos > 0.5) {
-                    ctx.strokeStyle = `rgba(255, ${50 + Math.random()*100}, 50, ${opacity})`;
-                    ctx.lineWidth = 2 + Math.random() * 2;
-                } else {
-                    // Cyan/Blue mix
-                    let g = 200 + i * 5;
-                    let b = 255;
-                    ctx.strokeStyle = `rgba(0, ${g}, ${b}, ${opacity})`;
-                    ctx.lineWidth = 2;
-                }
-
-                // Draw Strand
-                for (let x = 0; x <= width; x += 5) {
-                    // 1. Main Sine
-                    let y = height / 2 + Math.sin(x * 0.01 + time + (i * 0.1)) * baseAmp;
-                    
-                    // 2. Secondary Harmonic (adds complexity)
-                    y += Math.sin(x * 0.02 - time * 1.5) * (baseAmp * 0.3);
-
-                    // 3. Noise (only during chaos)
-                    if (chaos > 0) {
-                        y += (Math.random() - 0.5) * chaos * 30;
+            criteria.forEach(item => {
+                const radios = document.getElementsByName(item);
+                for (const radio of radios) {
+                    if (radio.checked) {
+                        totalScore += parseInt(radio.value);
+                        answeredCount++;
                     }
-
-                    // Apply Ribbon Offset
-                    y += offset;
-
-                    // Tilt the ribbon slightly for perspective
-                    y += (x / width) * (i * 10); 
-
-                    if (x === 0) ctx.moveTo(x, y);
-                    else ctx.lineTo(x, y);
                 }
-                ctx.stroke();
-            }
+            });
 
-            // HUD Randomizer
-            if (Math.random() > 0.9) {
-                let load = 42 + Math.floor(Math.sin(time) * 10);
-                if (isActive) load = 85 + Math.floor(Math.random() * 14);
-                loadVal.innerText = load;
-                latency.innerText = isActive ? Math.floor(Math.random() * 100) : 12;
+            // Update UI
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            const interpretationBox = document.getElementById('interpretationBox');
+            const incompleteBox = document.getElementById('incompleteBox');
+            
+            if (answeredCount === 8) {
+                scoreDisplay.innerText = totalScore;
+                incompleteBox.classList.add('hidden');
+                interpretationBox.classList.remove('hidden');
+                updateInterpretation(totalScore);
+            } else {
+                scoreDisplay.innerText = "--";
+                incompleteBox.classList.remove('hidden');
+                interpretationBox.classList.add('hidden');
             }
-
-            time += speed;
-            requestAnimationFrame(draw);
         }
-        draw();
+
+        function updateInterpretation(score) {
+            const statusText = document.getElementById('statusText');
+            const recText = document.getElementById('recommendationText');
+            const scoreBox = document.querySelector('.score-box');
+
+            // Reset classes
+            statusText.className = "text-xl font-bold mb-4"; 
+            
+            if (score >= 13) {
+                // Good / Low Risk
+                scoreBox.style.background = "linear-gradient(135deg, #2f855a 0%, #276749 100%)"; // Green
+                statusText.innerText = "Mild / No Dehydration";
+                statusText.classList.add("text-green-700");
+                recText.innerHTML = "<strong>Plan:</strong> Discharge with anticipated guidance.<br>Encourage oral rehydration therapy (ORT) at home. Return precautions given.";
+            } else if (score >= 9) {
+                // Moderate Risk
+                scoreBox.style.background = "linear-gradient(135deg, #d69e2e 0%, #b7791f 100%)"; // Yellow/Orange
+                statusText.innerText = "Moderate Dehydration";
+                statusText.classList.add("text-yellow-700");
+                recText.innerHTML = "<strong>Plan:</strong> Oral Rehydration Challenge in ED.<br>Trial of Zofran. Consider IV fluids if PO fails. Observation recommended.";
+            } else {
+                // Severe Risk
+                scoreBox.style.background = "linear-gradient(135deg, #c53030 0%, #9b2c2c 100%)"; // Red
+                statusText.innerText = "Severe Dehydration";
+                statusText.classList.add("text-red-700");
+                recText.innerHTML = "<strong>Plan:</strong> Immediate IV Access.<br>20mL/kg bolus Normal Saline. Admit for ongoing management and electrolyte correction.";
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('fernandoForm').reset();
+            calculateScore();
+            // Reset background color to blue
+            document.querySelector('.score-box').style.background = "linear-gradient(135deg, #2b6cb0 0%, #2c5282 100%)";
+        }
+
+        function copyResults() {
+            const score = document.getElementById('scoreDisplay').innerText;
+            if(score === "--") {
+                alert("Please complete the assessment first.");
+                return;
+            }
+            
+            const status = document.getElementById('statusText').innerText;
+            const text = `FERNANDO Index Assessment\nScore: ${score}/16\nInterpretation: ${status}\nAssessment Time: ${new Date().toLocaleString()}\n\nCalculated via Fernando Index Tool`;
+            
+            // Clipboard API specific to iframes/browsers
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            
+            const btn = document.querySelector('button[onclick="copyResults()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+            }, 2000);
+        }
     </script>
 </body>
 </html>
