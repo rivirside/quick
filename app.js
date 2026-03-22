@@ -1174,6 +1174,7 @@ function openArticle(id) {
 
   body.textContent = '';
 
+  // Hero image
   const heroDiv = document.createElement('div');
   if (article.image) {
     heroDiv.style.cssText = 'height:200px; border-radius:var(--radius); display:flex; align-items:center; justify-content:center; font-size:64px; margin-bottom:24px; background-size:cover; background-position:center';
@@ -1186,6 +1187,7 @@ function openArticle(id) {
   }
   body.appendChild(heroDiv);
 
+  // Category + title + meta
   const catSpan = document.createElement('span');
   catSpan.className = `article-category ${article.category}`;
   catSpan.style.cssText = 'position:static; margin-bottom:12px; display:inline-block';
@@ -1202,20 +1204,72 @@ function openArticle(id) {
   metaDiv.textContent = `By ${article.author} \u00B7 ${article.readTime} read \u00B7 March 21, 2026`;
   body.appendChild(metaDiv);
 
-  const p1 = document.createElement('p');
-  p1.style.cssText = 'color:var(--text-secondary); line-height:1.8; margin-bottom:16px';
-  p1.textContent = "This is a preview of the full article. In the live version of BoxScores, you'd see the complete story here with embedded stats, interactive charts, and related content recommendations.";
-  body.appendChild(p1);
+  // Blurred preview paragraph with fade
+  const previewWrap = document.createElement('div');
+  previewWrap.style.cssText = 'position:relative; margin-bottom:0; overflow:hidden; max-height:80px';
 
-  const p2 = document.createElement('p');
-  p2.style.cssText = 'color:var(--text-secondary); line-height:1.8; margin-bottom:16px';
-  p2.textContent = "Our team of writers and analysts bring you the most compelling stories from across the sports world. Whether it's in-depth analysis, breaking news, or the week's best memes \u2014 we've got you covered.";
-  body.appendChild(p2);
+  const previewText = document.createElement('p');
+  previewText.style.cssText = 'color:var(--text-secondary); line-height:1.8; margin-bottom:16px; filter:blur(3px); user-select:none';
+  previewText.textContent = 'Breaking down the numbers, the tape, and everything in between. Our analysts dove deep into the data to bring you this exclusive story. The findings are nothing short of remarkable — from the advanced metrics to the eye-test moments that define greatness in the modern era of sports.';
+  previewWrap.appendChild(previewText);
 
-  const p3 = document.createElement('p');
-  p3.style.cssText = 'color:var(--text-muted); font-style:italic';
-  p3.textContent = 'Sign up for BoxScores Pro to get unlimited access to all stories, ad-free.';
-  body.appendChild(p3);
+  const fadeOverlay = document.createElement('div');
+  fadeOverlay.style.cssText = 'position:absolute; bottom:0; left:0; right:0; height:60px; background:linear-gradient(to bottom, transparent, var(--bg-card))';
+  previewWrap.appendChild(fadeOverlay);
+  body.appendChild(previewWrap);
+
+  // Members-only gate
+  const gate = document.createElement('div');
+  gate.style.cssText = 'text-align:center; padding:32px 24px; border:1px solid var(--border); border-radius:var(--radius); background:rgba(255,255,255,0.02); margin-top:16px';
+
+  const lockIcon = document.createElement('div');
+  lockIcon.style.cssText = 'font-size:40px; margin-bottom:16px';
+  const lockI = document.createElement('i');
+  lockI.className = 'fa-solid fa-lock';
+  lockI.style.color = 'var(--red)';
+  lockIcon.appendChild(lockI);
+  gate.appendChild(lockIcon);
+
+  const gateTitle = document.createElement('h3');
+  gateTitle.style.cssText = 'font-size:20px; font-weight:800; margin-bottom:8px';
+  gateTitle.textContent = 'Members Only';
+  gate.appendChild(gateTitle);
+
+  const gateDesc = document.createElement('p');
+  gateDesc.style.cssText = 'color:var(--text-muted); font-size:14px; margin-bottom:24px; line-height:1.6';
+  gateDesc.textContent = 'This article is exclusive to BoxScores members. Create a free account to unlock all stories, analysis, and hot takes.';
+  gate.appendChild(gateDesc);
+
+  const gateButtons = document.createElement('div');
+  gateButtons.style.cssText = 'display:flex; gap:12px; justify-content:center; flex-wrap:wrap';
+
+  const signupBtn = document.createElement('button');
+  signupBtn.className = 'btn btn-primary';
+  signupBtn.textContent = 'Sign Up Free';
+  signupBtn.onclick = () => { closeModal('modal-article'); openModal('modal-signup'); };
+  gateButtons.appendChild(signupBtn);
+
+  const loginBtn = document.createElement('button');
+  loginBtn.className = 'btn btn-secondary';
+  loginBtn.textContent = 'Log In';
+  loginBtn.onclick = () => { closeModal('modal-article'); openModal('modal-login'); };
+  gateButtons.appendChild(loginBtn);
+
+  gate.appendChild(gateButtons);
+
+  const proNote = document.createElement('p');
+  proNote.style.cssText = 'color:var(--text-muted); font-size:12px; margin-top:16px';
+  const proNoteText = document.createTextNode('Already a member? ');
+  const proNoteLink = document.createElement('a');
+  proNoteLink.href = '#';
+  proNoteLink.style.color = 'var(--red)';
+  proNoteLink.textContent = 'Log in here';
+  proNoteLink.onclick = (e) => { e.preventDefault(); closeModal('modal-article'); openModal('modal-login'); };
+  proNote.appendChild(proNoteText);
+  proNote.appendChild(proNoteLink);
+  gate.appendChild(proNote);
+
+  body.appendChild(gate);
 
   modal.classList.add('active');
 }
