@@ -362,7 +362,7 @@ input, select { font-family: var(--font); }
   overflow: hidden;
   display: flex;
   gap: 20px;
-  align-items: flex-start;
+  align-items: center;
 }
 .feature-card::before {
   content: '';
