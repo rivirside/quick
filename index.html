@@ -1,678 +1,274 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BoxScores - Every Stat. Every Sport. Your Way.</title>
-  <link rel="stylesheet" href="styles.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <style>
-    /* Search dropdown */
-    #search-dropdown {
-      display: none;
-      position: absolute;
-      top: 100%;
-      right: 0;
-      width: 300px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      box-shadow: var(--shadow);
-      z-index: 1001;
-      max-height: 300px;
-      overflow-y: auto;
-    }
-    .search-result {
-      padding: 12px 16px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border-bottom: 1px solid var(--border);
-      transition: background 0.15s;
-    }
-    .search-result:hover { background: rgba(255,255,255,0.03); }
-    .search-result:last-child { border-bottom: none; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phoenix ↔ Tokyo Time Planner</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0f1117;color:#e4e4e7;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem}
+  h1{font-size:1.4rem;font-weight:600;margin-bottom:.25rem;color:#a1a1aa}
+  .subtitle{color:#52525b;font-size:.85rem;margin-bottom:2rem}
+  .badge{display:inline-block;background:#1e1e2e;border:1px solid #2e2e3e;border-radius:999px;padding:.35rem 1rem;font-size:.8rem;color:#818cf8;margin-bottom:2.5rem}
+
+  /* Clocks */
+  .clocks{display:flex;gap:3rem;margin-bottom:2.5rem;flex-wrap:wrap;justify-content:center}
+  .clock{text-align:center;min-width:180px}
+  .clock-label{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:#71717a;margin-bottom:.5rem}
+  .clock-time{font-size:3rem;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+  .clock-date{font-size:.8rem;color:#52525b;margin-top:.25rem}
+  .phoenix .clock-time{color:#fb923c}
+  .tokyo .clock-time{color:#818cf8}
+
+  /* Timeline */
+  .timeline-section{width:100%;max-width:800px;margin-bottom:2rem}
+  .timeline-section h2{font-size:.85rem;color:#71717a;margin-bottom:1rem;text-transform:uppercase;letter-spacing:.08em}
+  .timeline-row{display:flex;align-items:center;margin-bottom:.75rem}
+  .timeline-label{width:80px;font-size:.75rem;color:#a1a1aa;flex-shrink:0}
+  .timeline-bar{display:flex;flex:1;height:36px;border-radius:6px;overflow:hidden;gap:1px}
+  .hour-cell{flex:1;display:flex;align-items:center;justify-content:center;font-size:.6rem;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;position:relative}
+  .hour-cell:hover{transform:scaleY(1.15);z-index:1;filter:brightness(1.3)}
+  .hour-cell.sleep{background:#1a1a2e}
+  .hour-cell.groggy{background:#2d2a1a}
+  .hour-cell.awake{background:#1a2e1a}
+  .hour-cell.overlap{background:#166534;box-shadow:inset 0 0 0 1px rgba(74,222,128,.3)}
+  .hour-cell.selected{outline:2px solid #fff;outline-offset:-1px;z-index:2}
+
+  /* Hour labels */
+  .hour-labels-row{display:flex;margin-left:80px;flex:1;margin-bottom:1.5rem}
+  .hour-labels-row span{flex:1;text-align:center;font-size:.55rem;color:#3f3f46}
+
+  /* Legend */
+  .legend{display:flex;gap:1.5rem;justify-content:center;margin-bottom:2rem;flex-wrap:wrap}
+  .legend-item{display:flex;align-items:center;gap:.4rem;font-size:.75rem;color:#a1a1aa}
+  .legend-dot{width:12px;height:12px;border-radius:3px}
+
+  /* Planner card */
+  .planner{background:#1a1a2e;border:1px solid #2e2e3e;border-radius:12px;padding:1.5rem;max-width:500px;width:100%;text-align:center;min-height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .planner-hint{color:#52525b;font-size:.85rem}
+  .planner-result{font-size:1.1rem;line-height:1.6}
+  .planner-result .time-phoenix{color:#fb923c;font-weight:600}
+  .planner-result .time-tokyo{color:#818cf8;font-weight:600}
+  .planner-quality{display:inline-block;margin-top:.5rem;padding:.2rem .75rem;border-radius:999px;font-size:.75rem;font-weight:600}
+  .quality-good{background:#166534;color:#4ade80}
+  .quality-okay{background:#713f12;color:#fbbf24}
+  .quality-bad{background:#7f1d1d;color:#fca5a5}
+
+  /* Overlap callout */
+  .overlap-callout{background:linear-gradient(135deg,#0f2e1a,#1a1a2e);border:1px solid #166534;border-radius:12px;padding:1.25rem;max-width:500px;width:100%;text-align:center;margin-bottom:1.5rem}
+  .overlap-callout h3{color:#4ade80;font-size:.85rem;margin-bottom:.4rem}
+  .overlap-callout p{color:#a1a1aa;font-size:.85rem}
+
+  @media(max-width:600px){
+    .clocks{gap:1.5rem}
+    .clock-time{font-size:2.2rem}
+    .timeline-label{width:55px;font-size:.65rem}
+    .hour-cell{font-size:.5rem}
+    .hour-labels-row{margin-left:55px}
+    body{padding:1.5rem .75rem}
+  }
+</style>
 </head>
 <body>
 
-<!-- Ambient Background -->
-<div class="ambient-bg">
-  <div class="ambient-orb"></div>
-  <div class="ambient-orb"></div>
-  <div class="ambient-orb"></div>
-</div>
+<h1>Phoenix ↔ Tokyo</h1>
+<p class="subtitle">Plan across the Pacific</p>
+<div class="badge">Tokyo is 16 hours ahead</div>
 
-<!-- Navigation -->
-<nav class="nav">
-  <div class="nav-logo">
-    BOX<span class="red">SCORES</span>
-    <span class="dot"></span>
+<div class="clocks">
+  <div class="clock phoenix">
+    <div class="clock-label">Phoenix, AZ</div>
+    <div class="clock-time" id="phoenix-time">--:--:--</div>
+    <div class="clock-date" id="phoenix-date">---</div>
   </div>
-
-  <div class="nav-links">
-    <button class="nav-link active" data-page="home" onclick="navigate('home')">Home</button>
-    <button class="nav-link" data-page="scores" onclick="navigate('scores')">Scores</button>
-    <button class="nav-link" data-page="tools" onclick="navigate('tools')">Tools</button>
-    <button class="nav-link betting" data-page="betting" onclick="navigate('betting')">Gambler's Paradise</button>
-    <button class="nav-link" data-page="stories" onclick="navigate('stories')">Stories</button>
-    <button class="nav-link" data-page="pricing" onclick="navigate('pricing')">Pricing</button>
-  </div>
-
-  <div class="nav-right" style="position:relative">
-    <input type="text" class="nav-search" placeholder="Search players, teams..." oninput="handleSearch(this.value)" onfocus="handleSearch(this.value)">
-    <div id="search-dropdown"></div>
-    <button class="btn-signup" onclick="openModal('modal-signup')">Sign Up Free</button>
-  </div>
-
-  <button class="hamburger" onclick="toggleMenu()">&#9776;</button>
-</nav>
-
-<!-- ==================== HOME PAGE ==================== -->
-<div id="page-home" class="page active">
-
-  <!-- Hero -->
-  <div class="hero">
-    <div class="hero-badge">
-      <span class="live-dot"></span>
-      Live Data Across 10+ Sports
-    </div>
-    <h1>Every Stat.<br>Every Sport.<br>Your Way.</h1>
-    <p>The only sports data platform you'll ever need. Free tools, live scores, betting analytics, and stories &mdash; all in one place.</p>
-    <div class="hero-buttons">
-      <button class="btn btn-primary" onclick="navigate('scores')">View Live Scores</button>
-      <button class="btn btn-secondary" onclick="navigate('tools')">Explore Tools</button>
-    </div>
-  </div>
-
-  <!-- Ticker -->
-  <div class="ticker-wrap">
-    <div class="ticker" id="ticker"></div>
-  </div>
-
-  <div class="container">
-    <!-- Stats Counter -->
-    <div class="stats-counter">
-      <div class="stat-item">
-        <div class="stat-number" data-target="10000000+">0</div>
-        <div class="stat-label">Data Points</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number" data-target="50+">0</div>
-        <div class="stat-label">Sports & Leagues</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number" data-target="100+">0</div>
-        <div class="stat-label">Free Tools</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number" data-target="250000+">0</div>
-        <div class="stat-label">Active Users</div>
-      </div>
-    </div>
-
-    <!-- Feature Cards -->
-    <div class="features">
-      <div class="feature-card" onclick="navigate('scores')">
-        <span class="feature-icon"><i class="fa-solid fa-bolt"></i></span>
-        <div class="feature-card-text"><h3>Live Scores & Box Scores</h3>
-        <p>Real-time scores across every major sport. Click into any game for full box scores, play-by-play, and key stats.</p></div>
-      </div>
-      <div class="feature-card" onclick="navigate('tools')">
-        <span class="feature-icon"><i class="fa-solid fa-chart-column"></i></span>
-        <div class="feature-card-text"><h3>Interactive Data Tools</h3>
-        <p>Compare players head-to-head, build custom queries, explore stats with sortable tables. No other site lets you play with data like this.</p></div>
-      </div>
-      <div class="feature-card" onclick="navigate('betting')">
-        <span class="feature-icon"><i class="fa-solid fa-dice"></i></span>
-        <div class="feature-card-text"><h3>Gambler's Paradise</h3>
-        <p>Everything a bettor needs in one compact dashboard. Lines, injuries, AI predictions, sharp money trends &mdash; all at a glance.</p></div>
-      </div>
-      <div class="feature-card" onclick="navigate('stories')">
-        <span class="feature-icon"><i class="fa-solid fa-newspaper"></i></span>
-        <div class="feature-card-text"><h3>Stories & Humor</h3>
-        <p>Hot takes, meme roundups, deep analysis, and breaking news. The content you actually want to read about sports.</p></div>
-      </div>
-      <div class="feature-card" onclick="navigate('tools')">
-        <span class="feature-icon"><i class="fa-solid fa-magnifying-glass-chart"></i></span>
-        <div class="feature-card-text"><h3>Query Builder</h3>
-        <p>Run custom queries on our database like a pro. Filter by any stat, any condition, any sport. Export results to CSV.</p></div>
-      </div>
-      <div class="feature-card" onclick="navigate('pricing')">
-        <span class="feature-icon"><i class="fa-solid fa-crown"></i></span>
-        <div class="feature-card-text"><h3>100% Free Core</h3>
-        <p>All scores, basic tools, and stories are free forever. Go Pro for unlimited tools or Degen for the full betting suite.</p></div>
-      </div>
-    </div>
-
-    <!-- Featured Videos -->
-    <div class="section-header">
-      <h2><span class="accent"><i class="fa-solid fa-clapperboard"></i></span> Featured Videos</h2>
-    </div>
-    <div class="category-filters" id="video-filters">
-      <button class="category-filter active" data-sport="all" onclick="filterVideos('all')">All</button>
-      <button class="category-filter" data-sport="nba" onclick="filterVideos('nba')">NBA</button>
-      <button class="category-filter" data-sport="nfl" onclick="filterVideos('nfl')">NFL</button>
-      <button class="category-filter" data-sport="mlb" onclick="filterVideos('mlb')">MLB</button>
-      <button class="category-filter" data-sport="nhl" onclick="filterVideos('nhl')">NHL</button>
-      <button class="category-filter" data-sport="mls" onclick="filterVideos('mls')">MLS</button>
-    </div>
-    <div id="home-videos" class="carousel-wrapper">
-      <button class="carousel-arrow arrow-left" id="carousel-prev">&#8249;</button>
-      <div class="carousel-scene" id="carousel-scene"></div>
-      <button class="carousel-arrow arrow-right" id="carousel-next">&#8250;</button>
-      <div class="carousel-indicators" id="carousel-dots"></div>
-    </div>
-
-    <!-- Trending Stories Preview -->
-    <div class="section-header">
-      <h2><span class="accent"><i class="fa-solid fa-fire"></i></span> Trending Now</h2>
-      <button class="btn btn-secondary" style="padding:8px 16px; font-size:12px" onclick="navigate('stories')">View All</button>
-    </div>
-    <div id="home-articles" class="articles-grid"></div>
+  <div class="clock tokyo">
+    <div class="clock-label">Tokyo, JP</div>
+    <div class="clock-time" id="tokyo-time">--:--:--</div>
+    <div class="clock-date" id="tokyo-date">---</div>
   </div>
 </div>
 
-<!-- ==================== SCORES PAGE ==================== -->
-<div id="page-scores" class="page">
-  <div class="container">
-    <div class="section-header">
-      <h2><span class="accent"><i class="fa-solid fa-bolt"></i></span> Live Scores</h2>
-      <div class="date-buttons" style="display:flex; gap:8px; align-items:center">
-        <button class="btn btn-secondary date-btn" style="padding:6px 12px; font-size:11px" onclick="switchDate('yesterday', this)">Yesterday</button>
-        <button class="btn btn-primary date-btn active" style="padding:6px 12px; font-size:11px" onclick="switchDate('today', this)">Today</button>
-        <button class="btn btn-secondary date-btn" style="padding:6px 12px; font-size:11px" onclick="switchDate('tomorrow', this)">Tomorrow</button>
-      </div>
-    </div>
-
-    <div class="sport-tabs scores-section">
-      <button class="sport-tab active" data-sport="nba" onclick="switchSport('nba', this.parentElement)">NBA</button>
-      <button class="sport-tab" data-sport="nfl" onclick="switchSport('nfl', this.parentElement)">NFL</button>
-      <button class="sport-tab" data-sport="mlb" onclick="switchSport('mlb', this.parentElement)">MLB</button>
-      <button class="sport-tab" data-sport="nhl" onclick="switchSport('nhl', this.parentElement)">NHL</button>
-      <button class="sport-tab" data-sport="mls" onclick="switchSport('mls', this.parentElement)">MLS</button>
-    </div>
-
-    <div id="scores-grid" class="scores-grid"></div>
-
-    <!-- Standings -->
-    <div class="section-header" style="margin-top:20px">
-      <h2><span class="accent"><i class="fa-solid fa-trophy"></i></span> Standings</h2>
-    </div>
-    <div class="tool-section">
-      <div id="standings-container"></div>
-    </div>
+<div class="timeline-section">
+  <h2>24-Hour View</h2>
+  <div class="timeline-row">
+    <div class="timeline-label">Phoenix</div>
+    <div class="timeline-bar" id="phoenix-bar"></div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-label">Tokyo</div>
+    <div class="timeline-bar" id="tokyo-bar"></div>
+  </div>
+  <div class="timeline-row">
+    <div class="timeline-label"></div>
+    <div class="hour-labels-row" id="hour-labels"></div>
   </div>
 </div>
 
-<!-- ==================== TOOLS PAGE ==================== -->
-<div id="page-tools" class="page">
-  <div class="container">
-    <div class="section-header">
-      <h2><span class="accent"><i class="fa-solid fa-chart-column"></i></span> Data Tools</h2>
-    </div>
-
-    <!-- Player Comparison -->
-    <div class="tool-section">
-      <h3>Player Comparison</h3>
-      <p class="subtitle">Select two NBA players to compare their stats head-to-head</p>
-      <div class="compare-container">
-        <div class="compare-player">
-          <select id="compare-player-1" class="compare-select" onchange="runComparison()"></select>
-        </div>
-        <div class="compare-vs">VS</div>
-        <div class="compare-player">
-          <select id="compare-player-2" class="compare-select" onchange="runComparison()"></select>
-        </div>
-      </div>
-      <div id="compare-results" class="compare-stats"></div>
-    </div>
-
-    <!-- Player Radar Chart -->
-    <div class="tool-section">
-      <h3>Player Radar Chart</h3>
-      <p class="subtitle">Visualize a player's strengths across five key dimensions</p>
-      <div class="radar-controls">
-        <select id="radar-player-select" class="compare-select" style="max-width:320px"></select>
-      </div>
-      <div class="radar-chart-wrap">
-        <svg id="radar-chart-svg" viewBox="0 0 500 460" xmlns="http://www.w3.org/2000/svg"></svg>
-      </div>
-    </div>
-
-    <!-- Stat Explorer -->
-    <div class="tool-section">
-      <h3>Stat Explorer</h3>
-      <p class="subtitle">Click column headers to sort. Type to search by player, team, or position.</p>
-
-      <div class="sport-tabs" style="margin-bottom:16px">
-        <button class="table-sport-tab sport-tab active" data-sport="nba" onclick="switchTableSport('nba')">NBA</button>
-        <button class="table-sport-tab sport-tab" data-sport="nfl" onclick="switchTableSport('nfl')">NFL</button>
-        <button class="table-sport-tab sport-tab" data-sport="mlb" onclick="switchTableSport('mlb')">MLB</button>
-        <button class="table-sport-tab sport-tab" data-sport="nhl" onclick="switchTableSport('nhl')">NHL</button>
-      </div>
-
-      <div class="table-controls">
-        <input type="text" class="table-search" placeholder="Search players, teams, positions..." oninput="filterTable(this.value)">
-      </div>
-
-      <div class="table-overflow">
-        <table class="data-table" id="stat-table">
-          <thead id="stat-thead">
-            <tr>
-              <th data-col="name" onclick="sortTable('name')">Player<span class="sort-arrow"></span></th>
-              <th data-col="team" onclick="sortTable('team')">Team<span class="sort-arrow"></span></th>
-              <th data-col="pos" onclick="sortTable('pos')">Pos<span class="sort-arrow"></span></th>
-              <th data-col="ppg" onclick="sortTable('ppg')">PPG<span class="sort-arrow"></span></th>
-              <th data-col="rpg" onclick="sortTable('rpg')">RPG<span class="sort-arrow"></span></th>
-              <th data-col="apg" onclick="sortTable('apg')">APG<span class="sort-arrow"></span></th>
-              <th data-col="fg" onclick="sortTable('fg')">FG%<span class="sort-arrow"></span></th>
-              <th data-col="gp" onclick="sortTable('gp')">GP<span class="sort-arrow"></span></th>
-            </tr>
-          </thead>
-          <tbody id="stat-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Query Builder -->
-    <div class="tool-section">
-      <h3>Query Builder</h3>
-      <p class="subtitle">Build custom queries to filter and find exactly the data you need</p>
-
-      <div class="query-builder">
-        <div class="query-field">
-          <label>Sport</label>
-          <select id="query-sport" onchange="updateQueryStats()">
-            <option value="nba">NBA</option>
-            <option value="nfl">NFL</option>
-            <option value="mlb">MLB</option>
-            <option value="nhl">NHL</option>
-          </select>
-        </div>
-        <div class="query-field">
-          <label>Stat</label>
-          <select id="query-stat">
-            <option value="ppg">PPG</option>
-            <option value="rpg">RPG</option>
-            <option value="apg">APG</option>
-            <option value="gp">GP</option>
-          </select>
-        </div>
-        <div class="query-field">
-          <label>Condition</label>
-          <select id="query-condition">
-            <option value="gt">Greater Than</option>
-            <option value="lt">Less Than</option>
-            <option value="eq">Equal To</option>
-          </select>
-        </div>
-        <div class="query-field">
-          <label>Value</label>
-          <input type="number" id="query-value" value="25" step="0.1">
-        </div>
-        <button class="btn-run" onclick="runQuery()">Run Query</button>
-      </div>
-
-      <div id="query-results" class="query-results">Click "Run Query" to execute your query...</div>
-    </div>
-  </div>
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#1a2e1a"></div>Awake (8a–9p)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#2d2a1a"></div>Early / Late</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#1a1a2e"></div>Sleeping</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#166534"></div>Both awake</div>
 </div>
 
-<!-- ==================== BETTING PAGE ==================== -->
-<div id="page-betting" class="page">
-  <div class="container">
-    <div class="section-header">
-      <h2><span style="color:var(--red)"><i class="fa-solid fa-dice"></i></span> Gambler's Paradise</h2>
-    </div>
-
-    <div class="betting-warning">
-      21+ | Gambling Problem? Call 1-800-GAMBLER | Play Responsibly
-    </div>
-
-    <!-- Odds Table -->
-    <div class="tool-section">
-      <h3>Today's Lines</h3>
-      <p class="subtitle">Click any odds value to add to your slip</p>
-
-      <div class="sport-tabs" style="margin-bottom:16px">
-        <button class="betting-sport-tab sport-tab active" data-sport="nba" onclick="switchBettingSport('nba')">NBA</button>
-        <button class="betting-sport-tab sport-tab" data-sport="nfl" onclick="switchBettingSport('nfl')">NFL</button>
-        <button class="betting-sport-tab sport-tab" data-sport="mlb" onclick="switchBettingSport('mlb')">MLB</button>
-        <button class="betting-sport-tab sport-tab" data-sport="nhl" onclick="switchBettingSport('nhl')">NHL</button>
-      </div>
-
-      <div class="table-overflow">
-        <table class="odds-table">
-          <thead>
-            <tr>
-              <th>Game</th>
-              <th>Spread</th>
-              <th>ML Away</th>
-              <th>ML Home</th>
-              <th>O/U</th>
-              <th>Time</th>
-            </tr>
-          </thead>
-          <tbody id="odds-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Injury Report -->
-    <div class="tool-section">
-      <h3>Injury Report</h3>
-      <p class="subtitle">Latest injury updates across all sports</p>
-      <div class="sport-tabs" style="margin-bottom:16px">
-        <button class="injury-sport-tab sport-tab active" data-sport="all" onclick="filterInjuries('all')">All</button>
-        <button class="injury-sport-tab sport-tab" data-sport="nba" onclick="filterInjuries('nba')">NBA</button>
-        <button class="injury-sport-tab sport-tab" data-sport="nfl" onclick="filterInjuries('nfl')">NFL</button>
-        <button class="injury-sport-tab sport-tab" data-sport="mlb" onclick="filterInjuries('mlb')">MLB</button>
-        <button class="injury-sport-tab sport-tab" data-sport="nhl" onclick="filterInjuries('nhl')">NHL</button>
-      </div>
-      <div id="injury-list" class="injury-list"></div>
-    </div>
-
-    <!-- AI Predictions -->
-    <div class="tool-section">
-      <h3>AI Predictions Engine</h3>
-      <p class="subtitle">Our ML model analyzes 500+ variables per game. Updated every 30 minutes.</p>
-      <div id="predictions-grid" class="predictions-grid"></div>
-    </div>
-
-    <!-- Win Probability Chart -->
-    <div class="tool-section">
-      <h3>Win Probability Chart</h3>
-      <p class="subtitle">Live win probability over the course of the game. Select a game to visualize.</p>
-      <div class="win-prob-controls">
-        <select id="win-prob-game-select" class="compare-select" style="max-width:320px"></select>
-      </div>
-      <div class="win-prob-chart-wrap">
-        <canvas id="win-prob-canvas" width="760" height="340"></canvas>
-      </div>
-    </div>
-
-    <!-- Betting Trends -->
-    <div class="tool-section">
-      <h3>Public vs Sharp Money</h3>
-      <p class="subtitle">See where the money is going. Sharp money = professional bettors.</p>
-      <div id="trends-container"></div>
-    </div>
-  </div>
+<div class="overlap-callout">
+  <h3>Best overlap window</h3>
+  <p><span style="color:#fb923c">5 PM – 9 PM Phoenix</span> = <span style="color:#818cf8">9 AM – 1 PM Tokyo (+1 day)</span></p>
 </div>
 
-<!-- ==================== STORIES PAGE ==================== -->
-<div id="page-stories" class="page">
-  <div class="container">
-    <div class="section-header">
-      <h2><span class="accent"><i class="fa-solid fa-newspaper"></i></span> Stories & Humor</h2>
-    </div>
-
-    <div class="category-filters">
-      <button class="category-filter active" data-cat="all" onclick="filterStories('all')">All</button>
-      <button class="category-filter" data-cat="breaking" onclick="filterStories('breaking')">Breaking</button>
-      <button class="category-filter" data-cat="analysis" onclick="filterStories('analysis')">Analysis</button>
-      <button class="category-filter" data-cat="highlight" onclick="filterStories('highlight')">Highlights</button>
-      <button class="category-filter" data-cat="humor" onclick="filterStories('humor')">Humor</button>
-      <button class="category-filter" data-cat="hot-take" onclick="filterStories('hot-take')">Hot Takes</button>
-    </div>
-
-    <div id="articles-grid" class="articles-grid"></div>
-  </div>
+<div class="planner" id="planner">
+  <div class="planner-hint">Click any hour on the timeline to plan</div>
 </div>
 
-<!-- ==================== PRICING PAGE ==================== -->
-<div id="page-pricing" class="page">
-  <div class="container">
-    <div style="text-align:center; padding-top:40px">
-      <h2 style="font-size:36px; font-weight:900; margin-bottom:8px">Simple, Transparent Pricing</h2>
-      <p style="color:var(--text-secondary); font-size:16px; margin-bottom:8px">Start free. Upgrade when you're ready. Pause anytime.</p>
-      <p style="color:var(--text-muted); font-size:13px">No hidden fees. No contracts. Cancel or pause in one click.</p>
-    </div>
-
-    <div class="pricing-grid">
-      <div class="pricing-card">
-        <div class="pricing-name">Free</div>
-        <p style="color:var(--text-muted); font-size:13px">Everything you need to get started</p>
-        <div class="pricing-price">$0<span class="period"> forever</span></div>
-        <ul class="pricing-features">
-          <li>Live scores (all sports)</li>
-          <li>Basic box scores</li>
-          <li>Stories & humor section</li>
-          <li>Limited player comparison (3/day)</li>
-          <li>Ad-supported</li>
-        </ul>
-        <button class="btn-pricing" onclick="openModal('modal-signup')">Get Started</button>
-      </div>
-
-      <div class="pricing-card popular">
-        <div class="pricing-popular-badge">Most Popular</div>
-        <div class="pricing-name">Pro</div>
-        <p style="color:var(--text-muted); font-size:13px">For the serious sports fan</p>
-        <div class="pricing-price">$9.99<span class="period">/mo</span></div>
-        <ul class="pricing-features">
-          <li>Everything in Free</li>
-          <li>Unlimited data tools</li>
-          <li>Advanced stat explorer</li>
-          <li>Custom query builder</li>
-          <li>Ad-free experience</li>
-          <li>Custom dashboard layout</li>
-          <li>Export data to CSV</li>
-        </ul>
-        <button class="btn-pricing" onclick="openModal('modal-signup')">Start Free Trial</button>
-      </div>
-
-      <div class="pricing-card">
-        <div class="pricing-name">Degen</div>
-        <p style="color:var(--text-muted); font-size:13px">For those who live and breathe the action</p>
-        <div class="pricing-price">$19.99<span class="period">/mo</span></div>
-        <ul class="pricing-features">
-          <li>Everything in Pro</li>
-          <li>Gambler's Paradise full access</li>
-          <li>AI predictions engine</li>
-          <li>Real-time injury alerts</li>
-          <li>Sharp money indicators</li>
-          <li>Betting trends & analytics</li>
-          <li>Priority data updates</li>
-          <li>Pause anytime</li>
-        </ul>
-        <button class="btn-pricing" onclick="openModal('modal-signup')">Go Full Degen</button>
-      </div>
-    </div>
-
-    <!-- Pause Membership Feature -->
-    <div class="tool-section" style="margin-top:40px; text-align:center">
-      <h3>Pause Your Membership Anytime</h3>
-      <p class="subtitle">Need a break? Pause your subscription and pick up right where you left off. No charges while paused.</p>
-      <div style="display:flex; align-items:center; justify-content:center; gap:12px; margin-top:20px">
-        <span style="color:var(--text-secondary)">Membership Status:</span>
-        <label style="position:relative; display:inline-block; width:52px; height:28px; cursor:pointer">
-          <input type="checkbox" checked style="opacity:0; width:0; height:0" id="pause-toggle">
-          <span style="position:absolute; top:0; left:0; right:0; bottom:0; background:var(--green); border-radius:28px; transition:0.3s" id="pause-slider"></span>
-          <span style="position:absolute; top:2px; left:2px; width:24px; height:24px; background:#fff; border-radius:50%; transition:0.3s" id="pause-knob"></span>
-        </label>
-        <span id="pause-label" style="color:var(--green); font-weight:700">Active</span>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ==================== MODALS ==================== -->
-
-<!-- Sign Up Modal -->
-<div id="modal-signup" class="modal-overlay">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-signup')">&times;</button>
-    <h2>Join BoxScores</h2>
-    <p>Create your free account and get access to live scores, stories, and basic tools.</p>
-    <input type="text" class="modal-input" placeholder="Full Name">
-    <input type="email" class="modal-input" placeholder="Email Address">
-    <input type="password" class="modal-input" placeholder="Create Password">
-    <button class="btn btn-primary" style="width:100%" onclick="closeModal('modal-signup')">Create Free Account</button>
-    <p style="text-align:center; margin-top:16px; font-size:13px; color:var(--text-muted)">
-      Already have an account? <a href="#" onclick="closeModal('modal-signup'); openModal('modal-login'); return false;">Log In</a>
-    </p>
-  </div>
-</div>
-
-<!-- Login Modal -->
-<div id="modal-login" class="modal-overlay">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal('modal-login')">&times;</button>
-    <h2>Welcome Back</h2>
-    <p>Log in to access your personalized dashboard and saved preferences.</p>
-    <input type="email" class="modal-input" placeholder="Email Address">
-    <input type="password" class="modal-input" placeholder="Password">
-    <button class="btn btn-primary" style="width:100%" onclick="closeModal('modal-login')">Log In</button>
-    <p style="text-align:center; margin-top:16px; font-size:13px; color:var(--text-muted)">
-      Don't have an account? <a href="#" onclick="closeModal('modal-login'); openModal('modal-signup'); return false;">Sign Up Free</a>
-    </p>
-  </div>
-</div>
-
-<!-- Box Score Modal -->
-<div id="modal-boxscore" class="modal-overlay">
-  <div class="modal" style="max-width:600px">
-    <button class="modal-close" onclick="closeModal('modal-boxscore')">&times;</button>
-    <div id="boxscore-body"></div>
-  </div>
-</div>
-
-<!-- Article Modal -->
-<div id="modal-article" class="modal-overlay">
-  <div class="modal" style="max-width:640px">
-    <button class="modal-close" onclick="closeModal('modal-article')">&times;</button>
-    <div id="article-body"></div>
-  </div>
-</div>
-
-<!-- Footer -->
-<footer class="footer">
-  <div class="footer-content">
-    <div>
-      <div class="footer-brand">BOX<span class="red">SCORES</span></div>
-      <p class="footer-desc">The ultimate sports data platform. Every stat, every sport, your way. Built by fans, for fans.</p>
-    </div>
-    <div class="footer-col">
-      <h4>Product</h4>
-      <a href="#" onclick="navigate('scores'); return false;">Live Scores</a>
-      <a href="#" onclick="navigate('tools'); return false;">Data Tools</a>
-      <a href="#" onclick="navigate('betting'); return false;">Gambler's Paradise</a>
-      <a href="#" onclick="navigate('stories'); return false;">Stories</a>
-    </div>
-    <div class="footer-col">
-      <h4>Company</h4>
-      <a href="#">About Us</a>
-      <a href="#">Careers</a>
-      <a href="#">Contact</a>
-      <a href="#">Press</a>
-    </div>
-    <div class="footer-col">
-      <h4>Legal</h4>
-      <a href="#">Privacy Policy</a>
-      <a href="#">Terms of Service</a>
-      <a href="#">Cookie Policy</a>
-      <a href="#">Responsible Gaming</a>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    &copy; 2026 BoxScores. All rights reserved. Not affiliated with any sports league. Data for entertainment purposes.
-  </div>
-</footer>
-
-<script src="data.js"></script>
-<script src="app.js"></script>
 <script>
-  // Render trending articles on home page
-  document.addEventListener('DOMContentLoaded', () => {
-    const homeGrid = document.getElementById('home-articles');
-    if (!homeGrid) return;
-    const sportIconClasses = { nba: 'fa-basketball', nfl: 'fa-football', mlb: 'fa-baseball-bat-ball', nhl: 'fa-hockey-puck', mls: 'fa-futbol' };
-    const trending = ARTICLES.slice(0, 4);
+const PHX = 'America/Phoenix';
+const TYO = 'Asia/Tokyo';
+const OFFSET = 16;
 
-    trending.forEach(article => {
-      const card = document.createElement('div');
-      card.className = 'article-card';
-      card.addEventListener('click', () => { openArticle(article.id); });
+function fmt(date, tz) {
+  return new Intl.DateTimeFormat('en-US', {
+    timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
+  }).format(date);
+}
 
-      const thumb = document.createElement('div');
-      thumb.className = 'article-thumb';
-      if (article.image) {
-        thumb.style.backgroundImage = 'url(' + article.image + ')';
-      } else {
-        thumb.style.background = article.gradient || 'linear-gradient(135deg, #333, #555)';
-      }
+function fmtDate(date, tz) {
+  return new Intl.DateTimeFormat('en-US', {
+    timeZone: tz, weekday: 'short', month: 'short', day: 'numeric'
+  }).format(date);
+}
 
-      const catBadge = document.createElement('span');
-      catBadge.className = 'article-category ' + article.category;
-      catBadge.textContent = article.category.replace('-', ' ');
-      thumb.appendChild(catBadge);
-      card.appendChild(thumb);
+function updateClocks() {
+  const now = new Date();
+  document.getElementById('phoenix-time').textContent = fmt(now, PHX);
+  document.getElementById('phoenix-date').textContent = fmtDate(now, PHX);
+  document.getElementById('tokyo-time').textContent = fmt(now, TYO);
+  document.getElementById('tokyo-date').textContent = fmtDate(now, TYO);
+}
 
-      const body = document.createElement('div');
-      body.className = 'article-body';
-      const title = document.createElement('h3');
-      title.textContent = article.title;
-      body.appendChild(title);
+function zone(h) {
+  if (h >= 8 && h <= 21) return 'awake';
+  if ((h >= 6 && h <= 7) || h === 22) return 'groggy';
+  return 'sleep';
+}
 
-      const meta = document.createElement('div');
-      meta.className = 'article-meta';
-      const author = document.createElement('span');
-      author.textContent = article.author;
-      const readTime = document.createElement('span');
-      readTime.textContent = article.readTime + ' read';
-      meta.appendChild(author);
-      meta.appendChild(readTime);
-      body.appendChild(meta);
-      card.appendChild(body);
+function phxToTyo(h) { return (h + OFFSET) % 24; }
 
-      homeGrid.appendChild(card);
-    });
+function formatHourShort(h) {
+  if (h === 0) return '12a';
+  if (h < 12) return h + 'a';
+  if (h === 12) return '12p';
+  return (h - 12) + 'p';
+}
+
+function formatHour(h) {
+  if (h === 0) return '12:00 AM';
+  if (h < 12) return h + ':00 AM';
+  if (h === 12) return '12:00 PM';
+  return (h - 12) + ':00 PM';
+}
+
+function buildTimelines() {
+  const phxBar = document.getElementById('phoenix-bar');
+  const tyoBar = document.getElementById('tokyo-bar');
+  const labels = document.getElementById('hour-labels');
+
+  for (let h = 0; h < 24; h++) {
+    const tyoH = phxToTyo(h);
+    const phxZone = zone(h);
+    const tyoZone = zone(tyoH);
+    const bothAwake = phxZone === 'awake' && tyoZone === 'awake';
+
+    const pc = document.createElement('div');
+    pc.className = 'hour-cell ' + (bothAwake ? 'overlap' : phxZone);
+    pc.textContent = h;
+    pc.dataset.phxHour = h;
+    pc.addEventListener('click', function() { selectHour(h); });
+    phxBar.appendChild(pc);
+
+    const tc = document.createElement('div');
+    tc.className = 'hour-cell ' + (bothAwake ? 'overlap' : tyoZone);
+    tc.textContent = tyoH;
+    tc.dataset.phxHour = h;
+    tc.addEventListener('click', function() { selectHour(h); });
+    tyoBar.appendChild(tc);
+
+    const lb = document.createElement('span');
+    lb.textContent = h % 3 === 0 ? formatHourShort(h) : '';
+    labels.appendChild(lb);
+  }
+}
+
+function selectHour(phxH) {
+  document.querySelectorAll('.hour-cell').forEach(function(c) {
+    c.classList.remove('selected');
+  });
+  document.querySelectorAll('[data-phx-hour="' + phxH + '"]').forEach(function(c) {
+    c.classList.add('selected');
   });
 
-  // Pause toggle (fixed: on = knob right, off = knob left)
-  const pauseToggle = document.getElementById('pause-toggle');
-  if (pauseToggle) {
-    // Set initial state correctly (checked = active = knob right)
-    const knob = document.getElementById('pause-knob');
-    if (knob) knob.style.transform = 'translateX(24px)';
+  var tyoH = phxToTyo(phxH);
+  var phxZone = zone(phxH);
+  var tyoZone = zone(tyoH);
 
-    pauseToggle.addEventListener('change', function() {
-      const slider = document.getElementById('pause-slider');
-      const knob = document.getElementById('pause-knob');
-      const label = document.getElementById('pause-label');
-      if (this.checked) {
-        slider.style.background = 'var(--green)';
-        knob.style.transform = 'translateX(24px)';
-        label.textContent = 'Active';
-        label.style.color = 'var(--green)';
-      } else {
-        slider.style.background = 'var(--text-muted)';
-        knob.style.transform = 'translateX(0)';
-        label.textContent = 'Paused';
-        label.style.color = 'var(--yellow)';
-      }
-    });
+  var quality, qualityClass;
+  if (phxZone === 'awake' && tyoZone === 'awake') {
+    quality = 'Great for both';
+    qualityClass = 'quality-good';
+  } else if (phxZone === 'sleep' || tyoZone === 'sleep') {
+    quality = 'Someone is sleeping';
+    qualityClass = 'quality-bad';
+  } else {
+    quality = 'Doable but early/late';
+    qualityClass = 'quality-okay';
   }
+
+  var nextDay = (phxH + OFFSET >= 24) ? ' (+1 day)' : '';
+
+  var planner = document.getElementById('planner');
+  // Clear existing content
+  while (planner.firstChild) planner.removeChild(planner.firstChild);
+
+  var result = document.createElement('div');
+  result.className = 'planner-result';
+
+  var phxSpan = document.createElement('span');
+  phxSpan.className = 'time-phoenix';
+  phxSpan.textContent = formatHour(phxH) + ' Phoenix';
+
+  var tyoSpan = document.createElement('span');
+  tyoSpan.className = 'time-tokyo';
+  tyoSpan.textContent = formatHour(tyoH) + ' Tokyo' + nextDay;
+
+  result.appendChild(phxSpan);
+  result.appendChild(document.createTextNode(' = '));
+  result.appendChild(tyoSpan);
+  planner.appendChild(result);
+
+  var badge = document.createElement('div');
+  badge.className = 'planner-quality ' + qualityClass;
+  badge.textContent = quality;
+  planner.appendChild(badge);
+}
+
+function highlightNow() {
+  var now = new Date();
+  var phxHour = parseInt(new Intl.DateTimeFormat('en-US', {
+    timeZone: PHX, hour: 'numeric', hour12: false
+  }).format(now), 10);
+
+  document.querySelectorAll('.hour-cell').forEach(function(c) {
+    c.style.borderBottom = '';
+  });
+  document.querySelectorAll('[data-phx-hour="' + phxHour + '"]').forEach(function(c) {
+    c.style.borderBottom = '2px solid #fff';
+  });
+}
+
+buildTimelines();
+updateClocks();
+highlightNow();
+setInterval(updateClocks, 1000);
+setInterval(highlightNow, 60000);
 </script>
-
-<!-- Bet Slip Panel -->
-<div id="bet-slip" class="bet-slip"></div>
-
-<!-- Video Modal -->
-<div id="modal-video" class="modal-overlay">
-  <div class="modal" style="max-width:720px">
-    <button class="modal-close" onclick="closeModal('modal-video'); pauseVideo()">&times;</button>
-    <div id="video-body"></div>
-  </div>
-</div>
-
-<!-- Scroll to Top -->
-<button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
-
 </body>
 </html>
