@@ -1,274 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phoenix ↔ Tokyo Time Planner</title>
-<style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0f1117;color:#e4e4e7;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem}
-  h1{font-size:1.4rem;font-weight:600;margin-bottom:.25rem;color:#a1a1aa}
-  .subtitle{color:#52525b;font-size:.85rem;margin-bottom:2rem}
-  .badge{display:inline-block;background:#1e1e2e;border:1px solid #2e2e3e;border-radius:999px;padding:.35rem 1rem;font-size:.8rem;color:#818cf8;margin-bottom:2.5rem}
-
-  /* Clocks */
-  .clocks{display:flex;gap:3rem;margin-bottom:2.5rem;flex-wrap:wrap;justify-content:center}
-  .clock{text-align:center;min-width:180px}
-  .clock-label{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:#71717a;margin-bottom:.5rem}
-  .clock-time{font-size:3rem;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
-  .clock-date{font-size:.8rem;color:#52525b;margin-top:.25rem}
-  .phoenix .clock-time{color:#fb923c}
-  .tokyo .clock-time{color:#818cf8}
-
-  /* Timeline */
-  .timeline-section{width:100%;max-width:800px;margin-bottom:2rem}
-  .timeline-section h2{font-size:.85rem;color:#71717a;margin-bottom:1rem;text-transform:uppercase;letter-spacing:.08em}
-  .timeline-row{display:flex;align-items:center;margin-bottom:.75rem}
-  .timeline-label{width:80px;font-size:.75rem;color:#a1a1aa;flex-shrink:0}
-  .timeline-bar{display:flex;flex:1;height:36px;border-radius:6px;overflow:hidden;gap:1px}
-  .hour-cell{flex:1;display:flex;align-items:center;justify-content:center;font-size:.6rem;color:rgba(255,255,255,.5);cursor:pointer;transition:all .15s;position:relative}
-  .hour-cell:hover{transform:scaleY(1.15);z-index:1;filter:brightness(1.3)}
-  .hour-cell.sleep{background:#1a1a2e}
-  .hour-cell.groggy{background:#2d2a1a}
-  .hour-cell.awake{background:#1a2e1a}
-  .hour-cell.overlap{background:#166534;box-shadow:inset 0 0 0 1px rgba(74,222,128,.3)}
-  .hour-cell.selected{outline:2px solid #fff;outline-offset:-1px;z-index:2}
-
-  /* Hour labels */
-  .hour-labels-row{display:flex;margin-left:80px;flex:1;margin-bottom:1.5rem}
-  .hour-labels-row span{flex:1;text-align:center;font-size:.55rem;color:#3f3f46}
-
-  /* Legend */
-  .legend{display:flex;gap:1.5rem;justify-content:center;margin-bottom:2rem;flex-wrap:wrap}
-  .legend-item{display:flex;align-items:center;gap:.4rem;font-size:.75rem;color:#a1a1aa}
-  .legend-dot{width:12px;height:12px;border-radius:3px}
-
-  /* Planner card */
-  .planner{background:#1a1a2e;border:1px solid #2e2e3e;border-radius:12px;padding:1.5rem;max-width:500px;width:100%;text-align:center;min-height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center}
-  .planner-hint{color:#52525b;font-size:.85rem}
-  .planner-result{font-size:1.1rem;line-height:1.6}
-  .planner-result .time-phoenix{color:#fb923c;font-weight:600}
-  .planner-result .time-tokyo{color:#818cf8;font-weight:600}
-  .planner-quality{display:inline-block;margin-top:.5rem;padding:.2rem .75rem;border-radius:999px;font-size:.75rem;font-weight:600}
-  .quality-good{background:#166534;color:#4ade80}
-  .quality-okay{background:#713f12;color:#fbbf24}
-  .quality-bad{background:#7f1d1d;color:#fca5a5}
-
-  /* Overlap callout */
-  .overlap-callout{background:linear-gradient(135deg,#0f2e1a,#1a1a2e);border:1px solid #166534;border-radius:12px;padding:1.25rem;max-width:500px;width:100%;text-align:center;margin-bottom:1.5rem}
-  .overlap-callout h3{color:#4ade80;font-size:.85rem;margin-bottom:.4rem}
-  .overlap-callout p{color:#a1a1aa;font-size:.85rem}
-
-  @media(max-width:600px){
-    .clocks{gap:1.5rem}
-    .clock-time{font-size:2.2rem}
-    .timeline-label{width:55px;font-size:.65rem}
-    .hour-cell{font-size:.5rem}
-    .hour-labels-row{margin-left:55px}
-    body{padding:1.5rem .75rem}
-  }
-</style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TELL — human or machine?</title>
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
+<div class="frame">
+  <header class="topbar">
+    <span class="logo">TELL<span class="cursor">_</span></span>
+    <span class="tagline">who's real?</span>
+  </header>
 
-<h1>Phoenix ↔ Tokyo</h1>
-<p class="subtitle">Plan across the Pacific</p>
-<div class="badge">Tokyo is 16 hours ahead</div>
+  <!-- INTRO -->
+  <section id="screen-intro" class="screen active">
+    <p class="brief">
+      You'll trade <b>3 questions</b> with a stranger. They might be a <b>human</b> or an
+      <b>AI</b> — and they've been told to <i>act</i> as one or the other. Acting robotic
+      doesn't mean they are. Spot the <b>real</b> nature underneath the act.
+    </p>
+    <p class="brief">But there's a catch — <b>you</b> have a role to play too:</p>
 
-<div class="clocks">
-  <div class="clock phoenix">
-    <div class="clock-label">Phoenix, AZ</div>
-    <div class="clock-time" id="phoenix-time">--:--:--</div>
-    <div class="clock-date" id="phoenix-date">---</div>
-  </div>
-  <div class="clock tokyo">
-    <div class="clock-label">Tokyo, JP</div>
-    <div class="clock-time" id="tokyo-time">--:--:--</div>
-    <div class="clock-date" id="tokyo-date">---</div>
-  </div>
+    <div id="role-card" class="role-card">
+      <span class="role-kicker">YOUR ASSIGNMENT — PERFORM AS</span>
+      <span id="role-name" class="role-name">HUMAN</span>
+      <span id="role-flavor" class="role-flavor"></span>
+    </div>
+
+    <button id="start-btn" class="btn primary">ENTER THE ROOM →</button>
+  </section>
+
+  <!-- ROUNDS -->
+  <section id="screen-round" class="screen">
+    <div class="round-head">
+      <span id="round-tag" class="round-tag">ROUND 1 / 3</span>
+      <span class="mini-role">you are performing as <b id="round-role"></b></span>
+    </div>
+    <div id="transcript" class="transcript"></div>
+    <div class="composer">
+      <span id="phase-prompt" class="phase-prompt">Ask your opponent anything:</span>
+      <div class="composer-row">
+        <input id="turn-input" type="text" autocomplete="off" />
+        <button id="turn-send" class="btn send">SEND</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- GUESS -->
+  <section id="screen-guess" class="screen">
+    <h2 class="verdict-q">The conversation is over.</h2>
+    <p class="verdict-sub">Your opponent's <b>true nature</b> — what are they, really?</p>
+    <div class="guess-grid">
+      <button id="guess-human" class="guess-card human">
+        <span class="g-big">HUMAN</span><span class="g-sml">flesh &amp; blood</span>
+      </button>
+      <button id="guess-ai" class="guess-card ai">
+        <span class="g-big">AI</span><span class="g-sml">a machine</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="screen-result" class="screen">
+    <div id="result-banner" class="result-banner">MATCH</div>
+    <div id="reveal" class="reveal"></div>
+    <p id="result-note" class="result-note"></p>
+    <div class="result-foot">
+      <span id="streak" class="streak">Win streak: 0</span>
+      <button id="again-btn" class="btn primary">NEXT OPPONENT →</button>
+    </div>
+  </section>
 </div>
 
-<div class="timeline-section">
-  <h2>24-Hour View</h2>
-  <div class="timeline-row">
-    <div class="timeline-label">Phoenix</div>
-    <div class="timeline-bar" id="phoenix-bar"></div>
-  </div>
-  <div class="timeline-row">
-    <div class="timeline-label">Tokyo</div>
-    <div class="timeline-bar" id="tokyo-bar"></div>
-  </div>
-  <div class="timeline-row">
-    <div class="timeline-label"></div>
-    <div class="hour-labels-row" id="hour-labels"></div>
-  </div>
-</div>
-
-<div class="legend">
-  <div class="legend-item"><div class="legend-dot" style="background:#1a2e1a"></div>Awake (8a–9p)</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#2d2a1a"></div>Early / Late</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#1a1a2e"></div>Sleeping</div>
-  <div class="legend-item"><div class="legend-dot" style="background:#166534"></div>Both awake</div>
-</div>
-
-<div class="overlap-callout">
-  <h3>Best overlap window</h3>
-  <p><span style="color:#fb923c">5 PM – 9 PM Phoenix</span> = <span style="color:#818cf8">9 AM – 1 PM Tokyo (+1 day)</span></p>
-</div>
-
-<div class="planner" id="planner">
-  <div class="planner-hint">Click any hour on the timeline to plan</div>
-</div>
-
-<script>
-const PHX = 'America/Phoenix';
-const TYO = 'Asia/Tokyo';
-const OFFSET = 16;
-
-function fmt(date, tz) {
-  return new Intl.DateTimeFormat('en-US', {
-    timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
-  }).format(date);
-}
-
-function fmtDate(date, tz) {
-  return new Intl.DateTimeFormat('en-US', {
-    timeZone: tz, weekday: 'short', month: 'short', day: 'numeric'
-  }).format(date);
-}
-
-function updateClocks() {
-  const now = new Date();
-  document.getElementById('phoenix-time').textContent = fmt(now, PHX);
-  document.getElementById('phoenix-date').textContent = fmtDate(now, PHX);
-  document.getElementById('tokyo-time').textContent = fmt(now, TYO);
-  document.getElementById('tokyo-date').textContent = fmtDate(now, TYO);
-}
-
-function zone(h) {
-  if (h >= 8 && h <= 21) return 'awake';
-  if ((h >= 6 && h <= 7) || h === 22) return 'groggy';
-  return 'sleep';
-}
-
-function phxToTyo(h) { return (h + OFFSET) % 24; }
-
-function formatHourShort(h) {
-  if (h === 0) return '12a';
-  if (h < 12) return h + 'a';
-  if (h === 12) return '12p';
-  return (h - 12) + 'p';
-}
-
-function formatHour(h) {
-  if (h === 0) return '12:00 AM';
-  if (h < 12) return h + ':00 AM';
-  if (h === 12) return '12:00 PM';
-  return (h - 12) + ':00 PM';
-}
-
-function buildTimelines() {
-  const phxBar = document.getElementById('phoenix-bar');
-  const tyoBar = document.getElementById('tokyo-bar');
-  const labels = document.getElementById('hour-labels');
-
-  for (let h = 0; h < 24; h++) {
-    const tyoH = phxToTyo(h);
-    const phxZone = zone(h);
-    const tyoZone = zone(tyoH);
-    const bothAwake = phxZone === 'awake' && tyoZone === 'awake';
-
-    const pc = document.createElement('div');
-    pc.className = 'hour-cell ' + (bothAwake ? 'overlap' : phxZone);
-    pc.textContent = h;
-    pc.dataset.phxHour = h;
-    pc.addEventListener('click', function() { selectHour(h); });
-    phxBar.appendChild(pc);
-
-    const tc = document.createElement('div');
-    tc.className = 'hour-cell ' + (bothAwake ? 'overlap' : tyoZone);
-    tc.textContent = tyoH;
-    tc.dataset.phxHour = h;
-    tc.addEventListener('click', function() { selectHour(h); });
-    tyoBar.appendChild(tc);
-
-    const lb = document.createElement('span');
-    lb.textContent = h % 3 === 0 ? formatHourShort(h) : '';
-    labels.appendChild(lb);
-  }
-}
-
-function selectHour(phxH) {
-  document.querySelectorAll('.hour-cell').forEach(function(c) {
-    c.classList.remove('selected');
-  });
-  document.querySelectorAll('[data-phx-hour="' + phxH + '"]').forEach(function(c) {
-    c.classList.add('selected');
-  });
-
-  var tyoH = phxToTyo(phxH);
-  var phxZone = zone(phxH);
-  var tyoZone = zone(tyoH);
-
-  var quality, qualityClass;
-  if (phxZone === 'awake' && tyoZone === 'awake') {
-    quality = 'Great for both';
-    qualityClass = 'quality-good';
-  } else if (phxZone === 'sleep' || tyoZone === 'sleep') {
-    quality = 'Someone is sleeping';
-    qualityClass = 'quality-bad';
-  } else {
-    quality = 'Doable but early/late';
-    qualityClass = 'quality-okay';
-  }
-
-  var nextDay = (phxH + OFFSET >= 24) ? ' (+1 day)' : '';
-
-  var planner = document.getElementById('planner');
-  // Clear existing content
-  while (planner.firstChild) planner.removeChild(planner.firstChild);
-
-  var result = document.createElement('div');
-  result.className = 'planner-result';
-
-  var phxSpan = document.createElement('span');
-  phxSpan.className = 'time-phoenix';
-  phxSpan.textContent = formatHour(phxH) + ' Phoenix';
-
-  var tyoSpan = document.createElement('span');
-  tyoSpan.className = 'time-tokyo';
-  tyoSpan.textContent = formatHour(tyoH) + ' Tokyo' + nextDay;
-
-  result.appendChild(phxSpan);
-  result.appendChild(document.createTextNode(' = '));
-  result.appendChild(tyoSpan);
-  planner.appendChild(result);
-
-  var badge = document.createElement('div');
-  badge.className = 'planner-quality ' + qualityClass;
-  badge.textContent = quality;
-  planner.appendChild(badge);
-}
-
-function highlightNow() {
-  var now = new Date();
-  var phxHour = parseInt(new Intl.DateTimeFormat('en-US', {
-    timeZone: PHX, hour: 'numeric', hour12: false
-  }).format(now), 10);
-
-  document.querySelectorAll('.hour-cell').forEach(function(c) {
-    c.style.borderBottom = '';
-  });
-  document.querySelectorAll('[data-phx-hour="' + phxHour + '"]').forEach(function(c) {
-    c.style.borderBottom = '2px solid #fff';
-  });
-}
-
-buildTimelines();
-updateClocks();
-highlightNow();
-setInterval(updateClocks, 1000);
-setInterval(highlightNow, 60000);
-</script>
+<script src="opponent.js"></script>
+<script src="game.js"></script>
 </body>
 </html>
