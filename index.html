@@ -273,8 +273,14 @@ details.ref[open] summary .car{transform:rotate(90deg)}
   </section>
 
   <section class="screen" id="tab-stats">
+    <h2 class="sec">Forms to drill</h2>
+    <div class="card" id="weak-root"><p class="muted" style="font-size:14px">Answer a few quiz questions and your shakiest forms will surface here.</p></div>
     <h2 class="sec">Accuracy by binyan</h2>
     <div class="card" id="bstat-root"><p class="muted" style="font-size:14px">Complete a quiz to see your per-binyan breakdown.</p></div>
+    <h2 class="sec">Accuracy by tense</h2>
+    <div class="card" id="tstat-root"><p class="muted" style="font-size:14px">No data yet.</p></div>
+    <h2 class="sec">All time</h2>
+    <div class="card"><p class="muted" style="font-size:14px" id="life-line">–</p></div>
     <h2 class="sec">Activity</h2>
     <div class="card"><p class="muted" style="font-size:14px" id="act-line">–</p></div>
   </section>
@@ -407,7 +413,7 @@ const TPL={
    p1s:['אֶתְ',[1,'ַ',1],[2,'ֵ',2],[3,'',0]], p2ms:['תִּתְ',[1,'ַ',1],[2,'ֵ',2],[3,'',0]],
    p2fs:['תִּתְ',[1,'ַ',1],[2,'ְ',2],[3,'ִ',0],'י'], p3ms:['יִתְ',[1,'ַ',1],[2,'ֵ',2],[3,'',0]],
    p3fs:['תִּתְ',[1,'ַ',1],[2,'ֵ',2],[3,'',0]], p1p:['נִתְ',[1,'ַ',1],[2,'ֵ',2],[3,'',0]],
-   p2mp:['תִּתְ',[1,'ַ',1],[2,'ְ',2],[3,'',0],'וּ'], p3mp:['יִתְ',[1,'ַ',1],[2,'ְ',2],[3,'',0],'וּ']]}
+   p2mp:['תִּתְ',[1,'ַ',1],[2,'ְ',2],[3,'',0],'וּ'], p3mp:['יִתְ',[1,'ַ',1],[2,'ְ',2],[3,'',0],'וּ']}}
 };
 
 function conj(root, tpl){
@@ -417,7 +423,7 @@ function conj(root, tpl){
     const [i,v,d]=t; const L=root[i-1];
     w+=L;
     if(L==='ש') w+='ׁ';
-    if(d===2||(d===1&&BGDKFT.includes(L))) w+=DAGESH; w+=v;
+    if((d===2||(d===1&&BGDKFT.includes(L)))&&!'אהחער'.includes(L)) w+=DAGESH; w+=v;
   }
   for(let i=w.length-1;i>=0;i--){
     const c=w[i];
@@ -582,71 +588,71 @@ const EXPLICIT_VERBS=[
 ];
 const VOCAB_SEED=[
  /* basics */
- {he:'בַּיִת',tr:'bayit',en:'house',cat:'basics'},{he:'סֵפֶר',tr:'sefer',en:'book',cat:'basics'},
- {he:'מַיִם',tr:'mayim',en:'water',cat:'basics'},{he:'יוֹם',tr:'yom',en:'day',cat:'basics'},
- {he:'לַיְלָה',tr:'layla',en:'night',cat:'basics'},{he:'בֹּקֶר',tr:'boker',en:'morning',cat:'basics'},
- {he:'עֶרֶב',tr:'erev',en:'evening',cat:'basics'},{he:'אֹכֶל',tr:'okhel',en:'food',cat:'basics'},
- {he:'עִיר',tr:'ir',en:'city',cat:'basics'},{he:'דֶּרֶךְ',tr:'derekh',en:'way, road',cat:'basics'},
- {he:'שָׁנָה',tr:'shana',en:'year',cat:'basics'},{he:'שָׁבוּעַ',tr:'shavua',en:'week',cat:'basics'},
- {he:'חָבֵר',tr:'khaver',en:'friend',cat:'basics'},{he:'מִשְׁפָּחָה',tr:'mishpakha',en:'family',cat:'basics'},
- {he:'עֲבוֹדָה',tr:'avoda',en:'work, job',cat:'basics'},{he:'זְמַן',tr:'zman',en:'time',cat:'basics'},
- {he:'כֶּסֶף',tr:'kesef',en:'money',cat:'basics'},{he:'לֵב',tr:'lev',en:'heart',cat:'basics'},
- {he:'שֵׁם',tr:'shem',en:'name',cat:'basics'},{he:'מָקוֹם',tr:'makom',en:'place',cat:'basics'},
- {he:'שָׂפָה',tr:'safa',en:'language',cat:'basics'},{he:'מִלָּה',tr:'mila',en:'word',cat:'basics'},
- {he:'שִׁעוּר',tr:'shiur',en:'lesson',cat:'basics'},{he:'שְׁאֵלָה',tr:'sheela',en:'question',cat:'basics'},
- {he:'תְּשׁוּבָה',tr:'tshuva',en:'answer',cat:'basics'},{he:'גָּדוֹל',tr:'gadol',en:'big',cat:'basics'},
- {he:'קָטָן',tr:'katan',en:'small',cat:'basics'},{he:'חָדָשׁ',tr:'khadash',en:'new',cat:'basics'},
- {he:'יָשָׁן',tr:'yashan',en:'old (thing)',cat:'basics'},{he:'יָפֶה',tr:'yafe',en:'beautiful',cat:'basics'},
- {he:'טוֹב',tr:'tov',en:'good',cat:'basics'},{he:'רַע',tr:'ra',en:'bad',cat:'basics'},
- {he:'קַל',tr:'kal',en:'easy, light',cat:'basics'},{he:'קָשֶׁה',tr:'kashe',en:'hard, difficult',cat:'basics'},
- {he:'מָהִיר',tr:'mahir',en:'fast',cat:'basics'},{he:'מָחָר',tr:'makhar',en:'tomorrow',cat:'basics'},
- {he:'אֶתְמוֹל',tr:'etmol',en:'yesterday',cat:'basics'},{he:'הַיּוֹם',tr:'hayom',en:'today',cat:'basics'},
- {he:'עַכְשָׁו',tr:'akhshav',en:'now',cat:'basics'},{he:'תָּמִיד',tr:'tamid',en:'always',cat:'basics'},
- {he:'אוּלַי',tr:'ulay',en:'maybe',cat:'basics'},{he:'בְּבַקָּשָׁה',tr:'bevakasha',en:'please',cat:'basics'},
- {he:'תּוֹדָה',tr:'toda',en:'thank you',cat:'basics'},{he:'סְלִיחָה',tr:'slikha',en:'sorry, excuse me',cat:'basics'},
+ {id:'bayit',he:'בַּיִת',tr:'bayit',en:'house',cat:'basics'},{id:'sefer',he:'סֵפֶר',tr:'sefer',en:'book',cat:'basics'},
+ {id:'mayim',he:'מַיִם',tr:'mayim',en:'water',cat:'basics'},{id:'yom',he:'יוֹם',tr:'yom',en:'day',cat:'basics'},
+ {id:'layla',he:'לַיְלָה',tr:'layla',en:'night',cat:'basics'},{id:'boker',he:'בֹּקֶר',tr:'boker',en:'morning',cat:'basics'},
+ {id:'erev',he:'עֶרֶב',tr:'erev',en:'evening',cat:'basics'},{id:'okhel',he:'אֹכֶל',tr:'okhel',en:'food',cat:'basics'},
+ {id:'ir',he:'עִיר',tr:'ir',en:'city',cat:'basics'},{id:'derekh',he:'דֶּרֶךְ',tr:'derekh',en:'way, road',cat:'basics'},
+ {id:'shana',he:'שָׁנָה',tr:'shana',en:'year',cat:'basics'},{id:'shavua',he:'שָׁבוּעַ',tr:'shavua',en:'week',cat:'basics'},
+ {id:'khaver',he:'חָבֵר',tr:'khaver',en:'friend',cat:'basics'},{id:'mishpakha',he:'מִשְׁפָּחָה',tr:'mishpakha',en:'family',cat:'basics'},
+ {id:'avoda',he:'עֲבוֹדָה',tr:'avoda',en:'work, job',cat:'basics'},{id:'zman',he:'זְמַן',tr:'zman',en:'time',cat:'basics'},
+ {id:'kesef',he:'כֶּסֶף',tr:'kesef',en:'money',cat:'basics'},{id:'lev',he:'לֵב',tr:'lev',en:'heart',cat:'basics'},
+ {id:'shem',he:'שֵׁם',tr:'shem',en:'name',cat:'basics'},{id:'makom',he:'מָקוֹם',tr:'makom',en:'place',cat:'basics'},
+ {id:'safa',he:'שָׂפָה',tr:'safa',en:'language',cat:'basics'},{id:'mila',he:'מִלָּה',tr:'mila',en:'word',cat:'basics'},
+ {id:'shiur',he:'שִׁעוּר',tr:'shiur',en:'lesson',cat:'basics'},{id:'sheela',he:'שְׁאֵלָה',tr:'sheela',en:'question',cat:'basics'},
+ {id:'tshuva',he:'תְּשׁוּבָה',tr:'tshuva',en:'answer',cat:'basics'},{id:'gadol',he:'גָּדוֹל',tr:'gadol',en:'big',cat:'basics'},
+ {id:'katan',he:'קָטָן',tr:'katan',en:'small',cat:'basics'},{id:'khadash',he:'חָדָשׁ',tr:'khadash',en:'new',cat:'basics'},
+ {id:'yashan',he:'יָשָׁן',tr:'yashan',en:'old (thing)',cat:'basics'},{id:'yafe',he:'יָפֶה',tr:'yafe',en:'beautiful',cat:'basics'},
+ {id:'tov',he:'טוֹב',tr:'tov',en:'good',cat:'basics'},{id:'ra',he:'רַע',tr:'ra',en:'bad',cat:'basics'},
+ {id:'kal',he:'קַל',tr:'kal',en:'easy, light',cat:'basics'},{id:'kashe',he:'קָשֶׁה',tr:'kashe',en:'hard, difficult',cat:'basics'},
+ {id:'mahir',he:'מָהִיר',tr:'mahir',en:'fast',cat:'basics'},{id:'makhar',he:'מָחָר',tr:'makhar',en:'tomorrow',cat:'basics'},
+ {id:'etmol',he:'אֶתְמוֹל',tr:'etmol',en:'yesterday',cat:'basics'},{id:'hayom',he:'הַיּוֹם',tr:'hayom',en:'today',cat:'basics'},
+ {id:'akhshav',he:'עַכְשָׁו',tr:'akhshav',en:'now',cat:'basics'},{id:'tamid',he:'תָּמִיד',tr:'tamid',en:'always',cat:'basics'},
+ {id:'ulay',he:'אוּלַי',tr:'ulay',en:'maybe',cat:'basics'},{id:'bevakasha',he:'בְּבַקָּשָׁה',tr:'bevakasha',en:'please',cat:'basics'},
+ {id:'toda',he:'תּוֹדָה',tr:'toda',en:'thank you',cat:'basics'},{id:'slikha',he:'סְלִיחָה',tr:'slikha',en:'sorry, excuse me',cat:'basics'},
  /* home */
- {he:'דֶּלֶת',tr:'delet',en:'door',cat:'home'},{he:'חַלּוֹן',tr:'khalon',en:'window',cat:'home'},
- {he:'מִטָּה',tr:'mita',en:'bed',cat:'home'},{he:'שֻׁלְחָן',tr:'shulkhan',en:'table',cat:'home'},
- {he:'כִּסֵּא',tr:'kise',en:'chair',cat:'home'},{he:'מִטְבָּח',tr:'mitbakh',en:'kitchen',cat:'home'},
- {he:'חֶדֶר',tr:'kheder',en:'room',cat:'home'},{he:'אַמְבַּטְיָה',tr:'ambatya',en:'bathroom',cat:'home'},
- {he:'קִיר',tr:'kir',en:'wall',cat:'home'},{he:'רִצְפָּה',tr:'ritspa',en:'floor',cat:'home'},
- {he:'מַפְתֵּחַ',tr:'mafteakh',en:'key',cat:'home'},{he:'מַדְרֵגוֹת',tr:'madregot',en:'stairs',cat:'home'},
- {he:'גַּג',tr:'gag',en:'roof',cat:'home'},{he:'גִּינָה',tr:'gina',en:'garden',cat:'home'},
+ {id:'delet',he:'דֶּלֶת',tr:'delet',en:'door',cat:'home'},{id:'khalon',he:'חַלּוֹן',tr:'khalon',en:'window',cat:'home'},
+ {id:'mita',he:'מִטָּה',tr:'mita',en:'bed',cat:'home'},{id:'shulkhan',he:'שֻׁלְחָן',tr:'shulkhan',en:'table',cat:'home'},
+ {id:'kise',he:'כִּסֵּא',tr:'kise',en:'chair',cat:'home'},{id:'mitbakh',he:'מִטְבָּח',tr:'mitbakh',en:'kitchen',cat:'home'},
+ {id:'kheder',he:'חֶדֶר',tr:'kheder',en:'room',cat:'home'},{id:'ambatya',he:'אַמְבַּטְיָה',tr:'ambatya',en:'bathroom',cat:'home'},
+ {id:'kir',he:'קִיר',tr:'kir',en:'wall',cat:'home'},{id:'ritspa',he:'רִצְפָּה',tr:'ritspa',en:'floor',cat:'home'},
+ {id:'mafteakh',he:'מַפְתֵּחַ',tr:'mafteakh',en:'key',cat:'home'},{id:'madregot',he:'מַדְרֵגוֹת',tr:'madregot',en:'stairs',cat:'home'},
+ {id:'gag',he:'גַּג',tr:'gag',en:'roof',cat:'home'},{id:'gina',he:'גִּינָה',tr:'gina',en:'garden',cat:'home'},
  /* food */
- {he:'לֶחֶם',tr:'lekhem',en:'bread',cat:'food'},{he:'גְּבִינָה',tr:'gvina',en:'cheese',cat:'food'},
- {he:'בֵּיצָה',tr:'beytsa',en:'egg',cat:'food'},{he:'עוֹף',tr:'of',en:'chicken',cat:'food'},
- {he:'בָּשָׂר',tr:'basar',en:'meat',cat:'food'},{he:'דָּג',tr:'dag',en:'fish',cat:'food'},
- {he:'פְּרִי',tr:'pri',en:'fruit',cat:'food'},{he:'יֶרֶק',tr:'yerek',en:'vegetable',cat:'food'},
- {he:'מִיץ',tr:'mits',en:'juice',cat:'food'},{he:'קָפֶה',tr:'kafe',en:'coffee',cat:'food'},
- {he:'חָלָב',tr:'khalav',en:'milk',cat:'food'},{he:'תַּפּוּחַ',tr:'tapuakh',en:'apple',cat:'food'},
- {he:'שֶׁמֶן',tr:'shemen',en:'oil',cat:'food'},{he:'מֶלַח',tr:'melakh',en:'salt',cat:'food'},
- {he:'סֻכָּר',tr:'sukar',en:'sugar',cat:'food'},{he:'אֹרֶז',tr:'orez',en:'rice',cat:'food'},
+ {id:'lekhem',he:'לֶחֶם',tr:'lekhem',en:'bread',cat:'food'},{id:'gvina',he:'גְּבִינָה',tr:'gvina',en:'cheese',cat:'food'},
+ {id:'beytsa',he:'בֵּיצָה',tr:'beytsa',en:'egg',cat:'food'},{id:'of',he:'עוֹף',tr:'of',en:'chicken',cat:'food'},
+ {id:'basar',he:'בָּשָׂר',tr:'basar',en:'meat',cat:'food'},{id:'dag',he:'דָּג',tr:'dag',en:'fish',cat:'food'},
+ {id:'pri',he:'פְּרִי',tr:'pri',en:'fruit',cat:'food'},{id:'yerek',he:'יֶרֶק',tr:'yerek',en:'vegetable',cat:'food'},
+ {id:'mits',he:'מִיץ',tr:'mits',en:'juice',cat:'food'},{id:'kafe',he:'קָפֶה',tr:'kafe',en:'coffee',cat:'food'},
+ {id:'khalav',he:'חָלָב',tr:'khalav',en:'milk',cat:'food'},{id:'tapuakh',he:'תַּפּוּחַ',tr:'tapuakh',en:'apple',cat:'food'},
+ {id:'shemen',he:'שֶׁמֶן',tr:'shemen',en:'oil',cat:'food'},{id:'melakh',he:'מֶלַח',tr:'melakh',en:'salt',cat:'food'},
+ {id:'sukar',he:'סֻכָּר',tr:'sukar',en:'sugar',cat:'food'},{id:'orez',he:'אֹרֶז',tr:'orez',en:'rice',cat:'food'},
  /* clothing */
- {he:'חֻלְצָה',tr:'khultsa',en:'shirt',cat:'clothing'},{he:'מִכְנָסַיִם',tr:'mikhnasayim',en:'pants',cat:'clothing'},
- {he:'שִׂמְלָה',tr:'simla',en:'dress',cat:'clothing'},{he:'נַעֲלַיִם',tr:'na-alayim',en:'shoes',cat:'clothing'},
- {he:'גֶּרֶב',tr:'gerev',en:'sock',cat:'clothing'},{he:'מְעִיל',tr:'me-il',en:'coat',cat:'clothing'},
- {he:'כּוֹבַע',tr:'kova',en:'hat',cat:'clothing'},{he:'חֲגוֹרָה',tr:'khagora',en:'belt',cat:'clothing'},
- {he:'צַעִיף',tr:'tsa-if',en:'scarf',cat:'clothing'},{he:'בֶּגֶד',tr:'beged',en:'garment, clothes',cat:'clothing'},
+ {id:'khultsa',he:'חֻלְצָה',tr:'khultsa',en:'shirt',cat:'clothing'},{id:'mikhnasayim',he:'מִכְנָסַיִם',tr:'mikhnasayim',en:'pants',cat:'clothing'},
+ {id:'simla',he:'שִׂמְלָה',tr:'simla',en:'dress',cat:'clothing'},{id:'naalayim',he:'נַעֲלַיִם',tr:'na-alayim',en:'shoes',cat:'clothing'},
+ {id:'gerev',he:'גֶּרֶב',tr:'gerev',en:'sock',cat:'clothing'},{id:'meil',he:'מְעִיל',tr:'me-il',en:'coat',cat:'clothing'},
+ {id:'kova',he:'כּוֹבַע',tr:'kova',en:'hat',cat:'clothing'},{id:'khagora',he:'חֲגוֹרָה',tr:'khagora',en:'belt',cat:'clothing'},
+ {id:'tsaif',he:'צַעִיף',tr:'tsa-if',en:'scarf',cat:'clothing'},{id:'beged',he:'בֶּגֶד',tr:'beged',en:'garment, clothes',cat:'clothing'},
  /* health */
- {he:'רוֹפֵא',tr:'rofe',en:'doctor',cat:'health'},{he:'בֵּית חוֹלִים',tr:'beyt kholim',en:'hospital',cat:'health'},
- {he:'תְּרוּפָה',tr:'trufa',en:'medicine',cat:'health'},{he:'כְּאֵב',tr:'ke-ev',en:'pain, ache',cat:'health'},
- {he:'חֹם',tr:'khom',en:'fever, temperature',cat:'health'},{he:'בְּרִיאוּת',tr:'bri-ut',en:'health',cat:'health'},
- {he:'חוֹלֶה',tr:'khole',en:'sick',cat:'health'},{he:'בָּרִיא',tr:'bari',en:'healthy',cat:'health'},
- {he:'בֵּית מִרְקַחַת',tr:'beyt mirkahat',en:'pharmacy',cat:'health'},{he:'אַמְבּוּלַנְס',tr:'ambulans',en:'ambulance',cat:'health'},
+ {id:'rofe',he:'רוֹפֵא',tr:'rofe',en:'doctor',cat:'health'},{id:'beytkholim',he:'בֵּית חוֹלִים',tr:'beyt kholim',en:'hospital',cat:'health'},
+ {id:'trufa',he:'תְּרוּפָה',tr:'trufa',en:'medicine',cat:'health'},{id:'keev',he:'כְּאֵב',tr:'ke-ev',en:'pain, ache',cat:'health'},
+ {id:'khom',he:'חֹם',tr:'khom',en:'fever, temperature',cat:'health'},{id:'briut',he:'בְּרִיאוּת',tr:'bri-ut',en:'health',cat:'health'},
+ {id:'khole',he:'חוֹלֶה',tr:'khole',en:'sick',cat:'health'},{id:'bari',he:'בָּרִיא',tr:'bari',en:'healthy',cat:'health'},
+ {id:'beytmirkahat',he:'בֵּית מִרְקַחַת',tr:'beyt mirkahat',en:'pharmacy',cat:'health'},{id:'ambulans',he:'אַמְבּוּלַנְס',tr:'ambulans',en:'ambulance',cat:'health'},
  /* romance */
- {he:'אַהֲבָה',tr:'ahava',en:'love',cat:'romance'},{he:'נְשִׁיקָה',tr:'neshika',en:'kiss',cat:'romance'},
- {he:'פְּגִישָׁה',tr:'pgisha',en:'meeting, date',cat:'romance'},{he:'חָבִיב',tr:'khaviv',en:'cute, sweet',cat:'romance'},
- {he:'קֶשֶׁר',tr:'kesher',en:'relationship, connection',cat:'romance'},{he:'חָתוּנָה',tr:'khatuna',en:'wedding',cat:'romance'},
- {he:'זוּג',tr:'zug',en:'couple, pair',cat:'romance'},{he:'רוֹמַנְטִי',tr:'romantit',en:'romantic',cat:'romance'},
- {he:'לְהִתְאַהֵב',tr:'lehitahev',en:'to fall in love',cat:'romance'},{he:'פְּרִידָה',tr:'prida',en:'farewell, parting',cat:'romance'},
+ {id:'ahava',he:'אַהֲבָה',tr:'ahava',en:'love',cat:'romance'},{id:'neshika',he:'נְשִׁיקָה',tr:'neshika',en:'kiss',cat:'romance'},
+ {id:'pgisha',he:'פְּגִישָׁה',tr:'pgisha',en:'meeting, date',cat:'romance'},{id:'khaviv',he:'חָבִיב',tr:'khaviv',en:'cute, sweet',cat:'romance'},
+ {id:'kesher',he:'קֶשֶׁר',tr:'kesher',en:'relationship, connection',cat:'romance'},{id:'khatuna',he:'חָתוּנָה',tr:'khatuna',en:'wedding',cat:'romance'},
+ {id:'zug',he:'זוּג',tr:'zug',en:'couple, pair',cat:'romance'},{id:'romantit',he:'רוֹמַנְטִי',tr:'romantit',en:'romantic',cat:'romance'},
+ {id:'lehitahev',he:'לְהִתְאַהֵב',tr:'lehitahev',en:'to fall in love',cat:'romance'},{id:'prida',he:'פְּרִידָה',tr:'prida',en:'farewell, parting',cat:'romance'},
  /* nature */
- {he:'עֵץ',tr:'ets',en:'tree',cat:'nature'},{he:'פֶּרַח',tr:'perakh',en:'flower',cat:'nature'},
- {he:'יָם',tr:'yam',en:'sea',cat:'nature'},{he:'הָר',tr:'har',en:'mountain',cat:'nature'},
- {he:'שֶׁמֶשׁ',tr:'shemesh',en:'sun',cat:'nature'},{he:'יָרֵחַ',tr:'yareach',en:'moon',cat:'nature'},
- {he:'כּוֹכָב',tr:'kokhav',en:'star',cat:'nature'},{he:'גֶּשֶׁם',tr:'geshem',en:'rain',cat:'nature'},
- {he:'רוּחַ',tr:'ruakh',en:'wind, spirit',cat:'nature'},{he:'נָהָר',tr:'nahar',en:'river',cat:'nature'},
- {he:'כֶּלֶב',tr:'kelev',en:'dog',cat:'nature'},{he:'חָתוּל',tr:'khatul',en:'cat',cat:'nature'},
- {he:'צִפּוֹר',tr:'tsipor',en:'bird',cat:'nature'},{he:'שֶׁלֶג',tr:'sheleg',en:'snow',cat:'nature'}
+ {id:'ets',he:'עֵץ',tr:'ets',en:'tree',cat:'nature'},{id:'perakh',he:'פֶּרַח',tr:'perakh',en:'flower',cat:'nature'},
+ {id:'yam',he:'יָם',tr:'yam',en:'sea',cat:'nature'},{id:'har',he:'הָר',tr:'har',en:'mountain',cat:'nature'},
+ {id:'shemesh',he:'שֶׁמֶשׁ',tr:'shemesh',en:'sun',cat:'nature'},{id:'yareach',he:'יָרֵחַ',tr:'yareach',en:'moon',cat:'nature'},
+ {id:'kokhav',he:'כּוֹכָב',tr:'kokhav',en:'star',cat:'nature'},{id:'geshem',he:'גֶּשֶׁם',tr:'geshem',en:'rain',cat:'nature'},
+ {id:'ruakh',he:'רוּחַ',tr:'ruakh',en:'wind, spirit',cat:'nature'},{id:'nahar',he:'נָהָר',tr:'nahar',en:'river',cat:'nature'},
+ {id:'kelev',he:'כֶּלֶב',tr:'kelev',en:'dog',cat:'nature'},{id:'khatul',he:'חָתוּל',tr:'khatul',en:'cat',cat:'nature'},
+ {id:'tsipor',he:'צִפּוֹר',tr:'tsipor',en:'bird',cat:'nature'},{id:'sheleg',he:'שֶׁלֶג',tr:'sheleg',en:'snow',cat:'nature'}
 ];
 
 const CAT_LABELS={basics:'Everyday basics',home:'The home · הַבַּיִת',food:'Food & cooking · אֹכֶל',clothing:'Clothing · בְּגָדִים',health:'Health · בְּרִיאוּת',romance:'Romance & social · אַהֲבָה',nature:'Nature · טֶבַע'};
@@ -784,11 +790,36 @@ function acceptedAnswers(v,t,p){
 /* ===== state & persistence ===== */
 const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
 const dayDiff=(a,b)=>Math.round((new Date(b)-new Date(a))/864e5);
-let state={srs:{},custom:[],stats:{streak:0,lastDay:null,days:{},binyan:{}},ver:1};
+let state={srs:{},custom:[],log:[],stats:{streak:0,lastDay:null,days:{},totalReviews:0,totalCorrect:0,longestStreak:0},ver:2};
 let DBdoc=null, saveTimer=null;
 const badge=t=>{const el=document.getElementById('savebadge'); if(el) el.textContent=t;};
 
-function loadLocal(){ try{const raw=localStorage.getItem('shoresh');if(raw){const d=JSON.parse(raw);state={...state,...d};if(!state.stats.binyan)state.stats.binyan={};}}catch(e){} }
+function loadLocal(){ try{const raw=localStorage.getItem('shoresh');if(raw){const d=JSON.parse(raw);state={...state,...d};migrate();}}catch(e){} }
+/* versioned migration: v1 states fold their binyan tallies into the new
+   lifetime counters, and positional vocab SRS keys move to stable ids
+   while the seed array still has its original order */
+function migrate(){
+  const st=state.stats=state.stats||{};
+  if((state.ver||1)<2){
+    const b=st.binyan||{}; let r=0,w=0;
+    for(const k in b){ r+=b[k].r||0; w+=b[k].w||0; }
+    st.totalReviews=(st.totalReviews||0)+r+w;
+    st.totalCorrect=(st.totalCorrect||0)+r;
+    delete st.binyan;
+    const srs2={};
+    for(const key in state.srs){
+      const m=/^v(\d+)$/.exec(key);
+      if(m&&VOCAB_SEED[+m[1]]) srs2['v'+VOCAB_SEED[+m[1]].id]=state.srs[key];
+      else srs2[key]=state.srs[key];
+    }
+    state.srs=srs2;
+  }
+  if(!Array.isArray(state.log)) state.log=[];
+  st.days=st.days||{};
+  st.totalReviews=st.totalReviews||0; st.totalCorrect=st.totalCorrect||0;
+  st.longestStreak=Math.max(st.longestStreak||0,st.streak||0);
+  state.ver=2;
+}
 function persist(){
   try{localStorage.setItem('shoresh',JSON.stringify(state));}catch(e){}
   if(DBdoc){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>{DBdoc.set(state).catch(()=>{});},1200); }
@@ -799,17 +830,40 @@ async function initDb(){
     const db=await claude.use('db'); if(!db) return;
     DBdoc=db.doc('app/state');
     const snap=await DBdoc.get();
-    if(snap.exists){ state={...state,...snap.data()}; if(!state.stats.binyan)state.stats.binyan={}; renderAll(); }
+    if(snap.exists){ state={...state,...snap.data()}; migrate(); renderAll(); }
     else if(Object.keys(state.srs).length||state.custom.length){ DBdoc.set(state).catch(()=>{}); }
     badge('Progress syncs to your Claude account.');
   }catch(e){}
 }
 
-function trackBinyan(b,ok){
-  if(!state.stats.binyan) state.stats.binyan={};
-  if(!state.stats.binyan[b]) state.stats.binyan[b]={r:0,w:0};
-  if(ok) state.stats.binyan[b].r++; else state.stats.binyan[b].w++;
+const LOG_CAP=2000;
+function bumpTotals(ok){
+  state.stats.totalReviews=(state.stats.totalReviews||0)+1;
+  if(ok) state.stats.totalCorrect=(state.stats.totalCorrect||0)+1;
+}
+/* append-only attempt log — the single source of truth for all accuracy views */
+function logAttempt(vid,t,p,ok,mode){
+  state.log.push({v:vid,t,p,ok:ok?1:0,m:mode,ts:Date.now()});
+  if(state.log.length>LOG_CAP) state.log=state.log.slice(-LOG_CAP);
+  bumpTotals(ok);
   persist();
+}
+/* recency-weighted accuracy per (verb|tense|person) cell — newest attempts count most */
+function skillCells(){
+  const hist={};
+  for(const e of state.log){
+    if(!e.v||!e.t||!e.p) continue;
+    const k=e.v+'|'+e.t+'|'+e.p;
+    (hist[k]=hist[k]||[]).push(e.ok);
+  }
+  const out={};
+  for(const k in hist){
+    const h=hist[k].slice(-8);
+    let sc=0,ws=0,w=1;
+    for(let i=h.length-1;i>=0;i--){ sc+=h[i]*w; ws+=w; w*=0.8; }
+    out[k]={acc:sc/ws,n:hist[k].length};
+  }
+  return out;
 }
 
 function bumpActivity(n){
@@ -817,6 +871,7 @@ function bumpActivity(n){
   if(st.lastDay!==today){
     st.streak=(st.lastDay&&dayDiff(st.lastDay,today)===1)?st.streak+1:1;
     st.lastDay=today;
+    st.longestStreak=Math.max(st.longestStreak||0,st.streak);
   }
   st.days[today]=(st.days[today]||0)+n;
   persist(); renderStats();
@@ -826,7 +881,7 @@ function bumpActivity(n){
 const INTERVALS=[0,1,3,7,14,30,60];
 function cardPool(){
   const pool=[];
-  VOCAB_SEED.forEach((w,i)=>pool.push({id:'v'+i,kind:'vocab',w}));
+  VOCAB_SEED.forEach(w=>pool.push({id:'v'+w.id,kind:'vocab',w}));
   state.custom.forEach(w=>pool.push({id:'c'+w.cid,kind:'vocab',w}));
   ALL_VERBS.forEach(v=>pool.push({id:'verb_'+v.id,kind:'verb',v}));
   return pool;
@@ -845,7 +900,7 @@ function gradeCard(id,g){
   const e=state.srs[id]||{box:0};
   e.box=g===0?0:Math.min(e.box+(g===2?2:1),INTERVALS.length-1);
   e.due=addDays(todayStr(),INTERVALS[e.box]);
-  state.srs[id]=e; persist();
+  state.srs[id]=e; bumpTotals(g>0); persist();
 }
 
 /* ===== helpers ===== */
@@ -880,18 +935,34 @@ function quizVerbs(){
   const vs=focusBinyan?ALL_VERBS.filter(v=>v.b===focusBinyan):ALL_VERBS;
   return vs.length?vs:ALL_VERBS;
 }
+/* weighted sampling without replacement: weak cells drill hard, unseen cells
+   get an exploration bonus, mastered cells stay warm but rare */
+function pickWeighted(n){
+  const skill=skillCells(), cells=[];
+  for(const v of quizVerbs())
+    for(const t of ['past','present','future']){
+      if(!v.forms[t]) continue;
+      for(const p in v.forms[t]){
+        const s=skill[v.id+'|'+t+'|'+p];
+        cells.push({v,t,p,wgt:s?0.4+3*(1-s.acc):1.4});
+      }
+    }
+  const out=[];
+  for(let k=0;k<n&&cells.length;k++){
+    let tot=0; for(const c of cells) tot+=c.wgt;
+    let r=Math.random()*tot, idx=cells.length-1;
+    for(let i=0;i<cells.length;i++){ r-=cells[i].wgt; if(r<=0){idx=i;break;} }
+    out.push(cells.splice(idx,1)[0]);
+  }
+  return out;
+}
 
 /* ===== session runner ===== */
 const sess={items:[],i:0,right:0,mode:null};
 function openSession(mode){
   sess.mode=mode; sess.i=0; sess.right=0;
   if(mode==='mcq'||mode==='type'){
-    sess.items=Array.from({length:10},()=>{
-      const v=pick(quizVerbs());
-      const tenses=['past','present','future'].filter(t=>v.forms[t]);
-      const t=pick(tenses); const persons=Object.keys(v.forms[t]);
-      return {v,t,p:pick(persons)};
-    });
+    sess.items=pickWeighted(10);
   }else if(mode==='cloze'){
     sess.items=shuffle(SENTENCES).slice(0,10);
   }else{
@@ -962,7 +1033,7 @@ function renderMCQ(it,body){
     btn.classList.add(ok?'correct':'wrong');
     body.querySelectorAll('.opt').forEach((b,j)=>{if(opts[j]===correct)b.classList.add('correct');else if(b!==btn)b.classList.add('dim');});
     if(ok) sess.right++;
-    trackBinyan(v.b, ok);
+    logAttempt(v.id,t,p,ok,'mcq');
     const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
     fb.innerHTML=(ok?'Right — ':'It\'s ')+`<b class="he">${hn(correct)}</b> <button class="spk" data-speak="${esc(correct)}">🔊</button> · ${pl.en}, ${TENSES[t].en} of "${esc(v.en)}"`+(v.note?`<br><span class="muted">${esc(v.note)}</span>`:'');
     fb.insertAdjacentHTML('afterend',nextBtnRow()); bindNext();
@@ -990,7 +1061,7 @@ function renderType(it,body){
   const finish=(ok,revealed)=>{
     if(done)return; done=true;
     if(ok) sess.right++;
-    trackBinyan(v.b, ok);
+    logAttempt(v.id,t,p,ok,'type');
     const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
     fb.innerHTML=(ok?'Right — ':'The answer: ')+`<b class="he">${hn(correct)}</b> <button class="spk" data-speak="${esc(correct)}">🔊</button>`+(v.note?`<br><span class="muted">${esc(v.note)}</span>`:'');
     if(revealed){
@@ -1010,13 +1081,12 @@ function renderType(it,body){
   input.addEventListener('keydown',e=>{if(e.key==='Enter')$('#q-check').click();});
   $('#q-show').addEventListener('click',()=>{
     const fb=$('#fb'); fb.className='feedback on good'; done=true;
-    trackBinyan(v.b, false);
     fb.innerHTML=`<b class="he" style="font-size:24px">${hn(correct)}</b> <button class="spk" data-speak="${esc(correct)}">🔊</button> · grade yourself:
       <div class="row" style="margin-top:10px;gap:8px">
         <button class="btn ghost grow" id="sg-no">Didn't know</button>
         <button class="btn grow" id="sg-yes">Knew it</button></div>`;
-    $('#sg-yes').addEventListener('click',()=>{sess.right++;sess.i++;renderQuestion();});
-    $('#sg-no').addEventListener('click',()=>{sess.i++;renderQuestion();});
+    $('#sg-yes').addEventListener('click',()=>{logAttempt(v.id,t,p,true,'type');sess.right++;sess.i++;renderQuestion();});
+    $('#sg-no').addEventListener('click',()=>{logAttempt(v.id,t,p,false,'type');sess.i++;renderQuestion();});
   });
 }
 
@@ -1038,7 +1108,7 @@ function renderCloze(it,body){
     btn.classList.add(ok?'correct':'wrong');
     body.querySelectorAll('.opt').forEach((b,j)=>{if(opts[j]===correct)b.classList.add('correct');else if(b!==btn)b.classList.add('dim');});
     if(ok) sess.right++;
-    trackBinyan(v.b, ok);
+    logAttempt(v.id,it.t,it.p,ok,'cloze');
     const pl=personLabel(it.t,it.p);
     const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
     fb.innerHTML=`<span class="he" style="font-size:20px">${hn(esc(it.pre))} <b>${hn(correct)}</b> ${hn(esc(it.post))}</span> <button class="spk" data-speak="${esc(it.pre+' '+correct+' '+it.post)}">🔊</button><br>
@@ -1063,6 +1133,7 @@ function renderExc(it,body){
     btn.classList.add(ok?'correct':'wrong');
     body.querySelectorAll('.opt').forEach((b,j)=>{if(opts[j]===it.a)b.classList.add('correct');else if(b!==btn)b.classList.add('dim');});
     if(ok) sess.right++;
+    bumpTotals(ok); persist();
     const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
     fb.innerHTML=it.why;
     fb.insertAdjacentHTML('afterend',nextBtnRow()); bindNext();
@@ -1243,22 +1314,49 @@ $('#add-btn').addEventListener('click',()=>{
 });
 
 /* ===== binyan chart ===== */
+function statBar(label,r,w){
+  const tot=r+w;
+  const pct=tot?Math.round(r/tot*100):null;
+  const color=pct===null?'var(--line)':pct>=80?'var(--good)':pct>=60?'var(--gold)':'var(--bad)';
+  return `<div class="bstat-row">
+    <div style="font-size:12px;font-weight:600;color:var(--muted)">${label}</div>
+    <div class="bstat-bar-wrap"><div class="bstat-bar" style="width:${pct??0}%;background:${color}"></div></div>
+    <div class="bstat-pct">${pct===null?'–':pct+'%'}</div>
+  </div>`;
+}
+/* all accuracy views derive from the event log at render time */
 function renderBstat(){
-  const root=document.getElementById('bstat-root'); if(!root) return;
-  const b=state.stats.binyan||{};
-  let any=false;
-  const rows=Object.keys(BINYANIM).map(key=>{
-    const dat=b[key]||{r:0,w:0};
-    const tot=dat.r+dat.w; if(tot) any=true;
-    const pct=tot?Math.round(dat.r/tot*100):null;
-    const color=pct===null?'var(--line)':pct>=80?'var(--good)':pct>=60?'var(--gold)':'var(--bad)';
-    return `<div class="bstat-row">
-      <div style="font-size:12px;font-weight:600;color:var(--muted)">${BINYANIM[key].name}</div>
-      <div class="bstat-bar-wrap"><div class="bstat-bar" style="width:${pct??0}%;background:${color}"></div></div>
-      <div class="bstat-pct">${pct===null?'–':pct+'%'}</div>
-    </div>`;
-  }).join('');
-  root.innerHTML=any?rows:'<p class="muted" style="font-size:14px">Complete a quiz to see your per-binyan breakdown.</p>';
+  const broot=document.getElementById('bstat-root'), troot=document.getElementById('tstat-root');
+  if(!broot) return;
+  const byB={}, byT={past:{r:0,w:0},present:{r:0,w:0},future:{r:0,w:0}};
+  for(const e of state.log){
+    const v=VERB_BY_ID[e.v]; if(!v) continue;
+    const bb=byB[v.b]=byB[v.b]||{r:0,w:0};
+    e.ok?bb.r++:bb.w++;
+    if(byT[e.t]) e.ok?byT[e.t].r++:byT[e.t].w++;
+  }
+  const any=state.log.length>0;
+  broot.innerHTML=any?Object.keys(BINYANIM).map(k=>{const d=byB[k]||{r:0,w:0};return statBar(BINYANIM[k].name,d.r,d.w);}).join('')
+    :'<p class="muted" style="font-size:14px">Complete a quiz to see your per-binyan breakdown.</p>';
+  if(troot) troot.innerHTML=any?['past','present','future'].map(t=>statBar(TENSES[t].en,byT[t].r,byT[t].w)).join('')
+    :'<p class="muted" style="font-size:14px">No data yet.</p>';
+  renderWeak();
+}
+function renderWeak(){
+  const root=document.getElementById('weak-root'); if(!root) return;
+  const skill=skillCells();
+  const rows=Object.entries(skill).filter(([k,s])=>s.n>=2&&s.acc<0.85)
+    .sort((a,b)=>a[1].acc-b[1].acc).slice(0,6)
+    .map(([k,s])=>{
+      const [vid,t,p]=k.split('|'); const v=VERB_BY_ID[vid];
+      if(!v||!v.forms[t]||!v.forms[t][p]) return '';
+      const form=v.forms[t][p]; const pl=personLabel(t,p); const pct=Math.round(s.acc*100);
+      return `<div class="vrow"><span class="he">${hn(esc(form))}</span>
+        <button class="spk" data-speak="${esc(form)}">🔊</button>
+        <span class="m"><b>${esc(v.en)}</b><span>${TENSES[t].en} · ${pl.en} · ${BINYANIM[v.b].name}</span></span>
+        <span class="pill" style="background:${pct>=60?'var(--gold-soft)':'var(--bad-soft)'};color:${pct>=60?'var(--gold)':'var(--bad)'}">${pct}%</span></div>`;
+    }).join('');
+  root.innerHTML=rows||'<p class="muted" style="font-size:14px">Nothing shaky yet — answer more quiz questions and your weakest forms will surface here.</p>';
 }
 
 /* ===== stats & boot ===== */
@@ -1272,6 +1370,11 @@ function renderStats(){
   if(actEl){
     const days=Object.entries(state.stats.days||{}).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,7);
     actEl.textContent=days.length?days.map(([d,n])=>d.slice(5)+': '+n+' item'+(n===1?'':'s')).join(' · '):'No activity yet — start a quiz to begin your streak!';
+  }
+  const lifeEl=document.getElementById('life-line');
+  if(lifeEl){
+    const tr=state.stats.totalReviews||0, tc=state.stats.totalCorrect||0, ls=state.stats.longestStreak||0;
+    lifeEl.textContent=tr?`${tr} answers all time · ${Math.round(tc/tr*100)}% correct · longest streak ${ls} day${ls===1?'':'s'}`:'No answers yet.';
   }
 }
 function renderAll(){ renderStats(); renderVocab(); }
@@ -1300,8 +1403,8 @@ document.getElementById('restore-file').addEventListener('change',e=>{
     try{
       const data=JSON.parse(r.result);
       if(!data||typeof data!=='object'||!('srs' in data)) throw 0;
-      state={srs:{},custom:[],stats:{streak:0,lastDay:null,days:{},binyan:{}},ver:1,...data};
-      if(!state.stats.binyan)state.stats.binyan={};
+      state={srs:{},custom:[],log:[],stats:{streak:0,lastDay:null,days:{},totalReviews:0,totalCorrect:0,longestStreak:0},ver:2,...data};
+      migrate();
       persist(); renderAll(); badge('Backup restored.');
     }catch(_){ badge("That file doesn't look like a Shoresh backup."); }
     e.target.value='';
