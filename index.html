@@ -784,57 +784,57 @@ const SENTENCES=[
 ];
 
 const EXCEPTIONS=[
- {q:'In פ״נ verbs like נָפַל, what happens in the future?',
+ {id:'x_pnun_future',q:'In פ״נ verbs like נָפַל, what happens in the future?',
   a:'The נ disappears into a dagesh: יִפֹּל',
   d:['The נ doubles: יִנְנְפֹּל','Nothing — it stays: יִנְפֹּל','It moves to the end: יִפְלֹן'],
   why:'The נ assimilates into the next letter, leaving a dagesh: אֶפֹּל, תִּפֹּל, יִפֹּל.'},
- {q:'Which two binyanim have essentially no future tense in modern Hebrew?',
+ {id:'x_no_future_binyanim',q:'Which two binyanim have essentially no future tense in modern Hebrew?',
   a:"Pu'al and Huf'al",d:["Pa'al and Nif'al","Pi'el and Hif'il","Hitpa'el and Pu'al"],
   why:'Modern Hebrew phrases those passives another way; mostly met as present-tense adjectives (מְדֻבָּר, מֻזְמָן).'},
- {q:'Why is "he looked" הִסְתַּכֵּל and not הִתְסַכֵּל?',
+ {id:'x_metathesis',q:'Why is "he looked" הִסְתַּכֵּל and not הִתְסַכֵּל?',
   a:'The ת of הִתְ swaps places with the ס (metathesis)',
   d:['The ס is silent','It comes from a different root','The ת drops entirely'],
   why:'When a Hitpa\'el root starts with a sibilant (ס, שׂ), the ת and the first root letter switch positions.'},
- {q:'In ל״ה verbs like עָשָׂה, what happens to the ה before suffixes?',
+ {id:'x_lamedhe_suffix',q:'In ל״ה verbs like עָשָׂה, what happens to the ה before suffixes?',
   a:'It drops: עָשִׂיתִי, not "asahti"',
   d:['It becomes א: עשאתי','It doubles','It moves to the front'],
   why:'The final ה is a stand-in for an old י — it vanishes before most endings and the future ends in ־ֶה (תַּעֲשֶׂה).'},
- {q:'Where does the ו of ע״ו verbs like קָם go?',
+ {id:'x_ayinvav',q:'Where does the ו of ע״ו verbs like קָם go?',
   a:'Gone in past & present, back in the future (יָקוּם)',
   d:['Always visible','Only in the past','It becomes י in the future'],
   why:'קַמְתִּי, קָם, קָמִים — no ו. Then the future: אָקוּם, יָקוּם.'},
- {q:'Which binyan strengthens (historically doubles) the middle root letter?',
+ {id:'x_piel_dagesh',q:'Which binyan strengthens (historically doubles) the middle root letter?',
   a:"Pi'el — with Pu'al and Hitpa'el following suit",
   d:["Pa'al","Hif'il","Nif'al"],
   why:'That dagesh in דִּבֵּר, בִּקֵּשׁ, הִתְלַבֵּשׁ is the signature of the Pi\'el family.'},
- {q:'What do פ״א verbs like אכל and אמר do in the future?',
+ {id:'x_pealef_future',q:'What do פ״א verbs like אכל and אמר do in the future?',
   a:'The א goes silent and the vowel becomes o: יֹאכַל',
   d:['The א doubles: יַאֲכֹל','They conjugate regularly: יִאְכֹּל','The א moves: יָכְאַל'],
   why:'אֹכַל, תֹּאכַל, יֹאכַל — the א is written but not heard, prefix carries kholam.'},
- {q:'How many forms does the present tense have?',
+ {id:'x_present_forms',q:'How many forms does the present tense have?',
   a:'Four — it marks gender & number, never person',
   d:['Ten, like the past','Two','Six'],
   why:'כּוֹתֵב, כּוֹתֶבֶת, כּוֹתְבִים, כּוֹתְבוֹת serve for I/you/he alike; context supplies person.'},
- {q:'Nif\'al: past נִכְתַּב, future יִכָּתֵב. Where did the נ go?',
+ {id:'x_nifal_dagesh',q:'Nif\'al: past נִכְתַּב, future יִכָּתֵב. Where did the נ go?',
   a:'It assimilated into a dagesh in the first root letter',
   d:['It dropped without a trace','It moved after the כ','It became י'],
   why:'The נ prefix squeezes into the root letter: יִכָּתֵב — the dagesh in כ is its footprint.'},
- {q:'Which binyan is the passive mirror of Hif\'il?',
+ {id:'x_hifil_passive',q:'Which binyan is the passive mirror of Hif\'il?',
   a:"Huf'al (הֻפְעַל)",d:["Pu'al","Nif'al","Hitpa'el"],
   why:'Same skeleton, prefix takes u: הִסְבִּיר → הֻסְבַּר (was explained).'},
- {q:'פ״י verbs like ישב in the future: אֵשֵׁב, יֵשֵׁב. What happened?',
+ {id:'x_peyod_future',q:'פ״י verbs like ישב in the future: אֵשֵׁב, יֵשֵׁב. What happened?',
   a:'The initial י drops, leaving a tsere prefix',
   d:['The י doubles: יְיַשֵׁב','Nothing changed','The ב drops instead'],
   why:'יֵשֵׁב, not "yiyshev" — same story with ידע (יֵדַע) and, by analogy, הלך (יֵלֵךְ).'},
- {q:'How do you say "I am" with the verb היה?',
+ {id:'x_haya_present',q:'How do you say "I am" with the verb היה?',
   a:'You don\'t — Hebrew has no present tense of "to be"',
   d:['הֹוֶה אֲנִי','אֲנִי יִהְיֶה','אֲנִי הָיָה'],
   why:'אֲנִי עָיֵף — subject and predicate meet with no verb. היה supplies only past and future.'},
- {q:'What gives away a Hitpa\'el verb at a glance?',
+ {id:'x_hitpael_tav',q:'What gives away a Hitpa\'el verb at a glance?',
   a:'A הִתְ/מִתְ prefix whose ת survives even in the future',
   d:['A doubled first letter','A וּ suffix','A מְ prefix'],
   why:'הִתְלַבֵּשׁ, מִתְלַבֵּשׁ, יִתְלַבֵּשׁ — the ת rides along under every tense prefix.'},
- {q:'What does the label ע״ו on a root mean?',
+ {id:'x_root_labels',q:'What does the label ע״ו on a root mean?',
   a:'Its middle (2nd) letter is a weak ו',
   d:['It starts with ע','It ends with ו','It has only two letters'],
   why:'Grammar names slots by פ-ע-ל: פ=1st, ע=2nd, ל=3rd. ע״ו = "ayin slot holds ו", like ק-ו-ם.'}
@@ -1138,7 +1138,19 @@ function quizVerbs(){
   return vs.length?vs:ALL_VERBS;
 }
 /* weighted sampling without replacement: weak cells drill hard, unseen cells
-   get an exploration bonus, mastered cells stay warm but rare */
+   get an exploration bonus, mastered cells stay warm but rare. Every game
+   picks its questions through these two helpers. */
+function weightedSample(cells,n){
+  const pool=[...cells], out=[];
+  for(let k=0;k<n&&pool.length;k++){
+    let tot=0; for(const c of pool) tot+=c.wgt;
+    let r=Math.random()*tot, idx=pool.length-1;
+    for(let i=0;i<pool.length;i++){ r-=pool[i].wgt; if(r<=0){idx=i;break;} }
+    out.push(pool.splice(idx,1)[0]);
+  }
+  return out;
+}
+const cellWgt=(skill,key)=>{const s=skill[key];return s?0.4+3*(1-s.acc):1.4;};
 function pickWeighted(n){
   const skill=skillCells(), cells=[];
   let verbs=quizVerbs(), tenses=['past','present','future'];
@@ -1152,19 +1164,10 @@ function pickWeighted(n){
   for(const v of verbs)
     for(const t of tenses){
       if(!v.forms[t]) continue;
-      for(const p in v.forms[t]){
-        const s=skill[v.id+'|'+t+'|'+p];
-        cells.push({v,t,p,wgt:s?0.4+3*(1-s.acc):1.4});
-      }
+      for(const p in v.forms[t])
+        cells.push({v,t,p,wgt:cellWgt(skill,v.id+'|'+t+'|'+p)});
     }
-  const out=[];
-  for(let k=0;k<n&&cells.length;k++){
-    let tot=0; for(const c of cells) tot+=c.wgt;
-    let r=Math.random()*tot, idx=cells.length-1;
-    for(let i=0;i<cells.length;i++){ r-=cells[i].wgt; if(r<=0){idx=i;break;} }
-    out.push(cells.splice(idx,1)[0]);
-  }
-  return out;
+  return weightedSample(cells,n);
 }
 
 /* ===== session runner ===== */
@@ -1179,9 +1182,12 @@ function openSession(mode){
     sess.items=buildNaItems(10);
   }else if(mode==='cloze'){
     const pool=sessScope&&sessScope.verbs?SENTENCES.filter(s=>sessScope.verbs.includes(s.v)):SENTENCES;
-    sess.items=shuffle(pool.length?pool:SENTENCES).slice(0,10);
+    const base=pool.length?pool:SENTENCES;
+    const skill=skillCells();
+    sess.items=weightedSample(base.map(s=>({...s,wgt:cellWgt(skill,s.v+'|'+s.t+'|'+s.p)})),10);
   }else{
-    sess.items=shuffle(EXCEPTIONS).slice(0,10);
+    const skill=skillCells();
+    sess.items=weightedSample(EXCEPTIONS.map(q=>({...q,wgt:cellWgt(skill,q.id+'|rule|-')})),10);
   }
   $('#session').classList.add('on'); document.documentElement.style.overflow='hidden';
   renderQuestion();
@@ -1368,6 +1374,7 @@ function renderCloze(it,body){
 
 /* Exceptions */
 function renderExc(it,body){
+  const t0=performance.now();
   const opts=shuffle([it.a,...it.d]);
   body.innerHTML=`<div class="qcard">
       <div class="qkicker">Exceptions &amp; rules</div>
@@ -1382,7 +1389,7 @@ function renderExc(it,body){
     btn.classList.add(ok?'correct':'wrong');
     body.querySelectorAll('.opt').forEach((b,j)=>{if(opts[j]===it.a)b.classList.add('correct');else if(b!==btn)b.classList.add('dim');});
     if(ok) sess.right++;
-    bumpTotals(ok); persist();
+    logAttempt(it.id,'rule','-',ok,'exc',{k:'rule',lat:Math.round(performance.now()-t0)});
     const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
     fb.innerHTML=it.why;
     fb.insertAdjacentHTML('afterend',nextBtnRow()); bindNext();
@@ -1441,20 +1448,19 @@ function renderListen(it,body){
 function buildNaItems(n){
   let NS=NOUNS, AS=ADJS;
   if(sessScope){
-    if(sessScope.nouns&&sessScope.nouns.length) NS=NOUNS.filter(x=>sessScope.nouns.includes(x.id));
-    if(sessScope.adjs&&sessScope.adjs.length) AS=ADJS.filter(x=>sessScope.adjs.includes(x.id));
-    if(sessScope.nouns&&!sessScope.nouns.length) NS=[];
-    if(sessScope.adjs&&!sessScope.adjs.length) AS=[];
+    NS=sessScope.nouns?NOUNS.filter(x=>sessScope.nouns.includes(x.id)):[];
+    AS=sessScope.adjs?ADJS.filter(x=>sessScope.adjs.includes(x.id)):[];
     if(!NS.length&&!AS.length){ NS=NOUNS; AS=ADJS; }
   }
-  const items=[];
-  for(let i=0;i<n;i++){
-    const r=Math.random();
-    if(NS.length&&(!AS.length||r<0.4)) items.push({kind:'plural',w:pick(NS)});
-    else if(NS.length&&(!AS.length||r<0.65)) items.push({kind:'gender',w:pick(NS)});
-    else items.push({kind:'agree',a:pick(AS),f:pick(['ms','fs','mp','fp'])});
+  const skill=skillCells(), cells=[];
+  for(const w of NS){
+    cells.push({kind:'plural',w,wgt:cellWgt(skill,w.id+'|plural|-')});
+    cells.push({kind:'gender',w,wgt:cellWgt(skill,w.id+'|gender|-')});
   }
-  return items;
+  for(const a of AS)
+    for(const f of ['ms','fs','mp','fp'])
+      cells.push({kind:'agree',a,f,wgt:cellWgt(skill,a.id+'|agree|'+f)});
+  return weightedSample(cells,n);
 }
 function renderNa(it,body){
   const t0=performance.now();
@@ -1797,7 +1803,7 @@ function renderBstat(){
   if(troot) troot.innerHTML=any?['past','present','future'].map(t=>statBar(TENSES[t].en,byT[t].r,byT[t].w)).join('')
     :'<p class="muted" style="font-size:14px">No data yet.</p>';
   const mroot=document.getElementById('mstat-root');
-  const MODE_LABEL={mcq:'Quiz',type:'Type it',cloze:'Sentences',listen:'Listening',na:'Nouns & adj'};
+  const MODE_LABEL={mcq:'Quiz',type:'Type it',cloze:'Sentences',listen:'Listening',na:'Nouns & adj',exc:'Rules'};
   if(mroot) mroot.innerHTML=(any&&Object.keys(byM).length)?Object.keys(MODE_LABEL).filter(m=>byM[m]).map(m=>statBar(MODE_LABEL[m],byM[m].r,byM[m].w)).join('')
     :'<p class="muted" style="font-size:14px">No data yet.</p>';
   renderWeak();
