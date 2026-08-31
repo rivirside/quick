@@ -223,6 +223,16 @@ details.ref[open] summary .car{transform:rotate(90deg)}
   font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}
 .lrow b{font-size:14px;display:block}
 .lrow span.d{font-size:12px;color:var(--muted);display:block}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-dow{font-size:10px;text-align:center;color:var(--muted);font-weight:700;letter-spacing:.05em}
+.cal-day{aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-variant-numeric:tabular-nums;background:var(--surface2);color:var(--muted)}
+.cal-day.full{background:var(--good);color:#fff;font-weight:700}
+.cal-day.part{background:var(--gold-soft);color:var(--gold);font-weight:700}
+.cal-day.rest{background:transparent;border:1px dashed var(--line)}
+.cal-day.today{outline:2px solid var(--accent);outline-offset:1px}
+.cal-day.future{opacity:.35}
 </style>
 </head>
 <body>
@@ -300,6 +310,8 @@ details.ref[open] summary .car{transform:rotate(90deg)}
   </section>
 
   <section class="screen" id="tab-stats">
+    <h2 class="sec">Calendar</h2>
+    <div class="card" id="cal-root"></div>
     <h2 class="sec">Your level</h2>
     <div class="card" id="level-root"></div>
     <h2 class="sec">Forms to drill</h2>
@@ -338,6 +350,11 @@ details.ref[open] summary .car{transform:rotate(90deg)}
         <select class="setsel" id="set-len"><option value="5">5</option><option value="10">10</option><option value="15">15</option></select></div>
       <div class="row"><span class="grow" style="font-size:14.5px">Pu'al &amp; Huf'al<br><span class="muted" style="font-size:12px">Literary binyanim — rare in speech</span></span>
         <select class="setsel" id="set-lit"><option value="light">Rare (default)</option><option value="off">Skip them</option><option value="full">Full weight</option></select></div>
+    </div>
+    <h2 class="sec">Study schedule</h2>
+    <div class="card">
+      <p class="muted" style="margin:0 0 10px;font-size:13px">Set a goal per weekday — go harder some days, rest on others. Rest days never break your streak.</p>
+      <div id="sched-rows"></div>
     </div>
     <h2 class="sec">AI tutor</h2>
     <div class="card" id="set-ai"></div>
@@ -1198,10 +1215,28 @@ function classifyMiss(v,t,p,u){
 }
 const ERR_LABEL={spell:'right sounds, wrong letters (half credit)',typo:'a near-miss typo (half credit)',tense:'right person, wrong tense',person:'right tense, wrong person',form:'a different form of this verb',binyan:'the same root in a different binyan'};
 
+/* per-day goal: the weekday schedule wins, 0 means a rest day,
+   otherwise the plain daily goal applies */
+function goalFor(ds){
+  const P=state.prefs||{}, s=P.sched||{};
+  const v=s[new Date(ds+'T12:00:00').getDay()];
+  return v===0?0:(v==null?(P.goal||20):v);
+}
+/* a streak survives a gap if every skipped day was a scheduled rest day */
+function restGapOk(last,today){
+  const d=new Date(last+'T12:00:00'), end=new Date(today+'T12:00:00');
+  for(let i=0;i<60;i++){
+    d.setDate(d.getDate()+1);
+    if(d>=end) return true;
+    const ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    if(goalFor(ds)!==0) return false;
+  }
+  return false;
+}
 function bumpActivity(n){
   const today=todayStr(), st=state.stats;
   if(st.lastDay!==today){
-    st.streak=(st.lastDay&&dayDiff(st.lastDay,today)===1)?st.streak+1:1;
+    st.streak=(st.lastDay&&restGapOk(st.lastDay,today))?st.streak+1:1;
     st.lastDay=today;
     st.longestStreak=Math.max(st.longestStreak||0,st.streak);
   }
@@ -1317,6 +1352,7 @@ function renderSettings(){
   $('#set-goal').value=String(P.goal||20);
   $('#set-len').value=String(P.len||10);
   $('#set-lit').value=P.lit||'light';
+  renderSched();
   renderSettingsAi();
 }
 function renderSettingsAi(){
@@ -1334,6 +1370,66 @@ function renderSettingsAi(){
       const k=document.getElementById('set-ai-key').value.trim(); if(k) setAiKey(k);
     });
   }
+}
+let calOffset=0;
+function renderCal(){
+  const root=document.getElementById('cal-root'); if(!root) return;
+  const now=new Date();
+  const view=new Date(now.getFullYear(),now.getMonth()+calOffset,1);
+  const y=view.getFullYear(), m=view.getMonth();
+  const monthName=view.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  const first=new Date(y,m,1).getDay();
+  const dim=new Date(y,m+1,0).getDate();
+  const todayS=todayStr();
+  const fmt=d=>y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+  let cells='';
+  for(let i=0;i<first;i++) cells+='<div></div>';
+  for(let d=1;d<=dim;d++){
+    const ds=fmt(d);
+    const n=state.stats.days[ds]||0;
+    const g=goalFor(ds);
+    let cls='cal-day';
+    if(g===0) cls+=' rest';
+    else if(g>0&&n>=g) cls+=' full';
+    else if(n>0) cls+=' part';
+    if(ds===todayS) cls+=' today';
+    if(ds>todayS) cls+=' future';
+    cells+=`<div class="${cls}" title="${n} answers">${g===0&&!n?'🌴':d}</div>`;
+  }
+  const st=state.stats;
+  root.innerHTML=`<div class="cal-head">
+      <button class="chip" id="cal-prev">‹</button>
+      <b style="font-size:14px">${monthName}</b>
+      <button class="chip" id="cal-next"${calOffset>=0?' disabled style="opacity:.4"':''}>›</button>
+    </div>
+    <div class="cal-grid" style="margin-bottom:4px">${['S','M','T','W','T','F','S'].map(x=>`<div class="cal-dow">${x}</div>`).join('')}</div>
+    <div class="cal-grid">${cells}</div>
+    <p class="muted" style="font-size:12.5px;margin:12px 0 0;text-align:center">🔥 ${st.streak||0} day streak · longest ${st.longestStreak||0} · <span style="color:var(--good)">■</span> goal met · <span style="color:var(--gold)">■</span> some · 🌴 rest</p>`;
+  document.getElementById('cal-prev').addEventListener('click',()=>{calOffset--;renderCal();});
+  if(calOffset<0) document.getElementById('cal-next').addEventListener('click',()=>{calOffset++;renderCal();});
+}
+const DOW=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+function renderSched(){
+  const el=document.getElementById('sched-rows'); if(!el) return;
+  const P=state.prefs=state.prefs||{}; const s=P.sched||{};
+  el.innerHTML=DOW.map((d,i)=>{
+    const v=s[i]==null?'':String(s[i]);
+    return `<div class="row" style="margin-bottom:8px"><span class="grow" style="font-size:14px">${d}</span>
+      <select class="setsel sched-sel" data-d="${i}">
+        <option value=""${v===''?' selected':''}>Default</option>
+        <option value="0"${v==='0'?' selected':''}>Rest 🌴</option>
+        <option value="10"${v==='10'?' selected':''}>10</option>
+        <option value="20"${v==='20'?' selected':''}>20</option>
+        <option value="30"${v==='30'?' selected':''}>30</option>
+        <option value="50"${v==='50'?' selected':''}>50</option>
+      </select></div>`;
+  }).join('');
+  el.querySelectorAll('.sched-sel').forEach(sel=>sel.addEventListener('change',e=>{
+    const P2=state.prefs=state.prefs||{}; const s2=P2.sched=P2.sched||{};
+    const dd=+e.target.dataset.d, val=e.target.value;
+    if(val==='') delete s2[dd]; else s2[dd]=+val;
+    persist(); renderStats(); renderCal();
+  }));
 }
 $('#set-theme').addEventListener('change',e=>{(state.prefs=state.prefs||{}).theme=e.target.value;persist();applyTheme();});
 $('#set-nikud').addEventListener('click',()=>{toggleNikud();$('#set-nikud').textContent=nikudOn?'shown':'hidden';$('#set-nikud').classList.toggle('on',nikudOn);});
@@ -2786,6 +2882,7 @@ function renderBstat(){
   }
   const any=state.log.length>0;
   renderLevelCard();
+  renderCal();
   broot.innerHTML=any?Object.keys(BINYANIM).map(k=>{const d=byB[k]||{r:0,w:0};return statBar(BINYANIM[k].name,d.r,d.w);}).join('')
     :'<p class="muted" style="font-size:14px">Complete a quiz to see your per-binyan breakdown.</p>';
   if(troot) troot.innerHTML=any?['past','present','future'].map(t=>statBar(TENSES[t].en,byT[t].r,byT[t].w)).join('')
@@ -2816,10 +2913,13 @@ function renderWeak(){
 /* ===== stats & boot ===== */
 function renderHero(due){
   const root=document.getElementById('hero-root'); if(!root) return;
-  const goal=(state.prefs&&state.prefs.goal)||20;
+  const goal=goalFor(todayStr());
   const today=state.stats.days[todayStr()]||0;
   let inner;
-  if(due>=8){
+  if(goal===0&&due<8){
+    inner=`<button class="mode" id="hero-btn" data-hero="mix"><span class="glyph" style="background:var(--good-soft)">🌴</span>
+      <span class="grow"><b>Rest day</b><span class="d">Streak is safe — but a Daily Mix won't hurt</span></span></button>`;
+  }else if(due>=8){
     inner=`<button class="mode" id="hero-btn" data-hero="cards" style="border-color:var(--gold)"><span class="glyph" style="background:var(--gold-soft);color:var(--gold)">🃏</span>
       <span class="grow"><b>${due} cards waiting</b><span class="d">Clear the review queue first — then play</span></span></button>`;
   }else if(today<goal){
@@ -2838,11 +2938,11 @@ function renderHero(due){
 function renderStats(){
   const today=todayStr();
   const due=dueCards().length;
-  const goal=(state.prefs&&state.prefs.goal)||20, tn=state.stats.days[today]||0;
+  const goal=goalFor(today), tn=state.stats.days[today]||0;
   $('#st-due').textContent=due;
   $('#st-streak').textContent=state.stats.streak||0;
-  const te=$('#st-today'); te.textContent=tn+'/'+goal;
-  te.style.color=tn>=goal?'var(--good)':'';
+  const te=$('#st-today'); te.textContent=goal===0?tn+' 🌴':tn+'/'+goal;
+  te.style.color=goal>0&&tn>=goal?'var(--good)':'';
   renderHero(due);
   renderCardsHome();
   const actEl=document.getElementById('act-line');
