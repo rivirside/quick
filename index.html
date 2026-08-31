@@ -43,6 +43,7 @@
   --shadow:0 1px 2px rgba(0,0,0,.35),0 4px 14px rgba(0,0,0,.35);
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{background:var(--bg);color:var(--ink);font-family:'Heebo',system-ui,sans-serif;
   font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
 .he{font-family:'David Libre','Heebo',serif;direction:rtl;unicode-bidi:isolate}
@@ -1142,9 +1143,9 @@ function logAttempt(vid,t,p,ok,mode,extra){
   if(state.log.length>LOG_CAP) state.log=state.log.slice(-LOG_CAP);
   bumpTotals(ok);
   if(!ok){
-    for(const cid of ['verb_'+vid,vid,'v'+vid]){
+    for(const cid of ['verb_'+vid,'rverb_'+vid,vid,'r'+vid,'v'+vid]){
       const card=state.srs[cid];
-      if(card&&card.due>todayStr()){ card.due=todayStr(); break; }
+      if(card&&card.due>todayStr()) card.due=todayStr();
     }
   }
   persist();
@@ -1217,6 +1218,13 @@ function cardPool(){
   ALL_VERBS.forEach(v=>pool.push({id:'verb_'+v.id,kind:'verb',v}));
   NOUNS.forEach(w=>pool.push({id:w.id,kind:'noun',w}));
   ADJS.forEach(a=>pool.push({id:a.id,kind:'adj',a}));
+  /* reverse (recall) cards: English on the front, SAY the Hebrew, self-grade.
+     Recognition and recall are separate skills with separate schedules. */
+  VOCAB_SEED.forEach(w=>pool.push({id:'r'+w.id,kind:'rvocab',w}));
+  state.custom.forEach(w=>pool.push({id:'rc'+w.cid,kind:'rvocab',w}));
+  ALL_VERBS.forEach(v=>pool.push({id:'rverb_'+v.id,kind:'rverb',v}));
+  NOUNS.forEach(w=>pool.push({id:'r'+w.id,kind:'rnoun',w}));
+  ADJS.forEach(a=>pool.push({id:'r'+a.id,kind:'radj',a}));
   return pool;
 }
 /* fresh cards enter the deck through lessons: once any lesson is started,
@@ -1225,10 +1233,10 @@ function startedLessonCardIds(){
   const s=new Set();
   for(const L of LESSONS){
     if(!state.lessons.started.includes(L.id)) continue;
-    (L.vocab||[]).forEach(id=>s.add('v'+id));
-    (L.verbs||[]).forEach(id=>s.add('verb_'+id));
-    (L.nouns||[]).forEach(id=>s.add(id));
-    (L.adjs||[]).forEach(id=>s.add(id));
+    (L.vocab||[]).forEach(id=>{s.add('v'+id);s.add('r'+id);});
+    (L.verbs||[]).forEach(id=>{s.add('verb_'+id);s.add('rverb_'+id);});
+    (L.nouns||[]).forEach(id=>{s.add(id);s.add('r'+id);});
+    (L.adjs||[]).forEach(id=>{s.add(id);s.add('r'+id);});
   }
   return s;
 }
@@ -2382,7 +2390,7 @@ function renderSweep(){
   if(sweep.i>=sweep.q.length){
     $('#sess-body').innerHTML=`<div class="sess-done"><div class="big he">מְעֻלֶּה!</div>
       <h3>${sweep.marked} marked known</h3>
-      <p class="muted">${sweep.q.length?'Known words skip lesson flashcards and come back for review in three weeks.':'Everything already has practice history — nothing left to sweep.'}</p>
+      <p class="muted">${sweep.q.length?'Recognition marked — those skip lesson flashcards. Their reverse cards (English → say the Hebrew) still start fresh, because recognizing and recalling are different skills.':'Everything already has practice history — nothing left to sweep.'}</p>
       <div class="sess-actions" style="max-width:280px;margin:18px auto 0"><button class="btn wide" id="d-close">Done</button></div></div>`;
     $('#sess-bar').style.width='100%'; $('#sess-count').textContent='';
     $('#d-close').addEventListener('click',closeSession);
@@ -2392,14 +2400,14 @@ function renderSweep(){
   $('#sess-bar').style.width=(sweep.i/sweep.q.length*100)+'%';
   $('#sess-count').textContent=(sweep.i+1)+' / '+sweep.q.length;
   $('#sess-body').innerHTML=`<div class="flash" style="min-height:220px">
-      <div class="qkicker">Do you know this?</div>
+      <div class="qkicker">Do you recognize this?</div>
       <div class="front he" style="font-size:clamp(30px,9vw,44px)">${hn(esc(it.he))}</div>
       <div class="back"><b>${esc(it.en)}</b>${it.tr?' · <i>'+esc(it.tr)+'</i>':''}</div>
       <button class="spk" data-speak="${esc(it.he)}">🔊</button>
     </div>
     <div class="grade" style="grid-template-columns:1fr 1fr">
       <button class="again" id="sw-no">Still learning</button>
-      <button class="easy" id="sw-yes">Know it</button>
+      <button class="easy" id="sw-yes">I recognize it</button>
     </div>`;
   $('#sw-yes').addEventListener('click',()=>{
     state.srs[it.cid]={ef:2.5,ivl:21,due:addDays(todayStr(),21),lapses:0,reps:1};
@@ -2501,9 +2509,11 @@ function lessonProgress(L,skill){
     if(n>=6&&cells&&accSum/cells>=0.75) done++;
   }
   for(const wid of (L.vocab||[])){ total++;
-    const e=state.srs['v'+wid];
+    /* recognizing a word when shown is not knowing it — completion needs
+       recall: a graduated reverse card, or proven typed recall */
+    const prod=state.srs['r'+wid];
     const s=skill[wid+'|word|-'];
-    if((e&&(e.ivl||0)>=3)||(s&&s.n>=2&&s.acc>=0.7)) done++;
+    if((prod&&(prod.ivl||0)>=3)||(s&&s.n>=2&&s.acc>=0.7)) done++;
   }
   for(const nid of (L.nouns||[])){ total++;
     let n=0,a=0,c=0;
@@ -2581,14 +2591,18 @@ function renderFlash(){
   $('#sess-count').textContent=(deckI+1)+' / '+deck.length;
   const c=deck[deckI];
   const iv=nextIvls(state.srs[c.id]);
-  const front=c.kind==='vocab'||c.kind==='noun'?c.w.he:c.kind==='adj'?c.a.ms:c.v.lemma;
-  const kick=c.kind==='vocab'?'Vocabulary':c.kind==='noun'?'Noun · שֵׁם עֶצֶם':c.kind==='adj'?'Adjective · שֵׁם תֹּאַר':BINYANIM[c.v.b].name+' · <span class="he">'+esc(c.v.root)+'</span>';
+  const rev=c.kind.charAt(0)==='r';
+  const base=rev?c.kind.slice(1):c.kind;
+  const heWord=base==='vocab'||base==='noun'?c.w.he:base==='adj'?c.a.ms:c.v.lemma;
+  const enWord=base==='adj'?c.a.en:base==='verb'?c.v.en:c.w.en;
+  const front=rev?enWord:heWord;
+  const kick=(rev?'Say it in Hebrew · ':'')+(base==='vocab'?'Vocabulary':base==='noun'?'Noun · שֵׁם עֶצֶם':base==='adj'?'Adjective · שֵׁם תֹּאַר':BINYANIM[c.v.b].name+' · <span class="he">'+esc(c.v.root)+'</span>');
   $('#sess-body').innerHTML=`<div class="flash">
       <div class="qkicker">${kick}</div>
-      <div class="front he">${hn(esc(front))}</div>
-      <button class="spk" data-speak="${esc(front)}" style="margin-top:4px">🔊</button>
+      <div class="front${rev?'':' he'}"${rev?' style="font-family:Heebo,sans-serif;font-size:clamp(24px,7vw,36px)"':''}>${rev?esc(front):hn(esc(front))}</div>
+      ${rev?'<div class="muted" style="font-size:12.5px">Say it out loud, then check</div>':`<button class="spk" data-speak="${esc(front)}" style="margin-top:4px">🔊</button>`}
       <div class="back" id="f-back" hidden></div>
-      <button class="btn ghost" id="f-flip" style="margin-top:8px">Show answer</button>
+      <button class="btn ghost" id="f-flip" style="margin-top:8px">${rev?'Show the Hebrew':'Show answer'}</button>
     </div><div class="grade" id="f-grade" hidden>
       <button class="again">Again<small>today</small></button>
       <button class="good">Good<small>${iv.good}</small></button>
@@ -2596,13 +2610,25 @@ function renderFlash(){
     </div>`;
   $('#f-flip').addEventListener('click',()=>{
     const back=$('#f-back'); back.hidden=false;
-    back.innerHTML=c.kind==='vocab'
-      ?`<b>${esc(c.w.en)}</b>${c.w.tr?' · <i>'+esc(c.w.tr)+'</i>':''}`
-      :c.kind==='noun'
-      ?`<b>${esc(c.w.en)}</b> · ${c.w.g==='m'?'masculine':'feminine'}<br><span class="muted" style="font-size:13.5px">plural <span class="he" style="font-size:20px">${hn(c.w.pl)}</span></span>`
-      :c.kind==='adj'
-      ?`<b>${esc(c.a.en)}</b><br><span class="he" style="font-size:20px">${hn(c.a.ms)} · ${hn(c.a.fs)} · ${hn(c.a.mp)} · ${hn(c.a.fp)}</span>`
-      :`<b>${esc(c.v.en)}</b>${c.v.tr?' · <i>'+esc(c.v.tr)+'</i>':''}<br><span class="muted" style="font-size:13.5px">present <span class="he" style="font-size:19px">${c.v.forms.present?hn(c.v.forms.present.ms):'—'}</span> · future <span class="he" style="font-size:19px">${c.v.forms.future?hn(c.v.forms.future.p3ms):'—'}</span></span>`;
+    if(rev){
+      const spk=`<button class="spk" data-speak="${esc(heWord)}">🔊</button>`;
+      back.innerHTML=base==='vocab'
+        ?`<span class="he" style="font-size:28px;color:var(--ink)">${hn(heWord)}</span> ${spk}${c.w.tr?'<br><i>'+esc(c.w.tr)+'</i>':''}`
+        :base==='noun'
+        ?`<span class="he" style="font-size:28px;color:var(--ink)">${hn(c.w.he)}</span> ${spk}<br><span class="muted" style="font-size:13.5px">${c.w.g==='m'?'masculine':'feminine'} · plural <span class="he" style="font-size:19px">${hn(c.w.pl)}</span></span>`
+        :base==='adj'
+        ?`<span class="he" style="font-size:23px;color:var(--ink)">${hn(c.a.ms)} · ${hn(c.a.fs)} · ${hn(c.a.mp)} · ${hn(c.a.fp)}</span> ${spk}`
+        :`<span class="he" style="font-size:28px;color:var(--ink)">${hn(c.v.lemma)}</span> ${spk}${c.v.tr?' · <i>'+esc(c.v.tr)+'</i>':''}`;
+      speak(heWord);
+    }else{
+      back.innerHTML=base==='vocab'
+        ?`<b>${esc(c.w.en)}</b>${c.w.tr?' · <i>'+esc(c.w.tr)+'</i>':''}`
+        :base==='noun'
+        ?`<b>${esc(c.w.en)}</b> · ${c.w.g==='m'?'masculine':'feminine'}<br><span class="muted" style="font-size:13.5px">plural <span class="he" style="font-size:20px">${hn(c.w.pl)}</span></span>`
+        :base==='adj'
+        ?`<b>${esc(c.a.en)}</b><br><span class="he" style="font-size:20px">${hn(c.a.ms)} · ${hn(c.a.fs)} · ${hn(c.a.mp)} · ${hn(c.a.fp)}</span>`
+        :`<b>${esc(c.v.en)}</b>${c.v.tr?' · <i>'+esc(c.v.tr)+'</i>':''}<br><span class="muted" style="font-size:13.5px">present <span class="he" style="font-size:19px">${c.v.forms.present?hn(c.v.forms.present.ms):'—'}</span> · future <span class="he" style="font-size:19px">${c.v.forms.future?hn(c.v.forms.future.p3ms):'—'}</span></span>`;
+    }
     $('#f-flip').hidden=true; $('#f-grade').hidden=false;
   });
   const grade=g=>{gradeCard(c.id,g); bumpActivity(1); if(g===0)deckRedo.push(c); deckI++; renderFlash();};
