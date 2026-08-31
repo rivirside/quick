@@ -16,7 +16,6 @@
 <title>Shoresh</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=David+Libre:wght@500;700&family=Heebo:wght@400;500;600;700&display=swap">
 <style>
-/* ————— tokens ————— */
 :root{
   --bg:#F5F1E8; --surface:#FDFBF5; --surface2:#EDE7D9; --ink:#282318;
   --muted:#6E6654; --line:#DCD4C0; --accent:#235E9E; --accent-soft:#E3EAF3;
@@ -51,27 +50,24 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;pad
 input,select{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
-
-/* ————— shell ————— */
 #app{max-width:640px;margin:0 auto;padding:18px 16px 96px}
-header.top{display:flex;align-items:baseline;justify-content:space-between;margin:2px 2px 16px}
+header.top{display:flex;align-items:baseline;justify-content:space-between;margin:2px 2px 16px;flex-wrap:wrap;gap:8px}
 .brand{font-weight:700;font-size:20px;letter-spacing:.01em}
 .brand .he{font-weight:700;color:var(--accent);margin-inline-start:6px;font-size:22px}
 .daymark{font-size:13px;color:var(--muted)}
-
+.top-right{display:flex;align-items:center;gap:8px}
+#nikud-btn{font-size:13px;padding:4px 10px;border-radius:20px;background:var(--surface2);border:1px solid var(--line);font-weight:600;color:var(--ink)}
+#nikud-btn.off{color:var(--muted)}
 nav.tabs{position:fixed;bottom:0;left:0;right:0;background:var(--surface);
-  border-top:1px solid var(--line);display:flex;justify-content:center;gap:4px;
+  border-top:1px solid var(--line);display:flex;justify-content:center;gap:2px;
   padding:6px max(8px,env(safe-area-inset-left)) max(10px,env(safe-area-inset-bottom));z-index:40}
-nav.tabs button{flex:0 1 130px;display:flex;flex-direction:column;align-items:center;gap:2px;
-  padding:6px 4px;border-radius:10px;color:var(--muted);font-size:11.5px;font-weight:600;letter-spacing:.04em}
+nav.tabs button{flex:0 1 110px;display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:6px 4px;border-radius:10px;color:var(--muted);font-size:11px;font-weight:600;letter-spacing:.04em}
 nav.tabs button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 nav.tabs button.on{color:var(--accent);background:var(--accent-soft)}
-
 .screen{display:none}
 .screen.on{display:block;animation:rise .18s ease}
 @keyframes rise{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-
-/* ————— cards & common ————— */
 .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;
   padding:16px;box-shadow:var(--shadow)}
 .stack>*+*{margin-top:12px}
@@ -92,15 +88,11 @@ h2.sec{font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:upperc
 .btn[disabled]{opacity:.45;pointer-events:none}
 .muted{color:var(--muted);font-size:14px}
 .tnum{font-variant-numeric:tabular-nums}
-
-/* stats strip */
 .statstrip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;
   padding:10px 12px;box-shadow:var(--shadow)}
 .stat .n{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
 .stat .l{font-size:11.5px;color:var(--muted);font-weight:600;letter-spacing:.05em;text-transform:uppercase}
-
-/* mode launcher */
 .mode{display:flex;align-items:center;gap:14px;width:100%;text-align:start;
   background:var(--surface);border:1px solid var(--line);border-radius:14px;
   padding:14px 16px;box-shadow:var(--shadow);transition:transform .08s ease}
@@ -110,15 +102,11 @@ h2.sec{font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:upperc
   display:flex;align-items:center;justify-content:center;flex:none}
 .mode b{display:block;font-size:15.5px}
 .mode span.d{display:block;font-size:13px;color:var(--muted)}
-
-/* chips */
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{padding:6px 13px;border-radius:999px;background:var(--surface);border:1px solid var(--line);
   font-size:13.5px;font-weight:600;color:var(--muted)}
 .chip.on{background:var(--btn);border-color:var(--btn);color:var(--btn-ink)}
 .chip .he{font-family:'David Libre',serif}
-
-/* ————— session overlay ————— */
 #session{position:fixed;inset:0;background:var(--bg);z-index:60;display:none;overflow-y:auto}
 #session.on{display:block}
 .sess-wrap{max-width:640px;margin:0 auto;padding:14px 16px 40px;min-height:100%;display:flex;flex-direction:column}
@@ -127,7 +115,6 @@ h2.sec{font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:upperc
 .progress{flex:1;height:6px;border-radius:3px;background:var(--surface2);overflow:hidden}
 .progress i{display:block;height:100%;background:var(--accent);border-radius:3px;transition:width .25s ease}
 .sess-count{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
-
 .qcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;
   padding:22px 18px;box-shadow:var(--shadow);text-align:center}
 .qkicker{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
@@ -136,7 +123,6 @@ h2.sec{font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:upperc
 .qsub .he{font-size:17px}
 .qhint{margin-top:8px;font-size:14px;color:var(--accent);font-weight:600}
 .blank{color:var(--accent);letter-spacing:.05em}
-
 .opts{display:grid;gap:10px;margin-top:16px}
 .opt{background:var(--surface);border:1.5px solid var(--line);border-radius:13px;
   padding:12px 14px;font-size:22px;text-align:center;box-shadow:var(--shadow);transition:transform .08s ease}
@@ -146,13 +132,11 @@ h2.sec{font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:upperc
 .opt.wrong{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
 .opt.dim{opacity:.55}
 .opt small{display:block;font-size:13px;color:var(--muted);font-family:'Heebo',sans-serif}
-
 .feedback{margin-top:14px;border-radius:13px;padding:12px 14px;font-size:14.5px;display:none;text-align:start}
 .feedback.on{display:block}
 .feedback.good{background:var(--good-soft);color:var(--good)}
 .feedback.bad{background:var(--bad-soft);color:var(--bad)}
 .feedback .he{font-size:19px}
-
 .typebox{margin-top:16px}
 .typebox input{width:100%;background:var(--surface);border:1.5px solid var(--line);border-radius:13px;
   padding:13px 14px;font-size:24px;text-align:center;font-family:'David Libre',serif;direction:rtl}
@@ -162,8 +146,6 @@ h2.sec{font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:upperc
 .sess-done{text-align:center;padding:40px 10px}
 .sess-done .big{font-size:44px;font-family:'David Libre',serif;color:var(--accent)}
 .sess-done h3{font-size:22px;margin:10px 0 4px}
-
-/* flashcards */
 .flash{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);
   min-height:270px;display:flex;flex-direction:column;align-items:center;justify-content:center;
   text-align:center;padding:24px 18px;gap:8px}
@@ -176,8 +158,6 @@ h2.sec{font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:upperc
 .grade .good{background:var(--accent-soft);color:var(--accent)}
 .grade .easy{background:var(--good-soft);color:var(--good)}
 .grade small{display:block;font-weight:500;font-size:11.5px;opacity:.8}
-
-/* ————— reference ————— */
 details.ref{background:var(--surface);border:1px solid var(--line);border-radius:14px;
   box-shadow:var(--shadow);overflow:hidden}
 details.ref summary{list-style:none;display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer}
@@ -201,11 +181,9 @@ details.ref[open] summary .car{transform:rotate(90deg)}
 .exlist li{padding:7px 0;border-bottom:1px dashed var(--line);font-size:14px}
 .exlist li:last-child{border-bottom:none}
 .exlist .he{font-size:18px;font-weight:600}
-
-/* ————— vocab ————— */
-.vrow{display:flex;align-items:center;gap:12px;padding:10px 2px;border-bottom:1px solid var(--line)}
+.vrow{display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px solid var(--line)}
 .vrow:last-child{border-bottom:none}
-.vrow .he{font-size:22px;font-weight:600;min-width:96px;text-align:right}
+.vrow .he{font-size:22px;font-weight:600;min-width:90px;text-align:right}
 .vrow .m{flex:1}
 .vrow .m b{display:block;font-size:14.5px;font-weight:600}
 .vrow .m span{display:block;font-size:12.5px;color:var(--muted)}
@@ -216,28 +194,33 @@ details.ref[open] summary .car{transform:rotate(90deg)}
 .search{width:100%;background:var(--surface);border:1.5px solid var(--line);border-radius:11px;
   padding:10px 12px;margin-bottom:10px}
 .savebadge{font-size:12px;color:var(--muted);text-align:center;margin-top:10px}
+.spk{font-size:16px;padding:3px 7px;border-radius:8px;background:var(--surface2);border:1px solid var(--line);line-height:1;flex:none}
+.spk:active{transform:scale(.9)}
+.bstat-row{display:grid;grid-template-columns:80px 1fr 38px;align-items:center;gap:8px;margin:8px 0}
+.bstat-bar-wrap{height:12px;background:var(--surface2);border-radius:6px;overflow:hidden}
+.bstat-bar{height:100%;border-radius:6px;transition:width .3s ease}
+.bstat-pct{font-size:12px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.cat-label{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:14px 2px 6px}
 </style>
 </head>
 <body>
-
-
 <div id="app">
   <header class="top">
     <div class="brand">Shoresh<span class="he">שֹׁרֶשׁ</span></div>
-    <div class="daymark" id="daymark"></div>
+    <div class="top-right">
+      <button id="nikud-btn" onclick="toggleNikud()">אָ niqqud</button>
+      <div class="daymark" id="daymark"></div>
+    </div>
   </header>
 
-  <!-- PRACTICE -->
   <section class="screen on" id="tab-practice">
     <div class="statstrip">
       <div class="stat"><div class="n tnum" id="st-due">–</div><div class="l">cards due</div></div>
       <div class="stat"><div class="n tnum" id="st-streak">–</div><div class="l">day streak</div></div>
       <div class="stat"><div class="n tnum" id="st-today">–</div><div class="l">today</div></div>
     </div>
-
     <h2 class="sec">Focus</h2>
     <div class="chips" id="binyan-chips"></div>
-
     <h2 class="sec">Practice</h2>
     <div class="stack">
       <button class="mode" data-mode="mcq"><span class="glyph">אָ</span>
@@ -251,22 +234,19 @@ details.ref[open] summary .car{transform:rotate(90deg)}
     </div>
   </section>
 
-  <!-- CARDS -->
   <section class="screen" id="tab-cards">
     <div class="card" id="cards-home">
       <b style="font-size:17px">Flashcards</b>
       <p class="muted" id="cards-due-line" style="margin:6px 0 14px"></p>
       <button class="btn wide" id="cards-start">Start review</button>
-      <p class="muted" style="margin:10px 0 0;font-size:13px">Cards you miss come back sooner; cards you know drift further out. Vocabulary you add joins the deck automatically.</p>
+      <p class="muted" style="margin:10px 0 0;font-size:13px">Cards you miss come back sooner; cards you know drift further out.</p>
     </div>
   </section>
 
-  <!-- REFERENCE -->
   <section class="screen" id="tab-reference">
     <div class="stack" id="ref-root"></div>
   </section>
 
-  <!-- VOCAB -->
   <section class="screen" id="tab-vocab">
     <div class="card">
       <b style="font-size:16px">Add a word</b>
@@ -280,10 +260,9 @@ details.ref[open] summary .car{transform:rotate(90deg)}
     <h2 class="sec">Browse</h2>
     <input class="search" id="vsearch" placeholder="Search Hebrew or English…">
     <div class="stack" id="vocab-list"></div>
-
     <h2 class="sec">Your data</h2>
     <div class="card">
-      <p class="muted" style="margin:0 0 12px;font-size:13.5px">Progress, streaks and your added words live in this browser's storage on this device. Export a backup once in a while — restoring it brings everything back on any device.</p>
+      <p class="muted" style="margin:0 0 12px;font-size:13.5px">Progress and vocab live on this device. Export a backup to move between devices.</p>
       <div class="row">
         <button class="btn ghost grow" id="backup-btn">Export backup</button>
         <button class="btn ghost grow" id="restore-btn">Restore</button>
@@ -292,17 +271,23 @@ details.ref[open] summary .car{transform:rotate(90deg)}
     </div>
     <p class="savebadge" id="savebadge"></p>
   </section>
+
+  <section class="screen" id="tab-stats">
+    <h2 class="sec">Accuracy by binyan</h2>
+    <div class="card" id="bstat-root"><p class="muted" style="font-size:14px">Complete a quiz to see your per-binyan breakdown.</p></div>
+    <h2 class="sec">Activity</h2>
+    <div class="card"><p class="muted" style="font-size:14px" id="act-line">–</p></div>
+  </section>
 </div>
 
-<!-- bottom nav -->
 <nav class="tabs" aria-label="Sections">
   <button data-tab="practice" class="on"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".5"/></svg>Practice</button>
   <button data-tab="cards"><svg viewBox="0 0 24 24"><rect x="4" y="7" width="14" height="12" rx="2"/><path d="M8 4h12v12"/></svg>Cards</button>
   <button data-tab="reference"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h6v18H6a2 2 0 0 0-2 2z"/><path d="M20 5a2 2 0 0 0-2-2h-6v18h6a2 2 0 0 1 2 2z"/></svg>Reference</button>
   <button data-tab="vocab"><svg viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h8"/><path d="M18 15v6M15 18h6"/></svg>Vocab</button>
+  <button data-tab="stats"><svg viewBox="0 0 24 24"><path d="M3 18h3v-6H3zm4 0h3v-9H7zm4 0h3V6h-3zm4 0h3v-3h-3z"/></svg>Stats</button>
 </nav>
 
-<!-- session overlay -->
 <div id="session">
   <div class="sess-wrap">
     <div class="sess-top">
@@ -315,12 +300,23 @@ details.ref[open] summary .car{transform:rotate(90deg)}
 </div>
 <script>
 'use strict';
-/* ===================== conjugation engine =====================
-   Template tokens: literal pointed string, or [rootIndex, vowel, dagesh]
-   dagesh: 0 none · 1 only if the letter is begadkefat (בגדכפת) · 2 always */
+/* ===== TTS ===== */
+function speak(t){ if(!t) return; const u=new SpeechSynthesisUtterance(t); u.lang='he-IL'; u.rate=0.85; speechSynthesis.cancel(); speechSynthesis.speak(u); }
+document.addEventListener('click',e=>{ const b=e.target.closest('.spk'); if(b&&b.dataset.speak) speak(b.dataset.speak); });
+
+/* ===== niqqud toggle ===== */
+let nikudOn=true;
+function hn(s){ return nikudOn?s:s.normalize('NFC').replace(/[֑-ׇ]/g,''); }
+function toggleNikud(){
+  nikudOn=!nikudOn;
+  const btn=document.getElementById('nikud-btn');
+  btn.textContent=(nikudOn?'אָ':'א')+' niqqud';
+  btn.classList.toggle('off',!nikudOn);
+}
+
+/* ===== conjugation engine ===== */
 const DAGESH='ּ', BGDKFT='בגדכפת';
 const SOFIT={'כ':'ך','מ':'ם','נ':'ן','פ':'ף','צ':'ץ'};
-
 const TPL={
  paal:{
   past:{
@@ -411,7 +407,7 @@ const TPL={
    p1s:['אֶתְ',[1,'ַ',1],[2,'ֵ',2],[3,'',0]], p2ms:['תִּתְ',[1,'ַ',1],[2,'ֵ',2],[3,'',0]],
    p2fs:['תִּתְ',[1,'ַ',1],[2,'ְ',2],[3,'ִ',0],'י'], p3ms:['יִתְ',[1,'ַ',1],[2,'ֵ',2],[3,'',0]],
    p3fs:['תִּתְ',[1,'ַ',1],[2,'ֵ',2],[3,'',0]], p1p:['נִתְ',[1,'ַ',1],[2,'ֵ',2],[3,'',0]],
-   p2mp:['תִּתְ',[1,'ַ',1],[2,'ְ',2],[3,'',0],'וּ'], p3mp:['יִתְ',[1,'ַ',1],[2,'ְ',2],[3,'',0],'וּ']}}
+   p2mp:['תִּתְ',[1,'ַ',1],[2,'ְ',2],[3,'',0],'וּ'], p3mp:['יִתְ',[1,'ַ',1],[2,'ְ',2],[3,'',0],'וּ']]}
 };
 
 function conj(root, tpl){
@@ -420,10 +416,9 @@ function conj(root, tpl){
     if(typeof t==='string'){ w+=t; continue; }
     const [i,v,d]=t; const L=root[i-1];
     w+=L;
-    if(L==='ש') w+='ׁ'; // every auto root uses shin (sin roots are in the explicit tables)
+    if(L==='ש') w+='ׁ';
     if(d===2||(d===1&&BGDKFT.includes(L))) w+=DAGESH; w+=v;
   }
-  // final-letter form
   for(let i=w.length-1;i>=0;i--){
     const c=w[i];
     if(c>='א'&&c<='ת'){ if(SOFIT[c]) w=w.slice(0,i)+SOFIT[c]+w.slice(i+1); break; }
@@ -446,8 +441,6 @@ const PERSONS={
  p3ms:{en:'he',he:'הוּא'}, p3fs:{en:'she',he:'הִיא'}, p1p:{en:'we',he:'אֲנַחְנוּ'},
  p2mp:{en:'you (m pl)',he:'אַתֶּם'}, p3mp:{en:'they',he:'הֵם'}};
 const PRESENT_FORMS={ms:{en:'he / I (m)',he:'הוּא'},fs:{en:'she / I (f)',he:'הִיא'},mp:{en:'they (m)',he:'הֵם'},fp:{en:'they (f)',he:'הֵן'}};
-
-/* ===================== regular (auto-conjugated) verbs ===================== */
 const AUTO_VERBS=[
  {id:'ktv1',root:'כתב',b:'paal',en:'write',tr:'katav'},
  {id:'sgr1',root:'סגר',b:'paal',en:'close',tr:'sagar'},
@@ -459,6 +452,12 @@ const AUTO_VERBS=[
  {id:'pgsh1',root:'פגש',b:'paal',en:'meet',tr:'pagash'},
  {id:'bdk1',root:'בדק',b:'paal',en:'check',tr:'badak'},
  {id:'spr1',root:'ספר',b:'paal',en:'count',tr:'safar'},
+ {id:'khshv1',root:'חשב',b:'paal',en:'think',tr:'khashav'},
+ {id:'shbr1',root:'שבר',b:'paal',en:'break',tr:'shavar'},
+ {id:'lbsh1',root:'לבש',b:'paal',en:'wear, put on',tr:'lavash'},
+ {id:'grs1',root:'גרש',b:'paal',en:'expel, divorce',tr:'garesh'},
+ {id:'tskhk1',root:'צחק',b:'paal',en:'laugh',tr:'tsakhak'},
+ {id:'shkk1',root:'שחק',b:'paal',en:'play, act',tr:'sakhak'},
  {id:'dbr2',root:'דבר',b:'piel',en:'speak',tr:'diber'},
  {id:'bksh2',root:'בקש',b:'piel',en:'ask for, request',tr:'bikesh'},
  {id:'spr2',root:'ספר',b:'piel',en:'tell (a story)',tr:'siper'},
@@ -467,30 +466,35 @@ const AUTO_VERBS=[
  {id:'bshl2',root:'בשל',b:'piel',en:'cook',tr:'bishel'},
  {id:'tslm2',root:'צלמ',b:'piel',en:'photograph',tr:'tsilem'},
  {id:'shlm2',root:'שלמ',b:'piel',en:'pay',tr:'shilem'},
+ {id:'nign2',root:'נגנ',b:'piel',en:'play music',tr:'nigen'},
+ {id:'kbd2',root:'כבד',b:'piel',en:'honor, treat',tr:'kibed'},
  {id:'zmn5',root:'זמנ',b:'hifil',en:'invite, order',tr:'hizmin'},
  {id:'dlk5',root:'דלק',b:'hifil',en:'turn on, light',tr:'hidlik'},
- {id:'psk5',root:'פסק',b:'hifil',en:'stop',tr:'hifsik'},
+ {id:'psk5',root:'פסק',b:'hifil',en:'stop (tr)',tr:'hifsik'},
  {id:'sbr5',root:'סבר',b:'hifil',en:'explain',tr:'hisbir'},
- {id:'rgsh5',root:'רגש',b:'hifil',en:'feel',tr:'hirgish'},
+ {id:'rgsh5',root:'רגש',b:'hifil',en:'feel (emotion)',tr:'hirgish'},
  {id:'tkhl5',root:'תחל',b:'hifil',en:'begin',tr:'hitkhil'},
  {id:'ktv5',root:'כתב',b:'hifil',en:'dictate',tr:'hikhtiv'},
+ {id:'gdl5',root:'גדל',b:'hifil',en:'enlarge, raise',tr:'higdil'},
  {id:'kns3',root:'כנס',b:'nifal',en:'enter',tr:'nikhnas'},
- {id:'pgsh3',root:'פגש',b:'nifal',en:'meet (one another)',tr:'nifgash'},
+ {id:'pgsh3',root:'פגש',b:'nifal',en:'meet each other',tr:'nifgash'},
  {id:'zkr3',root:'זכר',b:'nifal',en:'be remembered',tr:'nizkar'},
+ {id:'shbr3',root:'שבר',b:'nifal',en:'get broken',tr:'nishbar'},
  {id:'lbsh7',root:'לבש',b:'hitpael',en:'get dressed',tr:'hitlabesh'},
  {id:'rgsh7',root:'רגש',b:'hitpael',en:'get excited',tr:'hitragesh'},
  {id:'kshr7',root:'קשר',b:'hitpael',en:'call, get in touch',tr:'hitkasher'},
  {id:'amn7',root:'אמנ',b:'hitpael',en:'work out, train',tr:'hitamen'},
  {id:'khtn7',root:'חתנ',b:'hitpael',en:'get married',tr:'hitkhaten'},
+ {id:'htnhg7',root:'נהג',b:'hitpael',en:'behave',tr:'hitnaheg'},
+ {id:'htbgr7',root:'בגר',b:'hitpael',en:'mature, grow up',tr:'hitbager'},
+ {id:'htptr7',root:'פטר',b:'hitpael',en:'resign, be dismissed',tr:'hitpater'},
  {id:'tslm4',root:'צלמ',b:'pual',en:'be photographed',tr:'tsulam'},
  {id:'shlm4',root:'שלמ',b:'pual',en:'be paid',tr:'shulam'},
  {id:'bshl4',root:'בשל',b:'pual',en:'be cooked',tr:'bushal'},
  {id:'zmn6',root:'זמנ',b:'hufal',en:'be invited',tr:'huzman'},
  {id:'psk6',root:'פסק',b:'hufal',en:'be stopped',tr:'hufsak'},
- {id:'dlk6',root:'דלק',b:'hufal',en:'be lit, turned on',tr:'hudlak'}
+ {id:'dlk6',root:'דלק',b:'hufal',en:'be lit',tr:'hudlak'}
 ];
-
-/* ===================== weak & irregular verbs (explicit tables) ===================== */
 const P6=['p1s','p2ms','p3ms','p3fs','p1p','p3mp'];
 function ex(past,present,future){
   const o={past:{},present:null,future:null};
@@ -501,7 +505,7 @@ function ex(past,present,future){
 }
 const EXPLICIT_VERBS=[
  {id:'asa',b:'paal',root:'ע-שׂ-ה',giz:'ל״ה',en:'do, make',tr:'asa',
-  note:'The final ה drops before most suffixes, and the future ends in ־ֶה: תַּעֲשֶׂה, not "ta\'aso".',
+  note:'The final ה drops before most suffixes, and the future ends in ־ֶה: תַּעֲשֶׂה.',
   f:ex(['עָשִׂיתִי','עָשִׂיתָ','עָשָׂה','עָשְׂתָה','עָשִׂינוּ','עָשׂוּ'],
       ['עוֹשֶׂה','עוֹשָׂה','עוֹשִׂים','עוֹשׂוֹת'],
       ['אֶעֱשֶׂה','תַּעֲשֶׂה','יַעֲשֶׂה','תַּעֲשֶׂה','נַעֲשֶׂה','יַעֲשׂוּ'])},
@@ -511,92 +515,141 @@ const EXPLICIT_VERBS=[
       ['רוֹצֶה','רוֹצָה','רוֹצִים','רוֹצוֹת'],
       ['אֶרְצֶה','תִּרְצֶה','יִרְצֶה','תִּרְצֶה','נִרְצֶה','יִרְצוּ'])},
  {id:'haya',b:'paal',root:'ה-י-ה',giz:'ל״ה',en:'be',tr:'haya',
-  note:'No present tense at all — "I am tired" is just אֲנִי עָיֵף. Past and future carry everything.',
+  note:'No present tense at all — "I am tired" is just אֲנִי עָיֵף.',
   f:ex(['הָיִיתִי','הָיִיתָ','הָיָה','הָיְתָה','הָיִינוּ','הָיוּ'],
       null,
       ['אֶהְיֶה','תִּהְיֶה','יִהְיֶה','תִּהְיֶה','נִהְיֶה','יִהְיוּ'])},
  {id:'nafal',b:'paal',root:'נ-פ-ל',giz:'פ״נ',en:'fall',tr:'nafal',
-  note:'The נ disappears in the future and squeezes into a dagesh: יִפֹּל, not "yinpol".',
+  note:'The נ disappears in the future into a dagesh: יִפֹּל.',
   f:ex(['נָפַלְתִּי','נָפַלְתָּ','נָפַל','נָפְלָה','נָפַלְנוּ','נָפְלוּ'],
       ['נוֹפֵל','נוֹפֶלֶת','נוֹפְלִים','נוֹפְלוֹת'],
       ['אֶפֹּל','תִּפֹּל','יִפֹּל','תִּפֹּל','נִפֹּל','יִפְּלוּ'])},
  {id:'natan',b:'paal',root:'נ-ת-נ',giz:'פ״נ',en:'give',tr:'natan',
-  note:'Both נ׳s assimilate: past נָתַתִּי (not "natanti"), future יִתֵּן.',
+  note:'Both נ׳s assimilate: past נָתַתִּי, future יִתֵּן.',
   f:ex(['נָתַתִּי','נָתַתָּ','נָתַן','נָתְנָה','נָתַנּוּ','נָתְנוּ'],
       ['נוֹתֵן','נוֹתֶנֶת','נוֹתְנִים','נוֹתְנוֹת'],
       ['אֶתֵּן','תִּתֵּן','יִתֵּן','תִּתֵּן','נִתֵּן','יִתְּנוּ'])},
  {id:'lakakh',b:'paal',root:'ל-ק-ח',giz:'irregular',en:'take',tr:'lakakh',
-  note:'Behaves like a פ״נ verb in the future even though it starts with ל: יִקַּח.',
+  note:'Behaves like a פ״נ verb in the future: יִקַּח.',
   f:ex(['לָקַחְתִּי','לָקַחְתָּ','לָקַח','לָקְחָה','לָקַחְנוּ','לָקְחוּ'],
       ['לוֹקֵחַ','לוֹקַחַת','לוֹקְחִים','לוֹקְחוֹת'],
       ['אֶקַּח','תִּקַּח','יִקַּח','תִּקַּח','נִקַּח','יִקְחוּ'])},
  {id:'kam',b:'paal',root:'ק-ו-ם',giz:'ע״ו',en:'get up',tr:'kam',
-  note:'The middle ו disappears in past and present, then returns in the future: קָם → יָקוּם.',
+  note:'The middle ו disappears in past and present, returns in future: קָם → יָקוּם.',
   f:ex(['קַמְתִּי','קַמְתָּ','קָם','קָמָה','קַמְנוּ','קָמוּ'],
       ['קָם','קָמָה','קָמִים','קָמוֹת'],
       ['אָקוּם','תָּקוּם','יָקוּם','תָּקוּם','נָקוּם','יָקוּמוּ'])},
  {id:'ba',b:'paal',root:'ב-ו-א',giz:'ע״ו + ל״א',en:'come',tr:'ba',
-  note:'Two weak letters at once: בָּא in past/present, the ו returns in the future (יָבוֹא).',
+  note:'Two weak letters: בָּא in past/present, ו returns in the future (יָבוֹא).',
   f:ex(['בָּאתִי','בָּאתָ','בָּא','בָּאָה','בָּאנוּ','בָּאוּ'],
       ['בָּא','בָּאָה','בָּאִים','בָּאוֹת'],
       ['אָבוֹא','תָּבוֹא','יָבוֹא','תָּבוֹא','נָבוֹא','יָבוֹאוּ'])},
  {id:'sam',b:'paal',root:'שׂ-י-ם',giz:'ע״י',en:'put',tr:'sam',
-  note:'Same pattern as ע״ו roots, but with י as the weak middle letter: שָׂם → יָשִׂים.',
+  note:'Same pattern as ע״ו but with י: שָׂם → יָשִׂים.',
   f:ex(['שַׂמְתִּי','שַׂמְתָּ','שָׂם','שָׂמָה','שַׂמְנוּ','שָׂמוּ'],
       ['שָׂם','שָׂמָה','שָׂמִים','שָׂמוֹת'],
       ['אָשִׂים','תָּשִׂים','יָשִׂים','תָּשִׂים','נָשִׂים','יָשִׂימוּ'])},
  {id:'yashav',b:'paal',root:'י-שׁ-ב',giz:'פ״י',en:'sit',tr:'yashav',
-  note:'The initial י drops in the future: אֵשֵׁב, יֵשֵׁב — not "yiyshev".',
+  note:'The initial י drops in the future: אֵשֵׁב, יֵשֵׁב.',
   f:ex(['יָשַׁבְתִּי','יָשַׁבְתָּ','יָשַׁב','יָשְׁבָה','יָשַׁבְנוּ','יָשְׁבוּ'],
       ['יוֹשֵׁב','יוֹשֶׁבֶת','יוֹשְׁבִים','יוֹשְׁבוֹת'],
       ['אֵשֵׁב','תֵּשֵׁב','יֵשֵׁב','תֵּשֵׁב','נֵשֵׁב','יֵשְׁבוּ'])},
  {id:'yada',b:'paal',root:'י-ד-ע',giz:'פ״י',en:'know',tr:'yada',
-  note:'Future loses the י like ישב: אֵדַע, יֵדַע. Present ends in patach under the ע: יוֹדֵעַ.',
+  note:'Future loses the י: אֵדַע, יֵדַע. Present: יוֹדֵעַ (patakh under ע).',
   f:ex(['יָדַעְתִּי','יָדַעְתָּ','יָדַע','יָדְעָה','יָדַעְנוּ','יָדְעוּ'],
       ['יוֹדֵעַ','יוֹדַעַת','יוֹדְעִים','יוֹדְעוֹת'],
       ['אֵדַע','תֵּדַע','יֵדַע','תֵּדַע','נֵדַע','יֵדְעוּ'])},
  {id:'halakh',b:'paal',root:'ה-ל-ך',giz:'irregular',en:'go, walk',tr:'halakh',
-  note:'Regular in the past, but the future behaves like a פ״י verb: אֵלֵךְ, יֵלֵךְ.',
+  note:'Regular past, but future is like פ״י: אֵלֵךְ, יֵלֵךְ.',
   f:ex(['הָלַכְתִּי','הָלַכְתָּ','הָלַךְ','הָלְכָה','הָלַכְנוּ','הָלְכוּ'],
       ['הוֹלֵךְ','הוֹלֶכֶת','הוֹלְכִים','הוֹלְכוֹת'],
       ['אֵלֵךְ','תֵּלֵךְ','יֵלֵךְ','תֵּלֵךְ','נֵלֵךְ','יֵלְכוּ'])},
  {id:'akhal',b:'paal',root:'א-כ-ל',giz:'פ״א',en:'eat',tr:'akhal',
-  note:'In the future the א goes silent and the vowel becomes o: אֹכַל, יֹאכַל.',
+  note:'In the future the א goes silent, vowel becomes o: יֹאכַל.',
   f:ex(['אָכַלְתִּי','אָכַלְתָּ','אָכַל','אָכְלָה','אָכַלְנוּ','אָכְלוּ'],
       ['אוֹכֵל','אוֹכֶלֶת','אוֹכְלִים','אוֹכְלוֹת'],
       ['אֹכַל','תֹּאכַל','יֹאכַל','תֹּאכַל','נֹאכַל','יֹאכְלוּ'])},
  {id:'amar',b:'paal',root:'א-מ-ר',giz:'פ״א',en:'say',tr:'amar',
-  note:'Same פ״א future as אכל: יֹאמַר. (Spoken Hebrew often prefers יגיד from הגיד.)',
+  note:'Same פ״א future: יֹאמַר.',
   f:ex(['אָמַרְתִּי','אָמַרְתָּ','אָמַר','אָמְרָה','אָמַרְנוּ','אָמְרוּ'],
       ['אוֹמֵר','אוֹמֶרֶת','אוֹמְרִים','אוֹמְרוֹת'],
       ['אֹמַר','תֹּאמַר','יֹאמַר','תֹּאמַר','נֹאמַר','יֹאמְרוּ'])},
  {id:'histakel',b:'hitpael',root:'ס-כ-ל',giz:'metathesis',en:'look (at)',tr:'histakel',
-  note:'When a Hitpa\'el root starts with ס or שׂ, the ת of הִתְ swaps places with it: הִסְתַּכֵּל, never "hitsakel".',
+  note:'Root starts with ס, so הִתְ swaps places with it: הִסְתַּכֵּל.',
   f:ex(['הִסְתַּכַּלְתִּי','הִסְתַּכַּלְתָּ','הִסְתַּכֵּל','הִסְתַּכְּלָה','הִסְתַּכַּלְנוּ','הִסְתַּכְּלוּ'],
       ['מִסְתַּכֵּל','מִסְתַּכֶּלֶת','מִסְתַּכְּלִים','מִסְתַּכְּלוֹת'],
       ['אֶסְתַּכֵּל','תִּסְתַּכֵּל','יִסְתַּכֵּל','תִּסְתַּכֵּל','נִסְתַּכֵּל','יִסְתַּכְּלוּ'])}
 ];
-
-/* ===================== general vocabulary ===================== */
 const VOCAB_SEED=[
- {he:'בַּיִת',tr:'bayit',en:'house'},{he:'סֵפֶר',tr:'sefer',en:'book'},{he:'מַיִם',tr:'mayim',en:'water'},
- {he:'יוֹם',tr:'yom',en:'day'},{he:'לַיְלָה',tr:'layla',en:'night'},{he:'בֹּקֶר',tr:'boker',en:'morning'},
- {he:'עֶרֶב',tr:'erev',en:'evening'},{he:'אֹכֶל',tr:'okhel',en:'food'},{he:'עִיר',tr:'ir',en:'city'},
- {he:'דֶּרֶךְ',tr:'derekh',en:'way, road'},{he:'שָׁנָה',tr:'shana',en:'year'},{he:'שָׁבוּעַ',tr:'shavua',en:'week'},
- {he:'חָבֵר',tr:'khaver',en:'friend'},{he:'מִשְׁפָּחָה',tr:'mishpakha',en:'family'},{he:'עֲבוֹדָה',tr:'avoda',en:'work, job'},
- {he:'זְמַן',tr:'zman',en:'time'},{he:'כֶּסֶף',tr:'kesef',en:'money'},{he:'לֵב',tr:'lev',en:'heart'},
- {he:'שֵׁם',tr:'shem',en:'name'},{he:'מָקוֹם',tr:'makom',en:'place'},{he:'שָׂפָה',tr:'safa',en:'language'},
- {he:'מִלָּה',tr:'mila',en:'word'},{he:'שִׁעוּר',tr:'shiur',en:'lesson'},{he:'שְׁאֵלָה',tr:'she\'ela',en:'question'},
- {he:'תְּשׁוּבָה',tr:'tshuva',en:'answer'},{he:'גָּדוֹל',tr:'gadol',en:'big'},{he:'קָטָן',tr:'katan',en:'small'},
- {he:'חָדָשׁ',tr:'khadash',en:'new'},{he:'יָשָׁן',tr:'yashan',en:'old (thing)'},{he:'יָפֶה',tr:'yafe',en:'beautiful'},
- {he:'טוֹב',tr:'tov',en:'good'},{he:'רַע',tr:'ra',en:'bad'},{he:'קַל',tr:'kal',en:'easy, light'},
- {he:'קָשֶׁה',tr:'kashe',en:'hard, difficult'},{he:'מָהִיר',tr:'mahir',en:'fast'},{he:'מָחָר',tr:'makhar',en:'tomorrow'},
- {he:'אֶתְמוֹל',tr:'etmol',en:'yesterday'},{he:'הַיּוֹם',tr:'hayom',en:'today'},{he:'עַכְשָׁו',tr:'akhshav',en:'now'},
- {he:'תָּמִיד',tr:'tamid',en:'always'},{he:'אוּלַי',tr:'ulay',en:'maybe'},{he:'בְּבַקָּשָׁה',tr:'bevakasha',en:'please'},
- {he:'תּוֹדָה',tr:'toda',en:'thank you'},{he:'סְלִיחָה',tr:'slikha',en:'sorry, excuse me'}
+ /* basics */
+ {he:'בַּיִת',tr:'bayit',en:'house',cat:'basics'},{he:'סֵפֶר',tr:'sefer',en:'book',cat:'basics'},
+ {he:'מַיִם',tr:'mayim',en:'water',cat:'basics'},{he:'יוֹם',tr:'yom',en:'day',cat:'basics'},
+ {he:'לַיְלָה',tr:'layla',en:'night',cat:'basics'},{he:'בֹּקֶר',tr:'boker',en:'morning',cat:'basics'},
+ {he:'עֶרֶב',tr:'erev',en:'evening',cat:'basics'},{he:'אֹכֶל',tr:'okhel',en:'food',cat:'basics'},
+ {he:'עִיר',tr:'ir',en:'city',cat:'basics'},{he:'דֶּרֶךְ',tr:'derekh',en:'way, road',cat:'basics'},
+ {he:'שָׁנָה',tr:'shana',en:'year',cat:'basics'},{he:'שָׁבוּעַ',tr:'shavua',en:'week',cat:'basics'},
+ {he:'חָבֵר',tr:'khaver',en:'friend',cat:'basics'},{he:'מִשְׁפָּחָה',tr:'mishpakha',en:'family',cat:'basics'},
+ {he:'עֲבוֹדָה',tr:'avoda',en:'work, job',cat:'basics'},{he:'זְמַן',tr:'zman',en:'time',cat:'basics'},
+ {he:'כֶּסֶף',tr:'kesef',en:'money',cat:'basics'},{he:'לֵב',tr:'lev',en:'heart',cat:'basics'},
+ {he:'שֵׁם',tr:'shem',en:'name',cat:'basics'},{he:'מָקוֹם',tr:'makom',en:'place',cat:'basics'},
+ {he:'שָׂפָה',tr:'safa',en:'language',cat:'basics'},{he:'מִלָּה',tr:'mila',en:'word',cat:'basics'},
+ {he:'שִׁעוּר',tr:'shiur',en:'lesson',cat:'basics'},{he:'שְׁאֵלָה',tr:'sheela',en:'question',cat:'basics'},
+ {he:'תְּשׁוּבָה',tr:'tshuva',en:'answer',cat:'basics'},{he:'גָּדוֹל',tr:'gadol',en:'big',cat:'basics'},
+ {he:'קָטָן',tr:'katan',en:'small',cat:'basics'},{he:'חָדָשׁ',tr:'khadash',en:'new',cat:'basics'},
+ {he:'יָשָׁן',tr:'yashan',en:'old (thing)',cat:'basics'},{he:'יָפֶה',tr:'yafe',en:'beautiful',cat:'basics'},
+ {he:'טוֹב',tr:'tov',en:'good',cat:'basics'},{he:'רַע',tr:'ra',en:'bad',cat:'basics'},
+ {he:'קַל',tr:'kal',en:'easy, light',cat:'basics'},{he:'קָשֶׁה',tr:'kashe',en:'hard, difficult',cat:'basics'},
+ {he:'מָהִיר',tr:'mahir',en:'fast',cat:'basics'},{he:'מָחָר',tr:'makhar',en:'tomorrow',cat:'basics'},
+ {he:'אֶתְמוֹל',tr:'etmol',en:'yesterday',cat:'basics'},{he:'הַיּוֹם',tr:'hayom',en:'today',cat:'basics'},
+ {he:'עַכְשָׁו',tr:'akhshav',en:'now',cat:'basics'},{he:'תָּמִיד',tr:'tamid',en:'always',cat:'basics'},
+ {he:'אוּלַי',tr:'ulay',en:'maybe',cat:'basics'},{he:'בְּבַקָּשָׁה',tr:'bevakasha',en:'please',cat:'basics'},
+ {he:'תּוֹדָה',tr:'toda',en:'thank you',cat:'basics'},{he:'סְלִיחָה',tr:'slikha',en:'sorry, excuse me',cat:'basics'},
+ /* home */
+ {he:'דֶּלֶת',tr:'delet',en:'door',cat:'home'},{he:'חַלּוֹן',tr:'khalon',en:'window',cat:'home'},
+ {he:'מִטָּה',tr:'mita',en:'bed',cat:'home'},{he:'שֻׁלְחָן',tr:'shulkhan',en:'table',cat:'home'},
+ {he:'כִּסֵּא',tr:'kise',en:'chair',cat:'home'},{he:'מִטְבָּח',tr:'mitbakh',en:'kitchen',cat:'home'},
+ {he:'חֶדֶר',tr:'kheder',en:'room',cat:'home'},{he:'אַמְבַּטְיָה',tr:'ambatya',en:'bathroom',cat:'home'},
+ {he:'קִיר',tr:'kir',en:'wall',cat:'home'},{he:'רִצְפָּה',tr:'ritspa',en:'floor',cat:'home'},
+ {he:'מַפְתֵּחַ',tr:'mafteakh',en:'key',cat:'home'},{he:'מַדְרֵגוֹת',tr:'madregot',en:'stairs',cat:'home'},
+ {he:'גַּג',tr:'gag',en:'roof',cat:'home'},{he:'גִּינָה',tr:'gina',en:'garden',cat:'home'},
+ /* food */
+ {he:'לֶחֶם',tr:'lekhem',en:'bread',cat:'food'},{he:'גְּבִינָה',tr:'gvina',en:'cheese',cat:'food'},
+ {he:'בֵּיצָה',tr:'beytsa',en:'egg',cat:'food'},{he:'עוֹף',tr:'of',en:'chicken',cat:'food'},
+ {he:'בָּשָׂר',tr:'basar',en:'meat',cat:'food'},{he:'דָּג',tr:'dag',en:'fish',cat:'food'},
+ {he:'פְּרִי',tr:'pri',en:'fruit',cat:'food'},{he:'יֶרֶק',tr:'yerek',en:'vegetable',cat:'food'},
+ {he:'מִיץ',tr:'mits',en:'juice',cat:'food'},{he:'קָפֶה',tr:'kafe',en:'coffee',cat:'food'},
+ {he:'חָלָב',tr:'khalav',en:'milk',cat:'food'},{he:'תַּפּוּחַ',tr:'tapuakh',en:'apple',cat:'food'},
+ {he:'שֶׁמֶן',tr:'shemen',en:'oil',cat:'food'},{he:'מֶלַח',tr:'melakh',en:'salt',cat:'food'},
+ {he:'סֻכָּר',tr:'sukar',en:'sugar',cat:'food'},{he:'אֹרֶז',tr:'orez',en:'rice',cat:'food'},
+ /* clothing */
+ {he:'חֻלְצָה',tr:'khultsa',en:'shirt',cat:'clothing'},{he:'מִכְנָסַיִם',tr:'mikhnasayim',en:'pants',cat:'clothing'},
+ {he:'שִׂמְלָה',tr:'simla',en:'dress',cat:'clothing'},{he:'נַעֲלַיִם',tr:'na-alayim',en:'shoes',cat:'clothing'},
+ {he:'גֶּרֶב',tr:'gerev',en:'sock',cat:'clothing'},{he:'מְעִיל',tr:'me-il',en:'coat',cat:'clothing'},
+ {he:'כּוֹבַע',tr:'kova',en:'hat',cat:'clothing'},{he:'חֲגוֹרָה',tr:'khagora',en:'belt',cat:'clothing'},
+ {he:'צַעִיף',tr:'tsa-if',en:'scarf',cat:'clothing'},{he:'בֶּגֶד',tr:'beged',en:'garment, clothes',cat:'clothing'},
+ /* health */
+ {he:'רוֹפֵא',tr:'rofe',en:'doctor',cat:'health'},{he:'בֵּית חוֹלִים',tr:'beyt kholim',en:'hospital',cat:'health'},
+ {he:'תְּרוּפָה',tr:'trufa',en:'medicine',cat:'health'},{he:'כְּאֵב',tr:'ke-ev',en:'pain, ache',cat:'health'},
+ {he:'חֹם',tr:'khom',en:'fever, temperature',cat:'health'},{he:'בְּרִיאוּת',tr:'bri-ut',en:'health',cat:'health'},
+ {he:'חוֹלֶה',tr:'khole',en:'sick',cat:'health'},{he:'בָּרִיא',tr:'bari',en:'healthy',cat:'health'},
+ {he:'בֵּית מִרְקַחַת',tr:'beyt mirkahat',en:'pharmacy',cat:'health'},{he:'אַמְבּוּלַנְס',tr:'ambulans',en:'ambulance',cat:'health'},
+ /* romance */
+ {he:'אַהֲבָה',tr:'ahava',en:'love',cat:'romance'},{he:'נְשִׁיקָה',tr:'neshika',en:'kiss',cat:'romance'},
+ {he:'פְּגִישָׁה',tr:'pgisha',en:'meeting, date',cat:'romance'},{he:'חָבִיב',tr:'khaviv',en:'cute, sweet',cat:'romance'},
+ {he:'קֶשֶׁר',tr:'kesher',en:'relationship, connection',cat:'romance'},{he:'חָתוּנָה',tr:'khatuna',en:'wedding',cat:'romance'},
+ {he:'זוּג',tr:'zug',en:'couple, pair',cat:'romance'},{he:'רוֹמַנְטִי',tr:'romantit',en:'romantic',cat:'romance'},
+ {he:'לְהִתְאַהֵב',tr:'lehitahev',en:'to fall in love',cat:'romance'},{he:'פְּרִידָה',tr:'prida',en:'farewell, parting',cat:'romance'},
+ /* nature */
+ {he:'עֵץ',tr:'ets',en:'tree',cat:'nature'},{he:'פֶּרַח',tr:'perakh',en:'flower',cat:'nature'},
+ {he:'יָם',tr:'yam',en:'sea',cat:'nature'},{he:'הָר',tr:'har',en:'mountain',cat:'nature'},
+ {he:'שֶׁמֶשׁ',tr:'shemesh',en:'sun',cat:'nature'},{he:'יָרֵחַ',tr:'yareach',en:'moon',cat:'nature'},
+ {he:'כּוֹכָב',tr:'kokhav',en:'star',cat:'nature'},{he:'גֶּשֶׁם',tr:'geshem',en:'rain',cat:'nature'},
+ {he:'רוּחַ',tr:'ruakh',en:'wind, spirit',cat:'nature'},{he:'נָהָר',tr:'nahar',en:'river',cat:'nature'},
+ {he:'כֶּלֶב',tr:'kelev',en:'dog',cat:'nature'},{he:'חָתוּל',tr:'khatul',en:'cat',cat:'nature'},
+ {he:'צִפּוֹר',tr:'tsipor',en:'bird',cat:'nature'},{he:'שֶׁלֶג',tr:'sheleg',en:'snow',cat:'nature'}
 ];
 
-/* ===================== cloze sentences ===================== */
+const CAT_LABELS={basics:'Everyday basics',home:'The home · הַבַּיִת',food:'Food & cooking · אֹכֶל',clothing:'Clothing · בְּגָדִים',health:'Health · בְּרִיאוּת',romance:'Romance & social · אַהֲבָה',nature:'Nature · טֶבַע'};
 const SENTENCES=[
  {pre:'מָחָר אֲנִי',post:'מִכְתָּב לְסָבְתָא.',en:'Tomorrow I will write a letter to grandma.',v:'ktv1',t:'future',p:'p1s'},
  {pre:'אֶתְמוֹל הִיא',post:'אֶת הַדֶּלֶת.',en:'Yesterday she closed the door.',v:'sgr1',t:'past',p:'p3fs'},
@@ -617,19 +670,23 @@ const SENTENCES=[
  {pre:'אֲנִי',post:'אֶת הַדֶּלֶת — קַר לִי.',en:'I will close the door — I\'m cold.',v:'sgr1',t:'future',p:'p1s'},
  {pre:'הַמּוֹרָה',post:'אוֹתָנוּ עִבְרִית.',en:'The teacher (f) teaches us Hebrew.',v:'lmd2',t:'present',p:'fs'},
  {pre:'הוּא',post:'טוֹב הַיּוֹם.',en:'He feels good today.',v:'rgsh5',t:'present',p:'ms'},
- {pre:'אֲנַחְנוּ',post:'אֶת הַמַּתָּנָה מִדָּנִי.',en:'We received the gift from Danny.',v:'kbl2',t:'past',p:'p1p'}
+ {pre:'אֲנַחְנוּ',post:'אֶת הַמַּתָּנָה מִדָּנִי.',en:'We received the gift from Danny.',v:'kbl2',t:'past',p:'p1p'},
+ {pre:'הִיא',post:'בְּמוּזִיקָה כָּל יוֹם.',en:'She plays music every day.',v:'nign2',t:'present',p:'fs'},
+ {pre:'הוּא לֹא',post:'בַּכִּיתָּה.',en:'He does not behave in class.',v:'htnhg7',t:'present',p:'ms'},
+ {pre:'אֲנִי',post:'עַל הַנּוֹשֵׂא.',en:'I am thinking about the topic.',v:'khshv1',t:'present',p:'ms'},
+ {pre:'הִיא',post:'שִׁמְלָה יָפָה.',en:'She is wearing a beautiful dress.',v:'lbsh1',t:'present',p:'fs'},
+ {pre:'הוּא',post:'אֶת הַכּוֹס בַּמִּטְבָּח.',en:'He broke the glass in the kitchen.',v:'shbr1',t:'past',p:'p3ms'}
 ];
 
-/* ===================== exception & rule questions ===================== */
 const EXCEPTIONS=[
  {q:'In פ״נ verbs like נָפַל, what happens in the future?',
   a:'The נ disappears into a dagesh: יִפֹּל',
   d:['The נ doubles: יִנְנְפֹּל','Nothing — it stays: יִנְפֹּל','It moves to the end: יִפְלֹן'],
-  why:'The נ assimilates into the next letter, leaving a dagesh behind: אֶפֹּל, תִּפֹּל, יִפֹּל.'},
+  why:'The נ assimilates into the next letter, leaving a dagesh: אֶפֹּל, תִּפֹּל, יִפֹּל.'},
  {q:'Which two binyanim have essentially no future tense in modern Hebrew?',
   a:"Pu'al and Huf'al",d:["Pa'al and Nif'al","Pi'el and Hif'il","Hitpa'el and Pu'al"],
-  why:'Modern Hebrew phrases those passives another way; you mostly meet them as present-tense adjectives (מְדֻבָּר, מֻזְמָן).'},
- {q:'Why is “he looked” הִסְתַּכֵּל and not הִתְסַכֵּל?',
+  why:'Modern Hebrew phrases those passives another way; mostly met as present-tense adjectives (מְדֻבָּר, מֻזְמָן).'},
+ {q:'Why is "he looked" הִסְתַּכֵּל and not הִתְסַכֵּל?',
   a:'The ת of הִתְ swaps places with the ס (metathesis)',
   d:['The ס is silent','It comes from a different root','The ת drops entirely'],
   why:'When a Hitpa\'el root starts with a sibilant (ס, שׂ), the ת and the first root letter switch positions.'},
@@ -640,7 +697,7 @@ const EXCEPTIONS=[
  {q:'Where does the ו of ע״ו verbs like קָם go?',
   a:'Gone in past & present, back in the future (יָקוּם)',
   d:['Always visible','Only in the past','It becomes י in the future'],
-  why:'קַמְתִּי, קָם, קָמִים — no ו anywhere. Then the future: אָקוּם, יָקוּם.'},
+  why:'קַמְתִּי, קָם, קָמִים — no ו. Then the future: אָקוּם, יָקוּם.'},
  {q:'Which binyan strengthens (historically doubles) the middle root letter?',
   a:"Pi'el — with Pu'al and Hitpa'el following suit",
   d:["Pa'al","Hif'il","Nif'al"],
@@ -648,26 +705,26 @@ const EXCEPTIONS=[
  {q:'What do פ״א verbs like אכל and אמר do in the future?',
   a:'The א goes silent and the vowel becomes o: יֹאכַל',
   d:['The א doubles: יַאֲכֹל','They conjugate regularly: יִאְכֹּל','The א moves: יָכְאַל'],
-  why:'אֹכַל, תֹּאכַל, יֹאכַל — the א is written but not heard, and the prefix carries a kholam.'},
+  why:'אֹכַל, תֹּאכַל, יֹאכַל — the א is written but not heard, prefix carries kholam.'},
  {q:'How many forms does the present tense have?',
   a:'Four — it marks gender & number, never person',
   d:['Ten, like the past','Two','Six'],
-  why:'כּוֹתֵב, כּוֹתֶבֶת, כּוֹתְבִים, כּוֹתְבוֹת serve for I/you/he alike; context supplies the person.'},
+  why:'כּוֹתֵב, כּוֹתֶבֶת, כּוֹתְבִים, כּוֹתְבוֹת serve for I/you/he alike; context supplies person.'},
  {q:'Nif\'al: past נִכְתַּב, future יִכָּתֵב. Where did the נ go?',
   a:'It assimilated into a dagesh in the first root letter',
   d:['It dropped without a trace','It moved after the כ','It became י'],
   why:'The נ prefix squeezes into the root letter: יִכָּתֵב — the dagesh in כ is its footprint.'},
  {q:'Which binyan is the passive mirror of Hif\'il?',
   a:"Huf'al (הֻפְעַל)",d:["Pu'al","Nif'al","Hitpa'el"],
-  why:'Same skeleton, but the prefix takes u: הִסְבִּיר → הֻסְבַּר (was explained).'},
+  why:'Same skeleton, prefix takes u: הִסְבִּיר → הֻסְבַּר (was explained).'},
  {q:'פ״י verbs like ישב in the future: אֵשֵׁב, יֵשֵׁב. What happened?',
   a:'The initial י drops, leaving a tsere prefix',
   d:['The י doubles: יְיַשֵׁב','Nothing changed','The ב drops instead'],
   why:'יֵשֵׁב, not "yiyshev" — same story with ידע (יֵדַע) and, by analogy, הלך (יֵלֵךְ).'},
- {q:'How do you say “I am” with the verb היה?',
+ {q:'How do you say "I am" with the verb היה?',
   a:'You don\'t — Hebrew has no present tense of "to be"',
   d:['הֹוֶה אֲנִי','אֲנִי יִהְיֶה','אֲנִי הָיָה'],
-  why:'אֲנִי עָיֵף — subject and predicate meet with no verb. היה supplies only past (הָיִיתִי) and future (אֶהְיֶה).'},
+  why:'אֲנִי עָיֵף — subject and predicate meet with no verb. היה supplies only past and future.'},
  {q:'What gives away a Hitpa\'el verb at a glance?',
   a:'A הִתְ/מִתְ prefix whose ת survives even in the future',
   d:['A doubled first letter','A וּ suffix','A מְ prefix'],
@@ -675,28 +732,25 @@ const EXCEPTIONS=[
  {q:'What does the label ע״ו on a root mean?',
   a:'Its middle (2nd) letter is a weak ו',
   d:['It starts with ע','It ends with ו','It has only two letters'],
-  why:'Grammar names slots by פ-ע-ל: פ = 1st, ע = 2nd, ל = 3rd. ע״ו = "ayin slot holds ו", like ק-ו-ם.'}
+  why:'Grammar names slots by פ-ע-ל: פ=1st, ע=2nd, ל=3rd. ע״ו = "ayin slot holds ו", like ק-ו-ם.'}
 ];
 </script>
 <script>
 'use strict';
-/* ===================== verb registry ===================== */
+/* ===== verb registry ===== */
 function buildAuto(v){
   const t=TPL[v.b], forms={past:{},present:{},future:t.future?{}:null};
   for(const p in t.past) forms.past[p]=conj(v.root,t.past[p]);
   for(const p in t.present) forms.present[p]=conj(v.root,t.present[p]);
   if(t.future) for(const p in t.future) forms.future[p]=conj(v.root,t.future[p]);
-  return {id:v.id,b:v.b,root:v.root.split('').map(c=>c==='ש'?'שׁ':c).join('-'),en:v.en,tr:v.tr,giz:null,note:null,
-    forms,lemma:forms.past.p3ms};
+  return {id:v.id,b:v.b,root:v.root.split('').map(c=>c==='ש'?'שׁ':c).join('-'),en:v.en,tr:v.tr,giz:null,note:null,forms,lemma:forms.past.p3ms};
 }
 const ALL_VERBS=[
   ...AUTO_VERBS.map(buildAuto),
-  ...EXPLICIT_VERBS.map(v=>({id:v.id,b:v.b,root:v.root,en:v.en,tr:v.tr,giz:v.giz,note:v.note,
-    forms:v.f,lemma:v.f.past.p3ms}))
+  ...EXPLICIT_VERBS.map(v=>({id:v.id,b:v.b,root:v.root,en:v.en,tr:v.tr,giz:v.giz,note:v.note,forms:v.f,lemma:v.f.past.p3ms}))
 ];
 const VERB_BY_ID=Object.fromEntries(ALL_VERBS.map(v=>[v.id,v]));
 
-/* every (tense,person,form) of a verb */
 function allForms(v){
   const out=[];
   for(const t of ['past','present','future']){
@@ -706,40 +760,35 @@ function allForms(v){
   return out;
 }
 
-/* ===================== answer normalization ===================== */
+/* ===== answer normalization ===== */
 const strip=s=>s.normalize('NFC').replace(/[֑-ׇ]/g,'').replace(/[׳״'"\s]/g,'');
-function maleHeur(pointed){ // approximate ktiv male (full spelling)
+function maleHeur(pointed){
   let out='';const chars=[...pointed.normalize('NFC')];
   const nextBase=i=>{let j=i+1;while(j<chars.length&&chars[j]>='֑'&&chars[j]<='ׇ')j++;return j;};
   for(let i=0;i<chars.length;i++){
     const c=chars[i]; out+=c;
-    if(c==='ֹ'||c==='ֻ'){ // holam / kubuts → add ו
-      const nb=chars[nextBase(i)]; if(nb!=='ו'&&nb!=='א') out+='ו';
-    }else if(c==='ִ'){ // chirik → add י when the next letter carries a dagesh
-      const j=nextBase(i), nb=chars[j];
-      let hasDagesh=false;
+    if(c==='ֹ'||c==='ֻ'){ const nb=chars[nextBase(i)]; if(nb!=='ו'&&nb!=='א') out+='ו'; }
+    else if(c==='ִ'){ const j=nextBase(i),nb=chars[j]; let hasDagesh=false;
       for(let k=j+1;k<chars.length&&chars[k]>='֑'&&chars[k]<='ׇ';k++) if(chars[k]==='ּ')hasDagesh=true;
-      if(nb&&nb!=='י'&&hasDagesh) out+='י';
-    }
+      if(nb&&nb!=='י'&&hasDagesh) out+='י'; }
   }
   return strip(out);
 }
 function acceptedAnswers(v,t,p){
   const set=new Set(); const f=v.forms[t][p];
   set.add(strip(f)); set.add(maleHeur(f));
-  // lenient double-yud starts (ktiv male writes some initial yods twice)
   for(const s of [...set]) if(s.startsWith('י')&&!s.startsWith('יי')) set.add('י'+s);
   return set;
 }
 
-/* ===================== state & persistence ===================== */
+/* ===== state & persistence ===== */
 const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
 const dayDiff=(a,b)=>Math.round((new Date(b)-new Date(a))/864e5);
-let state={srs:{},custom:[],stats:{streak:0,lastDay:null,days:{}},ver:1};
+let state={srs:{},custom:[],stats:{streak:0,lastDay:null,days:{},binyan:{}},ver:1};
 let DBdoc=null, saveTimer=null;
 const badge=t=>{const el=document.getElementById('savebadge'); if(el) el.textContent=t;};
 
-function loadLocal(){ try{const raw=localStorage.getItem('shoresh');if(raw)state={...state,...JSON.parse(raw)};}catch(e){} }
+function loadLocal(){ try{const raw=localStorage.getItem('shoresh');if(raw){const d=JSON.parse(raw);state={...state,...d};if(!state.stats.binyan)state.stats.binyan={};}}catch(e){} }
 function persist(){
   try{localStorage.setItem('shoresh',JSON.stringify(state));}catch(e){}
   if(DBdoc){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>{DBdoc.set(state).catch(()=>{});},1200); }
@@ -750,10 +799,17 @@ async function initDb(){
     const db=await claude.use('db'); if(!db) return;
     DBdoc=db.doc('app/state');
     const snap=await DBdoc.get();
-    if(snap.exists){ state={...state,...snap.data()}; renderAll(); }
+    if(snap.exists){ state={...state,...snap.data()}; if(!state.stats.binyan)state.stats.binyan={}; renderAll(); }
     else if(Object.keys(state.srs).length||state.custom.length){ DBdoc.set(state).catch(()=>{}); }
-    badge('Progress syncs to your Claude account — pick up on any device.');
+    badge('Progress syncs to your Claude account.');
   }catch(e){}
+}
+
+function trackBinyan(b,ok){
+  if(!state.stats.binyan) state.stats.binyan={};
+  if(!state.stats.binyan[b]) state.stats.binyan[b]={r:0,w:0};
+  if(ok) state.stats.binyan[b].r++; else state.stats.binyan[b].w++;
+  persist();
 }
 
 function bumpActivity(n){
@@ -766,7 +822,7 @@ function bumpActivity(n){
   persist(); renderStats();
 }
 
-/* ===================== SRS ===================== */
+/* ===== SRS ===== */
 const INTERVALS=[0,1,3,7,14,30,60];
 function cardPool(){
   const pool=[];
@@ -785,31 +841,32 @@ function dueCards(){
   return due.concat(fresh.slice(0,10)).slice(0,20);
 }
 function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');}
-function gradeCard(id,g){ // 0 again · 1 good · 2 easy
+function gradeCard(id,g){
   const e=state.srs[id]||{box:0};
   e.box=g===0?0:Math.min(e.box+(g===2?2:1),INTERVALS.length-1);
   e.due=addDays(todayStr(),INTERVALS[e.box]);
   state.srs[id]=e; persist();
 }
 
-/* ===================== helpers ===================== */
+/* ===== helpers ===== */
 const $=s=>document.querySelector(s);
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function personLabel(t,p){ return t==='present'?PRESENT_FORMS[p]:PERSONS[p]; }
 
-/* ===================== tabs ===================== */
+/* ===== tabs ===== */
 document.querySelectorAll('nav.tabs button').forEach(b=>{
   b.addEventListener('click',()=>{
     document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('on',x===b));
     document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
     $('#tab-'+b.dataset.tab).classList.add('on');
+    if(b.dataset.tab==='stats') renderBstat();
   });
 });
 
-/* ===================== binyan filter chips ===================== */
-let focusBinyan=null; // null = all
+/* ===== binyan filter chips ===== */
+let focusBinyan=null;
 (function(){
   const wrap=$('#binyan-chips');
   const mk=(key,label)=>{const c=document.createElement('button');c.className='chip'+(key===null?' on':'');
@@ -824,7 +881,7 @@ function quizVerbs(){
   return vs.length?vs:ALL_VERBS;
 }
 
-/* ===================== session runner ===================== */
+/* ===== session runner ===== */
 const sess={items:[],i:0,right:0,mode:null};
 function openSession(mode){
   sess.mode=mode; sess.i=0; sess.right=0;
@@ -856,8 +913,7 @@ function finishSession(){
   const word=pct===100?'מְצֻיָּן!':pct>=70?'כָּל הַכָּבוֹד!':'עוֹד פַּעַם?';
   const sub=pct===100?'Perfect round.':pct>=70?'Nice work — keep the streak going.':'Tough round — the reference tab is your friend.';
   $('#sess-body').innerHTML=`<div class="sess-done">
-    <div class="big he">${word}</div>
-    <h3>${sess.right} of ${sess.items.length}</h3>
+    <div class="big he">${word}</div><h3>${sess.right} of ${sess.items.length}</h3>
     <p class="muted">${sub}</p>
     <div class="sess-actions" style="max-width:340px;margin:18px auto 0">
       <button class="btn ghost" id="d-close">Done</button>
@@ -887,7 +943,7 @@ function renderQuestion(){
 function nextBtnRow(){return `<div class="sess-actions"><button class="btn wide" id="q-next">Next</button></div>`;}
 function bindNext(){$('#q-next').addEventListener('click',()=>{sess.i++;renderQuestion();});}
 
-/* ——— multiple choice conjugation ——— */
+/* MCQ */
 function renderMCQ(it,body){
   const {v,t,p}=it; const correct=v.forms[t][p];
   const opts=shuffle([correct,...distractors(v,t,p,3)]);
@@ -897,7 +953,7 @@ function renderMCQ(it,body){
       <div class="qbig">${esc(v.en)}</div>
       <div class="qsub">${TENSES[t].en} · ${pl.en} <span class="he">${pl.he}</span></div>
     </div>
-    <div class="opts">${opts.map((o,i)=>`<button class="opt he" data-i="${i}">${o}</button>`).join('')}</div>
+    <div class="opts">${opts.map((o,i)=>`<button class="opt he" data-i="${i}">${hn(o)}</button>`).join('')}</div>
     <div class="feedback" id="fb"></div>`;
   let done=false;
   body.querySelectorAll('.opt').forEach((btn,i)=>btn.addEventListener('click',()=>{
@@ -905,14 +961,15 @@ function renderMCQ(it,body){
     const ok=opts[i]===correct;
     btn.classList.add(ok?'correct':'wrong');
     body.querySelectorAll('.opt').forEach((b,j)=>{if(opts[j]===correct)b.classList.add('correct');else if(b!==btn)b.classList.add('dim');});
-    if(ok)sess.right++;
+    if(ok) sess.right++;
+    trackBinyan(v.b, ok);
     const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
-    fb.innerHTML=(ok?'Right — ':'It\'s ')+`<b class="he">${correct}</b> · ${pl.en}, ${TENSES[t].en} of “${esc(v.en)}”`+(v.note?`<br><span class="muted">${esc(v.note)}</span>`:'');
+    fb.innerHTML=(ok?'Right — ':'It\'s ')+`<b class="he">${hn(correct)}</b> <button class="spk" data-speak="${esc(correct)}">🔊</button> · ${pl.en}, ${TENSES[t].en} of "${esc(v.en)}"`+(v.note?`<br><span class="muted">${esc(v.note)}</span>`:'');
     fb.insertAdjacentHTML('afterend',nextBtnRow()); bindNext();
   }));
 }
 
-/* ——— type the answer ——— */
+/* Type */
 function renderType(it,body){
   const {v,t,p}=it; const correct=v.forms[t][p]; const pl=personLabel(t,p);
   body.innerHTML=`<div class="qcard">
@@ -932,9 +989,10 @@ function renderType(it,body){
   let done=false;
   const finish=(ok,revealed)=>{
     if(done)return; done=true;
+    if(ok) sess.right++;
+    trackBinyan(v.b, ok);
     const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
-    fb.innerHTML=(ok?'Right — ':'The answer: ')+`<b class="he">${correct}</b>`+(v.note?`<br><span class="muted">${esc(v.note)}</span>`:'');
-    if(ok)sess.right++;
+    fb.innerHTML=(ok?'Right — ':'The answer: ')+`<b class="he">${hn(correct)}</b> <button class="spk" data-speak="${esc(correct)}">🔊</button>`+(v.note?`<br><span class="muted">${esc(v.note)}</span>`:'');
     if(revealed){
       fb.innerHTML+=`<div class="row" style="margin-top:10px;gap:8px">
         <button class="btn ghost grow" id="sg-no">I didn't have it</button>
@@ -952,7 +1010,8 @@ function renderType(it,body){
   input.addEventListener('keydown',e=>{if(e.key==='Enter')$('#q-check').click();});
   $('#q-show').addEventListener('click',()=>{
     const fb=$('#fb'); fb.className='feedback on good'; done=true;
-    fb.innerHTML=`<b class="he" style="font-size:24px">${correct}</b> · grade yourself:
+    trackBinyan(v.b, false);
+    fb.innerHTML=`<b class="he" style="font-size:24px">${hn(correct)}</b> <button class="spk" data-speak="${esc(correct)}">🔊</button> · grade yourself:
       <div class="row" style="margin-top:10px;gap:8px">
         <button class="btn ghost grow" id="sg-no">Didn't know</button>
         <button class="btn grow" id="sg-yes">Knew it</button></div>`;
@@ -961,16 +1020,16 @@ function renderType(it,body){
   });
 }
 
-/* ——— sentences (cloze) ——— */
+/* Cloze */
 function renderCloze(it,body){
   const v=VERB_BY_ID[it.v]; const correct=v.forms[it.t][it.p];
   const opts=shuffle([correct,...distractors(v,it.t,it.p,3)]);
   body.innerHTML=`<div class="qcard">
-      <div class="qkicker">${BINYANIM[v.b].name} · “${esc(v.en)}”</div>
-      <div class="qbig he" style="font-size:clamp(24px,6.5vw,32px)">${esc(it.pre)} <span class="blank">____</span> ${esc(it.post)}</div>
+      <div class="qkicker">${BINYANIM[v.b].name} · "${esc(v.en)}"</div>
+      <div class="qbig he" style="font-size:clamp(24px,6.5vw,32px)">${hn(esc(it.pre))} <span class="blank">____</span> ${hn(esc(it.post))}</div>
       <div class="qsub">${esc(it.en)}</div>
     </div>
-    <div class="opts">${opts.map((o,i)=>`<button class="opt he" data-i="${i}">${o}</button>`).join('')}</div>
+    <div class="opts">${opts.map((o,i)=>`<button class="opt he" data-i="${i}">${hn(o)}</button>`).join('')}</div>
     <div class="feedback" id="fb"></div>`;
   let done=false;
   body.querySelectorAll('.opt').forEach((btn,i)=>btn.addEventListener('click',()=>{
@@ -978,16 +1037,17 @@ function renderCloze(it,body){
     const ok=opts[i]===correct;
     btn.classList.add(ok?'correct':'wrong');
     body.querySelectorAll('.opt').forEach((b,j)=>{if(opts[j]===correct)b.classList.add('correct');else if(b!==btn)b.classList.add('dim');});
-    if(ok)sess.right++;
+    if(ok) sess.right++;
+    trackBinyan(v.b, ok);
     const pl=personLabel(it.t,it.p);
     const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
-    fb.innerHTML=`<span class="he" style="font-size:20px">${esc(it.pre)} <b>${correct}</b> ${esc(it.post)}</span><br>
+    fb.innerHTML=`<span class="he" style="font-size:20px">${hn(esc(it.pre))} <b>${hn(correct)}</b> ${hn(esc(it.post))}</span> <button class="spk" data-speak="${esc(it.pre+' '+correct+' '+it.post)}">🔊</button><br>
       <span class="muted">${TENSES[it.t].en}, ${pl.en} — ${BINYANIM[v.b].name} of ${esc(v.root)}</span>`;
     fb.insertAdjacentHTML('afterend',nextBtnRow()); bindNext();
   }));
 }
 
-/* ——— exceptions & rules ——— */
+/* Exceptions */
 function renderExc(it,body){
   const opts=shuffle([it.a,...it.d]);
   body.innerHTML=`<div class="qcard">
@@ -1002,7 +1062,7 @@ function renderExc(it,body){
     const ok=opts[i]===it.a;
     btn.classList.add(ok?'correct':'wrong');
     body.querySelectorAll('.opt').forEach((b,j)=>{if(opts[j]===it.a)b.classList.add('correct');else if(b!==btn)b.classList.add('dim');});
-    if(ok)sess.right++;
+    if(ok) sess.right++;
     const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
     fb.innerHTML=it.why;
     fb.insertAdjacentHTML('afterend',nextBtnRow()); bindNext();
@@ -1010,8 +1070,7 @@ function renderExc(it,body){
 }
 
 document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>openSession(b.dataset.mode)));
-
-/* ===================== flashcards ===================== */
+/* ===== flashcards ===== */
 let deck=[],deckI=0,deckRedo=[];
 $('#cards-start').addEventListener('click',()=>{
   deck=shuffle(dueCards()); deckRedo=[]; deckI=0;
@@ -1028,8 +1087,7 @@ function renderFlash(){
         <div class="sess-actions" style="max-width:280px;margin:18px auto 0">
         <button class="btn wide" id="d-close">Done</button></div></div>`;
       $('#sess-bar').style.width='100%'; $('#sess-count').textContent='';
-      $('#d-close').addEventListener('click',()=>{closeSession();renderCardsHome();});
-      return;
+      $('#d-close').addEventListener('click',()=>{closeSession();renderCardsHome();}); return;
     }
   }
   $('#sess-bar').style.width=(deckI/deck.length*100)+'%';
@@ -1039,7 +1097,8 @@ function renderFlash(){
   const kick=c.kind==='vocab'?'Vocabulary':BINYANIM[c.v.b].name+' · <span class="he">'+esc(c.v.root)+'</span>';
   $('#sess-body').innerHTML=`<div class="flash">
       <div class="qkicker">${kick}</div>
-      <div class="front he">${esc(front)}</div>
+      <div class="front he">${hn(esc(front))}</div>
+      <button class="spk" data-speak="${esc(front)}" style="margin-top:4px">🔊</button>
       <div class="back" id="f-back" hidden></div>
       <button class="btn ghost" id="f-flip" style="margin-top:8px">Show answer</button>
     </div><div class="grade" id="f-grade" hidden>
@@ -1048,11 +1107,10 @@ function renderFlash(){
       <button class="easy">Easy<small>much later</small></button>
     </div>`;
   $('#f-flip').addEventListener('click',()=>{
-    const back=$('#f-back');
-    back.hidden=false;
+    const back=$('#f-back'); back.hidden=false;
     back.innerHTML=c.kind==='vocab'
       ?`<b>${esc(c.w.en)}</b>${c.w.tr?' · <i>'+esc(c.w.tr)+'</i>':''}`
-      :`<b>${esc(c.v.en)}</b>${c.v.tr?' · <i>'+esc(c.v.tr)+'</i>':''}<br><span class="muted" style="font-size:13.5px">present <span class="he" style="font-size:19px">${c.v.forms.present?c.v.forms.present.ms:'—'}</span> · future <span class="he" style="font-size:19px">${c.v.forms.future?c.v.forms.future.p3ms:'—'}</span></span>`;
+      :`<b>${esc(c.v.en)}</b>${c.v.tr?' · <i>'+esc(c.v.tr)+'</i>':''}<br><span class="muted" style="font-size:13.5px">present <span class="he" style="font-size:19px">${c.v.forms.present?hn(c.v.forms.present.ms):'—'}</span> · future <span class="he" style="font-size:19px">${c.v.forms.future?hn(c.v.forms.future.p3ms):'—'}</span></span>`;
     $('#f-flip').hidden=true; $('#f-grade').hidden=false;
   });
   const grade=g=>{gradeCard(c.id,g); bumpActivity(1); if(g===0)deckRedo.push(c); deckI++; renderFlash();};
@@ -1066,7 +1124,7 @@ function renderCardsHome(){
   $('#cards-start').disabled=!n;
 }
 
-/* ===================== reference ===================== */
+/* ===== reference ===== */
 function refTable6(v){
   const rows=P6.map(p=>{
     const past=v.f?v.f.past[p]:v.forms.past[p];
@@ -1092,33 +1150,32 @@ function refTableFull(root,b){
     <div class="note">present · הֹוֶה:&nbsp; <span class="he" style="font-size:18px">${pres}</span></div>`;
 }
 const REF_NOTES={
- paal:{root:'כתב',note:'No prefix, no doubled letters — the plain, unmarked form. Past is built with suffixes (־תִּי, ־תָּ…), future with prefixes (א/ת/י/נ). הוּא and אַתָּה share a future form — context tells them apart.',
-  ex:[['הוּא כָּתַב מִכְתָּב אָרֹךְ','hu katav mikhtav arokh — “He wrote a long letter”'],['אֲנִי כּוֹתֶבֶת כָּל יוֹם','ani kotevet kol yom — “I write every day (f)”']]},
- nifal:{root:'כתב',note:'Marked by a נ prefix in the past (נִכְתַּב) that disappears into a doubled consonant in the future (יִכָּתֵב). Besides plain passives it covers reflexive-ish meanings — הוּא נִפְצַע can mean “he got hurt” without naming who did it.',
-  ex:[['הַדֶּלֶת נִפְתְּחָה','ha-delet niftekha — “The door opened”'],['זֶה נִשְׁמָע טוֹב','ze nishma tov — “That sounds good”']]},
- piel:{root:'דבר',note:'The middle root letter is strengthened (historically doubled), and the present opens with a מְ prefix. Often adds a sense of doing something thoroughly, repeatedly, or professionally.',
-  ex:[['הוּא מְדַבֵּר עִבְרִית','hu medaber ivrit — “He speaks Hebrew”'],['הִיא לִמְּדָה אוֹתִי לִשְׂחוֹת','hi limda oti lisxot — “She taught me to swim”']]},
- pual:{root:'דבר',note:'Same skeleton as Pi\'el, but with a u vowel under the first root letter. Modern Hebrew barely uses a future tense here — you\'ll mostly meet Pu\'al as a present-tense adjective (עִבְרִית מְדֻבֶּרֶת, “spoken Hebrew”).',
-  ex:[['עִבְרִית מְדֻבֶּרֶת','ivrit muderet — “Spoken Hebrew”'],['הַנּוֹשֵׂא דֻּבַּר בַּיְּשִׁיבָה','ha-nose dubar ba-yeshiva — “The topic was discussed in the meeting”']]},
- hifil:{root:'כתב',note:'The causative — “make X happen”: הִכְתִּיב is literally “made someone write”, i.e. dictated. Past and present open with הִ/מַ, and the future takes an a-vowel prefix (אַ/תַּ/יַ/נַ).',
-  ex:[['הוּא הִסְבִּיר לִי אֶת הַשִּׁעוּר','hu hisbir li et ha-shi\'ur — “He explained the lesson to me”'],['הִיא הִרְגִּישָׁה עֲיֵפָה','hi hirgisha ayefa — “She felt tired”']]},
- hufal:{root:'כתב',note:'The passive mirror of Hif\'il: same skeleton, but the prefix takes a u vowel (הֻ/מֻ). Like Pu\'al, the future is essentially unused today.',
-  ex:[['הַפְּרוֹיֶקְט הֻגַּשׁ בַּזְּמַן','ha-proyekt hugash ba-zman — “The project was submitted on time”'],['הַמְּנַהֵל הֻחְלַף','ha-menahel hukhlaf — “The manager was replaced”']]},
- hitpael:{root:'לבש',note:'Unmistakable: past and present open with הִתְ/מִתְ, and the future keeps the ת even after its own prefix. Meanings split three ways — reflexive (הִתְרַחֵץ, washed himself), reciprocal (הִתְכַּתְּבוּ, corresponded), and gradual process (הִתְפַּתֵּחַ, developed).',
-  ex:[['אֲנִי מִתְקַלֵּחַ כָּל בֹּקֶר','ani mitkaleax kol boker — “I shower every morning”'],['הֵם הִתְחַתְּנוּ בְּתֵל אָבִיב','hem hitxatnu be-tel aviv — “They got married in Tel Aviv”']]}
+ paal:{root:'כתב',note:'No prefix, no doubled letters — the plain, unmarked form. Past with suffixes (־תִּי, ־תָּ…), future with prefixes (א/ת/י/נ). הוּא and אַתָּה share a future form — context tells them apart.',
+  ex:[['הוּא כָּתַב מִכְתָּב אָרֹךְ','hu katav mikhtav arokh — "He wrote a long letter"'],['אֲנִי כּוֹתֶבֶת כָּל יוֹם','ani kotevet kol yom — "I write every day (f)"']]},
+ nifal:{root:'כתב',note:'Marked by a נ prefix in past (נִכְתַּב) that disappears into a doubled consonant in future (יִכָּתֵב). Besides passives it covers reflexive-ish meanings — הוּא נִפְצַע can mean "he got hurt" without naming who did it.',
+  ex:[['הַדֶּלֶת נִפְתְּחָה','ha-delet niftekha — "The door opened"'],['זֶה נִשְׁמָע טוֹב','ze nishma tov — "That sounds good"']]},
+ piel:{root:'דבר',note:'The middle root letter is strengthened (historically doubled), present opens with מְ prefix. Often adds a sense of doing something thoroughly, repeatedly, or professionally.',
+  ex:[['הוּא מְדַבֵּר עִבְרִית','hu medaber ivrit — "He speaks Hebrew"'],['הִיא לִמְּדָה אוֹתִי לִשְׂחוֹת','hi limda oti liskhot — "She taught me to swim"']]},
+ pual:{root:'דבר',note:'Same skeleton as Pi\'el but with a u vowel under the first root letter. Modern Hebrew barely uses a future tense here — mostly met as a present-tense adjective (עִבְרִית מְדֻבֶּרֶת, "spoken Hebrew").',
+  ex:[['עִבְרִית מְדֻבֶּרֶת','ivrit muderet — "Spoken Hebrew"'],['הַנּוֹשֵׂא דֻּבַּר בַּיְּשִׁיבָה','ha-nose dubar ba-yeshiva — "The topic was discussed"']]},
+ hifil:{root:'כתב',note:'The causative — "make X happen": הִכְתִּיב = "made someone write" (dictated). Past and present open with הִ/מַ; future takes an a-vowel prefix (אַ/תַּ/יַ/נַ).',
+  ex:[['הוּא הִסְבִּיר לִי אֶת הַשִּׁעוּר','hu hisbir li et ha-shiur — "He explained the lesson to me"'],['הִיא הִרְגִּישָׁה עֲיֵפָה','hi hirgisha ayefa — "She felt tired"']]},
+ hufal:{root:'כתב',note:'Passive mirror of Hif\'il: same skeleton, prefix takes u (הֻ/מֻ). Like Pu\'al, future is essentially unused today.',
+  ex:[['הַפְּרוֹיֶקְט הֻגַּשׁ בַּזְּמַן','ha-proyekt hugash ba-zman — "The project was submitted on time"'],['הַמְּנַהֵל הֻחְלַף','ha-menahel hukhlaf — "The manager was replaced"']]},
+ hitpael:{root:'לבש',note:'Unmistakable: past and present open with הִתְ/מִתְ, future keeps the ת after its prefix. Meanings: reflexive (הִתְרַחֵץ), reciprocal (הִתְכַּתְּבוּ), gradual process (הִתְפַּתֵּחַ).',
+  ex:[['אֲנִי מִתְקַלֵּחַ כָּל בֹּקֶר','ani mitkaleakh kol boker — "I shower every morning"'],['הֵם הִתְחַתְּנוּ בְּתֵל אָבִיב','hem hitkhantnu be-tel aviv — "They got married in Tel Aviv"']]}
 };
 function renderReference(){
   const root=$('#ref-root');
   let html=`<div class="card">
     <b style="font-size:16px">How the system works</b>
-    <p style="font-size:14px;margin:8px 0 0">Every verb is built from a <b>שֹׁרֶשׁ</b> (shoresh, “root”) — usually three consonants carrying the core meaning. The binyan is the template; the root is what gets plugged in: <span class="he" style="font-size:18px">כָּתַב · נִכְתַּב · הִכְתִּיב</span> (wrote · was written · dictated) all share כ-ת-ב.</p>
-    <p style="font-size:14px;margin:10px 0 0">Grammar names root positions with <span class="he">פ-ע-ל</span>: <span class="he"><b>פ</b></span> = 1st letter, <span class="he"><b>ע</b></span> = 2nd, <span class="he"><b>ל</b></span> = 3rd. Labels like <span class="he">פ״נ</span> flag a weak letter in that slot:</p>
+    <p style="font-size:14px;margin:8px 0 0">Every verb is built from a <b>שֹׁרֶשׁ</b> (shoresh, "root") — usually three consonants. The binyan is the template; the root is what gets plugged in: <span class="he" style="font-size:18px">כָּתַב · נִכְתַּב · הִכְתִּיב</span> (wrote · was written · dictated) all share כ-ת-ב.</p>
+    <p style="font-size:14px;margin:10px 0 0">Grammar names root positions with <span class="he">פ-ע-ל</span>: <span class="he"><b>פ</b></span>=1st, <span class="he"><b>ע</b></span>=2nd, <span class="he"><b>ל</b></span>=3rd. Labels like <span class="he">פ״נ</span> flag a weak letter:</p>
     <ul class="exlist">
       <li><span class="he">פ״נ</span> — first letter is נ (נ-פ-ל, to fall)</li>
       <li><span class="he">פ״י</span> — first letter is י (י-שׁ-ב, to sit)</li>
       <li><span class="he">ע״ו / ע״י</span> — middle letter is ו or י (ק-ו-ם, to get up)</li>
       <li><span class="he">ל״ה</span> — last letter is ה (ר-א-ה, to see)</li>
-      <li><span class="he">ל״א</span> — last letter is א (ק-ר-א, to read)</li>
     </ul></div>
     <h2 class="sec">The seven binyanim</h2><div class="stack">`;
   for(const b in BINYANIM){
@@ -1145,21 +1202,31 @@ function renderReference(){
   root.innerHTML=html;
 }
 
-/* ===================== vocab ===================== */
+/* ===== vocab ===== */
 function renderVocab(){
   const q=($('#vsearch').value||'').trim().toLowerCase();
   const qh=strip(q);
   const match=w=>!q||strip(w.he).includes(qh)||w.en.toLowerCase().includes(q)||(w.tr||'').toLowerCase().includes(q);
   const list=$('#vocab-list'); let html='';
-  const row=(w,del)=>`<div class="vrow"><span class="he">${esc(w.he)}</span>
+  const row=(w,del)=>`<div class="vrow">
+    <span class="he">${hn(esc(w.he))}</span>
+    <button class="spk" data-speak="${esc(w.he)}">🔊</button>
     <span class="m"><b>${esc(w.en)}</b>${w.tr?`<span>${esc(w.tr)}</span>`:''}</span>
     ${del?`<button class="del" data-cid="${w.cid}" aria-label="delete">×</button>`:''}</div>`;
   const mine=state.custom.filter(match);
   if(mine.length) html+=`<div class="card"><b style="font-size:14px">My words</b>${mine.map(w=>row(w,true)).join('')}</div>`;
   const verbs=ALL_VERBS.filter(v=>match({he:v.lemma,en:v.en,tr:v.tr}));
   if(verbs.length) html+=`<div class="card"><b style="font-size:14px">Verbs</b>${verbs.map(v=>row({he:v.lemma,en:v.en+' · '+BINYANIM[v.b].name,tr:v.tr},false)).join('')}</div>`;
-  const gen=VOCAB_SEED.filter(match);
-  if(gen.length) html+=`<div class="card"><b style="font-size:14px">Everyday words</b>${gen.map(w=>row(w,false)).join('')}</div>`;
+  if(!q){
+    const cats=Object.keys(CAT_LABELS);
+    for(const cat of cats){
+      const words=VOCAB_SEED.filter(w=>(w.cat||'basics')===cat);
+      if(words.length) html+=`<div class="cat-label">${CAT_LABELS[cat]}</div><div class="card">${words.map(w=>row(w,false)).join('')}</div>`;
+    }
+  } else {
+    const gen=VOCAB_SEED.filter(match);
+    if(gen.length) html+=`<div class="card">${gen.map(w=>row(w,false)).join('')}</div>`;
+  }
   list.innerHTML=html||'<p class="muted" style="text-align:center">No matches.</p>';
   list.querySelectorAll('.del').forEach(b=>b.addEventListener('click',()=>{
     state.custom=state.custom.filter(w=>String(w.cid)!==b.dataset.cid);
@@ -1175,12 +1242,37 @@ $('#add-btn').addEventListener('click',()=>{
   persist(); renderVocab(); renderStats();
 });
 
-/* ===================== stats & boot ===================== */
+/* ===== binyan chart ===== */
+function renderBstat(){
+  const root=document.getElementById('bstat-root'); if(!root) return;
+  const b=state.stats.binyan||{};
+  let any=false;
+  const rows=Object.keys(BINYANIM).map(key=>{
+    const dat=b[key]||{r:0,w:0};
+    const tot=dat.r+dat.w; if(tot) any=true;
+    const pct=tot?Math.round(dat.r/tot*100):null;
+    const color=pct===null?'var(--line)':pct>=80?'var(--good)':pct>=60?'var(--gold)':'var(--bad)';
+    return `<div class="bstat-row">
+      <div style="font-size:12px;font-weight:600;color:var(--muted)">${BINYANIM[key].name}</div>
+      <div class="bstat-bar-wrap"><div class="bstat-bar" style="width:${pct??0}%;background:${color}"></div></div>
+      <div class="bstat-pct">${pct===null?'–':pct+'%'}</div>
+    </div>`;
+  }).join('');
+  root.innerHTML=any?rows:'<p class="muted" style="font-size:14px">Complete a quiz to see your per-binyan breakdown.</p>';
+}
+
+/* ===== stats & boot ===== */
 function renderStats(){
+  const today=todayStr();
   $('#st-due').textContent=dueCards().length;
   $('#st-streak').textContent=state.stats.streak||0;
-  $('#st-today').textContent=state.stats.days[todayStr()]||0;
+  $('#st-today').textContent=state.stats.days[today]||0;
   renderCardsHome();
+  const actEl=document.getElementById('act-line');
+  if(actEl){
+    const days=Object.entries(state.stats.days||{}).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,7);
+    actEl.textContent=days.length?days.map(([d,n])=>d.slice(5)+': '+n+' item'+(n===1?'':'s')).join(' · '):'No activity yet — start a quiz to begin your streak!';
+  }
 }
 function renderAll(){ renderStats(); renderVocab(); }
 (function(){
@@ -1191,14 +1283,11 @@ function renderAll(){ renderStats(); renderVocab(); }
   initDb();
 })();
 </script>
-
 <script>
 'use strict';
-/* --- backup & restore --- */
 document.getElementById('backup-btn').addEventListener('click',()=>{
   const blob=new Blob([JSON.stringify(state,null,1)],{type:'application/json'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download='shoresh-backup-'+todayStr()+'.json';
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(a.href),5000);
@@ -1211,15 +1300,14 @@ document.getElementById('restore-file').addEventListener('change',e=>{
     try{
       const data=JSON.parse(r.result);
       if(!data||typeof data!=='object'||!('srs' in data)) throw 0;
-      state={srs:{},custom:[],stats:{streak:0,lastDay:null,days:{}},ver:1,...data};
-      persist(); renderAll();
-      badge('Backup restored.');
+      state={srs:{},custom:[],stats:{streak:0,lastDay:null,days:{},binyan:{}},ver:1,...data};
+      if(!state.stats.binyan)state.stats.binyan={};
+      persist(); renderAll(); badge('Backup restored.');
     }catch(_){ badge("That file doesn't look like a Shoresh backup."); }
     e.target.value='';
   };
   r.readAsText(f);
 });
-/* --- service worker --- */
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 </script>
 </body>
