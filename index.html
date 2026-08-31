@@ -231,6 +231,10 @@ details.ref[open] summary .car{transform:rotate(90deg)}
         <span class="grow"><b>Sentences</b><span class="d">Fill the blank with the right verb form</span></span></button>
       <button class="mode" data-mode="exc"><span class="glyph">!</span>
         <span class="grow"><b>Exceptions &amp; rules</b><span class="d">Weak roots, missing tenses, sneaky letters</span></span></button>
+      <button class="mode" data-mode="listen"><span class="glyph">🔊</span>
+        <span class="grow"><b>Listen &amp; type</b><span class="d">Dictation — type the form you hear</span></span></button>
+      <button class="mode" data-mode="na"><span class="glyph">ה</span>
+        <span class="grow"><b>Nouns &amp; adjectives</b><span class="d">Plurals, gender, and agreement</span></span></button>
     </div>
   </section>
 
@@ -262,11 +266,13 @@ details.ref[open] summary .car{transform:rotate(90deg)}
     <div class="stack" id="vocab-list"></div>
     <h2 class="sec">Your data</h2>
     <div class="card">
-      <p class="muted" style="margin:0 0 12px;font-size:13.5px">Progress and vocab live on this device. Export a backup to move between devices.</p>
+      <p class="muted" style="margin:0 0 12px;font-size:13.5px">Progress and vocab live on this device. Export a backup to move between devices — Restore replaces everything, Merge combines a backup with this device's progress.</p>
       <div class="row">
-        <button class="btn ghost grow" id="backup-btn">Export backup</button>
+        <button class="btn ghost grow" id="backup-btn">Export</button>
         <button class="btn ghost grow" id="restore-btn">Restore</button>
+        <button class="btn ghost grow" id="merge-btn">Merge</button>
         <input type="file" id="restore-file" accept="application/json,.json" hidden>
+        <input type="file" id="merge-file" accept="application/json,.json" hidden>
       </div>
     </div>
     <p class="savebadge" id="savebadge"></p>
@@ -279,6 +285,8 @@ details.ref[open] summary .car{transform:rotate(90deg)}
     <div class="card" id="bstat-root"><p class="muted" style="font-size:14px">Complete a quiz to see your per-binyan breakdown.</p></div>
     <h2 class="sec">Accuracy by tense</h2>
     <div class="card" id="tstat-root"><p class="muted" style="font-size:14px">No data yet.</p></div>
+    <h2 class="sec">Accuracy by mode</h2>
+    <div class="card" id="mstat-root"><p class="muted" style="font-size:14px">No data yet.</p></div>
     <h2 class="sec">All time</h2>
     <div class="card"><p class="muted" style="font-size:14px" id="life-line">–</p></div>
     <h2 class="sec">Activity</h2>
@@ -656,6 +664,42 @@ const VOCAB_SEED=[
 ];
 
 const CAT_LABELS={basics:'Everyday basics',home:'The home · הַבַּיִת',food:'Food & cooking · אֹכֶל',clothing:'Clothing · בְּגָדִים',health:'Health · בְּרִיאוּת',romance:'Romance & social · אַהֲבָה',nature:'Nature · טֶבַע'};
+
+const NOUNS=[
+ {id:'n_bayit',he:'בַּיִת',pl:'בָּתִּים',g:'m',en:'house'},
+ {id:'n_ish',he:'אִישׁ',pl:'אֲנָשִׁים',g:'m',en:'man'},
+ {id:'n_isha',he:'אִשָּׁה',pl:'נָשִׁים',g:'f',en:'woman'},
+ {id:'n_yeled',he:'יֶלֶד',pl:'יְלָדִים',g:'m',en:'boy, child'},
+ {id:'n_yalda',he:'יַלְדָּה',pl:'יְלָדוֹת',g:'f',en:'girl'},
+ {id:'n_shana',he:'שָׁנָה',pl:'שָׁנִים',g:'f',en:'year'},
+ {id:'n_ir',he:'עִיר',pl:'עָרִים',g:'f',en:'city'},
+ {id:'n_shulchan',he:'שֻׁלְחָן',pl:'שֻׁלְחָנוֹת',g:'m',en:'table'},
+ {id:'n_chalon',he:'חַלּוֹן',pl:'חַלּוֹנוֹת',g:'m',en:'window'},
+ {id:'n_layla',he:'לַיְלָה',pl:'לֵילוֹת',g:'m',en:'night'},
+ {id:'n_mila',he:'מִלָּה',pl:'מִלִּים',g:'f',en:'word'},
+ {id:'n_sefer',he:'סֵפֶר',pl:'סְפָרִים',g:'m',en:'book'},
+ {id:'n_derech',he:'דֶּרֶךְ',pl:'דְּרָכִים',g:'f',en:'way, road'},
+ {id:'n_kos',he:'כּוֹס',pl:'כּוֹסוֹת',g:'f',en:'glass, cup'},
+ {id:'n_rechov',he:'רְחוֹב',pl:'רְחוֹבוֹת',g:'m',en:'street'},
+ {id:'n_beitsa',he:'בֵּיצָה',pl:'בֵּיצִים',g:'f',en:'egg'},
+ {id:'n_chaver',he:'חָבֵר',pl:'חֲבֵרִים',g:'m',en:'friend'},
+ {id:'n_makom',he:'מָקוֹם',pl:'מְקוֹמוֹת',g:'m',en:'place'},
+ {id:'n_em',he:'אֵם',pl:'אִמָּהוֹת',g:'f',en:'mother'},
+ {id:'n_av',he:'אָב',pl:'אָבוֹת',g:'m',en:'father'}
+];
+const ADJS=[
+ {id:'a_gadol',ms:'גָּדוֹל',fs:'גְּדוֹלָה',mp:'גְּדוֹלִים',fp:'גְּדוֹלוֹת',en:'big'},
+ {id:'a_katan',ms:'קָטָן',fs:'קְטַנָּה',mp:'קְטַנִּים',fp:'קְטַנּוֹת',en:'small'},
+ {id:'a_yafe',ms:'יָפֶה',fs:'יָפָה',mp:'יָפִים',fp:'יָפוֹת',en:'beautiful'},
+ {id:'a_tov',ms:'טוֹב',fs:'טוֹבָה',mp:'טוֹבִים',fp:'טוֹבוֹת',en:'good'},
+ {id:'a_chadash',ms:'חָדָשׁ',fs:'חֲדָשָׁה',mp:'חֲדָשִׁים',fp:'חֲדָשׁוֹת',en:'new'},
+ {id:'a_yashan',ms:'יָשָׁן',fs:'יְשָׁנָה',mp:'יְשָׁנִים',fp:'יְשָׁנוֹת',en:'old'},
+ {id:'a_kashe',ms:'קָשֶׁה',fs:'קָשָׁה',mp:'קָשִׁים',fp:'קָשׁוֹת',en:'hard'},
+ {id:'a_kal',ms:'קַל',fs:'קַלָּה',mp:'קַלִּים',fp:'קַלּוֹת',en:'easy, light'},
+ {id:'a_chacham',ms:'חָכָם',fs:'חֲכָמָה',mp:'חֲכָמִים',fp:'חֲכָמוֹת',en:'smart'},
+ {id:'a_ayef',ms:'עָיֵף',fs:'עֲיֵפָה',mp:'עֲיֵפִים',fp:'עֲיֵפוֹת',en:'tired'}
+];
+const AGREE_PRONOUNS={ms:{he:'הוּא',en:'he'},fs:{he:'הִיא',en:'she'},mp:{he:'הֵם',en:'they (m)'},fp:{he:'הֵן',en:'they (f)'}};
 const SENTENCES=[
  {pre:'מָחָר אֲנִי',post:'מִכְתָּב לְסָבְתָא.',en:'Tomorrow I will write a letter to grandma.',v:'ktv1',t:'future',p:'p1s'},
  {pre:'אֶתְמוֹל הִיא',post:'אֶת הַדֶּלֶת.',en:'Yesterday she closed the door.',v:'sgr1',t:'past',p:'p3fs'},
@@ -798,27 +842,56 @@ function loadLocal(){ try{const raw=localStorage.getItem('shoresh');if(raw){cons
 /* versioned migration: v1 states fold their binyan tallies into the new
    lifetime counters, and positional vocab SRS keys move to stable ids
    while the seed array still has its original order */
-function migrate(){
-  const st=state.stats=state.stats||{};
-  if((state.ver||1)<2){
+function migrateObj(o){
+  const st=o.stats=o.stats||{};
+  o.srs=o.srs||{}; o.custom=o.custom||[];
+  if((o.ver||1)<2){
     const b=st.binyan||{}; let r=0,w=0;
     for(const k in b){ r+=b[k].r||0; w+=b[k].w||0; }
     st.totalReviews=(st.totalReviews||0)+r+w;
     st.totalCorrect=(st.totalCorrect||0)+r;
     delete st.binyan;
     const srs2={};
-    for(const key in state.srs){
+    for(const key in o.srs){
       const m=/^v(\d+)$/.exec(key);
-      if(m&&VOCAB_SEED[+m[1]]) srs2['v'+VOCAB_SEED[+m[1]].id]=state.srs[key];
-      else srs2[key]=state.srs[key];
+      if(m&&VOCAB_SEED[+m[1]]) srs2['v'+VOCAB_SEED[+m[1]].id]=o.srs[key];
+      else srs2[key]=o.srs[key];
     }
-    state.srs=srs2;
+    o.srs=srs2;
   }
-  if(!Array.isArray(state.log)) state.log=[];
+  if(!Array.isArray(o.log)) o.log=[];
   st.days=st.days||{};
   st.totalReviews=st.totalReviews||0; st.totalCorrect=st.totalCorrect||0;
   st.longestStreak=Math.max(st.longestStreak||0,st.streak||0);
-  state.ver=2;
+  o.ver=2;
+  return o;
+}
+function migrate(){ migrateObj(state); }
+/* union two devices' states: newest SRS entry per card wins, logs union by
+   (ts, cell) then re-cap, lifetime counters take the max — merge, don't clobber */
+function mergeStates(a,b){
+  migrateObj(a); migrateObj(b);
+  const out={...a};
+  out.srs={...b.srs,...a.srs};
+  for(const k in b.srs){ const x=a.srs[k],y=b.srs[k];
+    if(x&&y) out.srs[k]=(y.due>x.due||(y.due===x.due&&y.box>x.box))?y:x; }
+  const cids=new Set(a.custom.map(w=>String(w.cid)));
+  out.custom=[...a.custom,...b.custom.filter(w=>!cids.has(String(w.cid)))];
+  const ekey=e=>(e.ts||0)+'|'+e.v+'|'+(e.t||'')+'|'+(e.p||'');
+  const seen=new Map();
+  for(const e of [...a.log,...b.log]) seen.set(ekey(e),e);
+  out.log=[...seen.values()].sort((x,y)=>(x.ts||0)-(y.ts||0)).slice(-LOG_CAP);
+  const sa=a.stats,sb=b.stats;
+  out.stats={...sa};
+  out.stats.totalReviews=Math.max(sa.totalReviews,sb.totalReviews);
+  out.stats.totalCorrect=Math.max(sa.totalCorrect,sb.totalCorrect);
+  out.stats.longestStreak=Math.max(sa.longestStreak,sb.longestStreak);
+  out.stats.streak=Math.max(sa.streak||0,sb.streak||0);
+  out.stats.lastDay=[sa.lastDay,sb.lastDay].filter(Boolean).sort().pop()||null;
+  out.stats.days={...sb.days,...sa.days};
+  for(const d in sb.days) out.stats.days[d]=Math.max(sa.days[d]||0,sb.days[d]);
+  out.ver=2;
+  return out;
 }
 function persist(){
   try{localStorage.setItem('shoresh',JSON.stringify(state));}catch(e){}
@@ -830,7 +903,7 @@ async function initDb(){
     const db=await claude.use('db'); if(!db) return;
     DBdoc=db.doc('app/state');
     const snap=await DBdoc.get();
-    if(snap.exists){ state={...state,...snap.data()}; migrate(); renderAll(); }
+    if(snap.exists){ state=mergeStates(state,snap.data()); renderAll(); DBdoc.set(state).catch(()=>{}); }
     else if(Object.keys(state.srs).length||state.custom.length){ DBdoc.set(state).catch(()=>{}); }
     badge('Progress syncs to your Claude account.');
   }catch(e){}
@@ -842,8 +915,10 @@ function bumpTotals(ok){
   if(ok) state.stats.totalCorrect=(state.stats.totalCorrect||0)+1;
 }
 /* append-only attempt log — the single source of truth for all accuracy views */
-function logAttempt(vid,t,p,ok,mode){
-  state.log.push({v:vid,t,p,ok:ok?1:0,m:mode,ts:Date.now()});
+function logAttempt(vid,t,p,ok,mode,extra){
+  const e={v:vid,t,p,ok:ok?1:0,m:mode,ts:Date.now()};
+  if(extra) for(const x of ['err','sc','lat','k']) if(extra[x]!=null) e[x]=extra[x];
+  state.log.push(e);
   if(state.log.length>LOG_CAP) state.log=state.log.slice(-LOG_CAP);
   bumpTotals(ok);
   persist();
@@ -854,7 +929,7 @@ function skillCells(){
   for(const e of state.log){
     if(!e.v||!e.t||!e.p) continue;
     const k=e.v+'|'+e.t+'|'+e.p;
-    (hist[k]=hist[k]||[]).push(e.ok);
+    (hist[k]=hist[k]||[]).push('sc' in e?e.sc:e.ok);
   }
   const out={};
   for(const k in hist){
@@ -865,6 +940,34 @@ function skillCells(){
   }
   return out;
 }
+/* classify a typed miss: another form of the same verb? same root in another
+   binyan? a one-character typo? — feeds the err field on log events */
+function lev1(a,b){
+  if(a===b) return true;
+  const la=a.length, lb=b.length;
+  if(Math.abs(la-lb)>1) return false;
+  let i=0,j=0,edits=0;
+  while(i<la&&j<lb){
+    if(a[i]===b[j]){i++;j++;continue;}
+    if(++edits>1) return false;
+    if(la>lb) i++; else if(lb>la) j++; else {i++;j++;}
+  }
+  return edits+(la-i)+(lb-j)<=1;
+}
+function classifyMiss(v,t,p,u){
+  if(!u) return 'other';
+  for(const f of allForms(v)){
+    if(f.t===t&&f.p===p) continue;
+    if(strip(f.form)===u||maleHeur(f.form)===u)
+      return f.t===t?'person':(f.p===p?'tense':'form');
+  }
+  for(const o of ALL_VERBS){
+    if(o.id===v.id||o.root!==v.root) continue;
+    for(const f of allForms(o)) if(strip(f.form)===u||maleHeur(f.form)===u) return 'binyan';
+  }
+  return lev1(u,strip(v.forms[t][p]))?'typo':'other';
+}
+const ERR_LABEL={typo:'a near-miss typo (half credit)',tense:'right person, wrong tense',person:'right tense, wrong person',form:'a different form of this verb',binyan:'the same root in a different binyan'};
 
 function bumpActivity(n){
   const today=todayStr(), st=state.stats;
@@ -961,8 +1064,10 @@ function pickWeighted(n){
 const sess={items:[],i:0,right:0,mode:null};
 function openSession(mode){
   sess.mode=mode; sess.i=0; sess.right=0;
-  if(mode==='mcq'||mode==='type'){
+  if(mode==='mcq'||mode==='type'||mode==='listen'){
     sess.items=pickWeighted(10);
+  }else if(mode==='na'){
+    sess.items=buildNaItems(10);
   }else if(mode==='cloze'){
     sess.items=shuffle(SENTENCES).slice(0,10);
   }else{
@@ -1007,6 +1112,8 @@ function renderQuestion(){
   const it=sess.items[sess.i], body=$('#sess-body');
   if(sess.mode==='mcq') return renderMCQ(it,body);
   if(sess.mode==='type') return renderType(it,body);
+  if(sess.mode==='listen') return renderListen(it,body);
+  if(sess.mode==='na') return renderNa(it,body);
   if(sess.mode==='cloze') return renderCloze(it,body);
   return renderExc(it,body);
 }
@@ -1016,6 +1123,7 @@ function bindNext(){$('#q-next').addEventListener('click',()=>{sess.i++;renderQu
 
 /* MCQ */
 function renderMCQ(it,body){
+  const t0=performance.now();
   const {v,t,p}=it; const correct=v.forms[t][p];
   const opts=shuffle([correct,...distractors(v,t,p,3)]);
   const pl=personLabel(t,p);
@@ -1033,15 +1141,21 @@ function renderMCQ(it,body){
     btn.classList.add(ok?'correct':'wrong');
     body.querySelectorAll('.opt').forEach((b,j)=>{if(opts[j]===correct)b.classList.add('correct');else if(b!==btn)b.classList.add('dim');});
     if(ok) sess.right++;
-    logAttempt(v.id,t,p,ok,'mcq');
+    const extra={lat:Math.round(performance.now()-t0)};
+    if(!ok){
+      const ch=allForms(v).find(f=>f.form===opts[i]);
+      if(ch) extra.err=ch.t===t?'person':(ch.p===p?'tense':'form');
+    }
+    logAttempt(v.id,t,p,ok,'mcq',extra);
     const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
-    fb.innerHTML=(ok?'Right — ':'It\'s ')+`<b class="he">${hn(correct)}</b> <button class="spk" data-speak="${esc(correct)}">🔊</button> · ${pl.en}, ${TENSES[t].en} of "${esc(v.en)}"`+(v.note?`<br><span class="muted">${esc(v.note)}</span>`:'');
+    fb.innerHTML=(ok?'Right — ':'It\'s ')+`<b class="he">${hn(correct)}</b> <button class="spk" data-speak="${esc(correct)}">🔊</button> · ${pl.en}, ${TENSES[t].en} of "${esc(v.en)}"`+(!ok&&extra.err?` — you picked ${ERR_LABEL[extra.err]}`:'')+(v.note?`<br><span class="muted">${esc(v.note)}</span>`:'');
     fb.insertAdjacentHTML('afterend',nextBtnRow()); bindNext();
   }));
 }
 
 /* Type */
 function renderType(it,body){
+  const t0=performance.now();
   const {v,t,p}=it; const correct=v.forms[t][p]; const pl=personLabel(t,p);
   body.innerHTML=`<div class="qcard">
       <div class="qkicker">${BINYANIM[v.b].name} · <span class="he">${esc(v.root)}</span></div>
@@ -1058,12 +1172,17 @@ function renderType(it,body){
   const input=$('#ans'); input.focus();
   const acc=acceptedAnswers(v,t,p);
   let done=false;
-  const finish=(ok,revealed)=>{
+  const finish=(ok,revealed,u)=>{
     if(done)return; done=true;
     if(ok) sess.right++;
-    logAttempt(v.id,t,p,ok,'type');
+    const extra={lat:Math.round(performance.now()-t0)};
+    if(!ok&&u){
+      extra.err=classifyMiss(v,t,p,u);
+      if(extra.err==='typo') extra.sc=0.5;
+    }
+    logAttempt(v.id,t,p,ok,'type',extra);
     const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
-    fb.innerHTML=(ok?'Right — ':'The answer: ')+`<b class="he">${hn(correct)}</b> <button class="spk" data-speak="${esc(correct)}">🔊</button>`+(v.note?`<br><span class="muted">${esc(v.note)}</span>`:'');
+    fb.innerHTML=(ok?'Right — ':'The answer: ')+`<b class="he">${hn(correct)}</b> <button class="spk" data-speak="${esc(correct)}">🔊</button>`+(!ok&&extra.err?` — that was ${ERR_LABEL[extra.err]}`:'')+(v.note?`<br><span class="muted">${esc(v.note)}</span>`:'');
     if(revealed){
       fb.innerHTML+=`<div class="row" style="margin-top:10px;gap:8px">
         <button class="btn ghost grow" id="sg-no">I didn't have it</button>
@@ -1076,7 +1195,7 @@ function renderType(it,body){
   };
   $('#q-check').addEventListener('click',()=>{
     const u=strip(input.value||''); if(!u){input.focus();return;}
-    finish(acc.has(u),false);
+    finish(acc.has(u),false,u);
   });
   input.addEventListener('keydown',e=>{if(e.key==='Enter')$('#q-check').click();});
   $('#q-show').addEventListener('click',()=>{
@@ -1085,13 +1204,14 @@ function renderType(it,body){
       <div class="row" style="margin-top:10px;gap:8px">
         <button class="btn ghost grow" id="sg-no">Didn't know</button>
         <button class="btn grow" id="sg-yes">Knew it</button></div>`;
-    $('#sg-yes').addEventListener('click',()=>{logAttempt(v.id,t,p,true,'type');sess.right++;sess.i++;renderQuestion();});
-    $('#sg-no').addEventListener('click',()=>{logAttempt(v.id,t,p,false,'type');sess.i++;renderQuestion();});
+    $('#sg-yes').addEventListener('click',()=>{logAttempt(v.id,t,p,true,'type',{lat:Math.round(performance.now()-t0)});sess.right++;sess.i++;renderQuestion();});
+    $('#sg-no').addEventListener('click',()=>{logAttempt(v.id,t,p,false,'type',{lat:Math.round(performance.now()-t0)});sess.i++;renderQuestion();});
   });
 }
 
 /* Cloze */
 function renderCloze(it,body){
+  const t0=performance.now();
   const v=VERB_BY_ID[it.v]; const correct=v.forms[it.t][it.p];
   const opts=shuffle([correct,...distractors(v,it.t,it.p,3)]);
   body.innerHTML=`<div class="qcard">
@@ -1108,7 +1228,12 @@ function renderCloze(it,body){
     btn.classList.add(ok?'correct':'wrong');
     body.querySelectorAll('.opt').forEach((b,j)=>{if(opts[j]===correct)b.classList.add('correct');else if(b!==btn)b.classList.add('dim');});
     if(ok) sess.right++;
-    logAttempt(v.id,it.t,it.p,ok,'cloze');
+    const extra={lat:Math.round(performance.now()-t0)};
+    if(!ok){
+      const ch=allForms(v).find(f=>f.form===opts[i]);
+      if(ch) extra.err=ch.t===it.t?'person':(ch.p===it.p?'tense':'form');
+    }
+    logAttempt(v.id,it.t,it.p,ok,'cloze',extra);
     const pl=personLabel(it.t,it.p);
     const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
     fb.innerHTML=`<span class="he" style="font-size:20px">${hn(esc(it.pre))} <b>${hn(correct)}</b> ${hn(esc(it.post))}</span> <button class="spk" data-speak="${esc(it.pre+' '+correct+' '+it.post)}">🔊</button><br>
@@ -1136,6 +1261,104 @@ function renderExc(it,body){
     bumpTotals(ok); persist();
     const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
     fb.innerHTML=it.why;
+    fb.insertAdjacentHTML('afterend',nextBtnRow()); bindNext();
+  }));
+}
+
+/* dictation: hear a form, type it */
+function renderListen(it,body){
+  const t0=performance.now();
+  const {v,t,p}=it; const correct=v.forms[t][p]; const pl=personLabel(t,p);
+  body.innerHTML=`<div class="qcard">
+      <div class="qkicker">Listen &amp; type</div>
+      <div class="qbig" style="font-size:36px">🔊</div>
+      <div class="qsub">Type the form you hear — nikud optional</div>
+      <div class="sess-actions" style="max-width:200px;margin:14px auto 0">
+        <button class="btn ghost wide" id="q-play">▶ Play again</button>
+      </div>
+    </div>
+    <div class="typebox"><input id="ans" autocomplete="off" autocapitalize="off" placeholder="Type what you heard…"></div>
+    <div class="sess-actions">
+      <button class="btn ghost" id="q-show">Show answer</button>
+      <button class="btn" id="q-check">Check</button>
+    </div>
+    <div class="feedback" id="fb"></div>`;
+  $('#q-play').addEventListener('click',()=>speak(correct));
+  speak(correct);
+  const input=$('#ans');
+  const acc=acceptedAnswers(v,t,p);
+  let done=false;
+  const reveal=`<b class="he">${hn(correct)}</b> <button class="spk" data-speak="${esc(correct)}">🔊</button> · ${pl.en}, ${TENSES[t].en} of "${esc(v.en)}" (${BINYANIM[v.b].name})`;
+  const finish=(ok,u)=>{
+    if(done)return; done=true;
+    if(ok) sess.right++;
+    const extra={lat:Math.round(performance.now()-t0)};
+    if(!ok&&u){ extra.err=classifyMiss(v,t,p,u); if(extra.err==='typo') extra.sc=0.5; }
+    logAttempt(v.id,t,p,ok,'listen',extra);
+    const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
+    fb.innerHTML=(ok?'Right — ':'It was ')+reveal+(!ok&&extra.err?` — that was ${ERR_LABEL[extra.err]}`:'');
+    fb.insertAdjacentHTML('afterend',nextBtnRow()); bindNext();
+  };
+  $('#q-check').addEventListener('click',()=>{
+    const u=strip(input.value||''); if(!u){input.focus();return;}
+    finish(acc.has(u),u);
+  });
+  input.addEventListener('keydown',e=>{if(e.key==='Enter')$('#q-check').click();});
+  $('#q-show').addEventListener('click',()=>{
+    if(done)return; done=true;
+    logAttempt(v.id,t,p,false,'listen',{lat:Math.round(performance.now()-t0)});
+    const fb=$('#fb'); fb.className='feedback on bad';
+    fb.innerHTML='It was '+reveal;
+    fb.insertAdjacentHTML('afterend',nextBtnRow()); bindNext();
+  });
+}
+
+/* nouns & adjectives: plurals, gender, agreement */
+function buildNaItems(n){
+  const items=[];
+  for(let i=0;i<n;i++){
+    const r=Math.random();
+    if(r<0.4) items.push({kind:'plural',w:pick(NOUNS)});
+    else if(r<0.65) items.push({kind:'gender',w:pick(NOUNS)});
+    else items.push({kind:'agree',a:pick(ADJS),f:pick(['ms','fs','mp','fp'])});
+  }
+  return items;
+}
+function renderNa(it,body){
+  const t0=performance.now();
+  let kicker,big,bigHe,sub,correct,opts,vid,t,p,kk,speakTxt;
+  if(it.kind==='plural'){
+    kicker='Plural · רַבִּים'; big=it.w.he; bigHe=true; sub=`"${esc(it.w.en)}" — pick the plural`;
+    correct=it.w.pl; vid=it.w.id; t='plural'; p='-'; kk='noun'; speakTxt=it.w.pl;
+    opts=shuffle([correct,...shuffle(NOUNS.filter(x=>x.id!==it.w.id).map(x=>x.pl)).slice(0,3)]);
+  }else if(it.kind==='gender'){
+    kicker='Gender · מִין'; big=it.w.he; bigHe=true; sub=`"${esc(it.w.en)}" — masculine or feminine?`;
+    correct=it.w.g==='m'?'Masculine · זָכָר':'Feminine · נְקֵבָה'; vid=it.w.id; t='gender'; p='-'; kk='noun'; speakTxt=it.w.he;
+    opts=shuffle(['Masculine · זָכָר','Feminine · נְקֵבָה']);
+  }else{
+    const pr=AGREE_PRONOUNS[it.f];
+    kicker='Agreement · הַתְאָמָה'; big=it.a.en; bigHe=false; sub=`for ${pr.en} <span class="he">${pr.he}</span>`;
+    correct=it.a[it.f]; vid=it.a.id; t='agree'; p=it.f; kk='adj'; speakTxt=it.a[it.f];
+    opts=shuffle(['ms','fs','mp','fp'].map(x=>it.a[x]));
+  }
+  const optHe=it.kind!=='gender';
+  body.innerHTML=`<div class="qcard">
+      <div class="qkicker">${kicker}</div>
+      <div class="qbig${bigHe?' he':''}">${bigHe?hn(esc(big)):esc(big)}</div>
+      <div class="qsub">${sub}</div>
+    </div>
+    <div class="opts">${opts.map((o,i)=>`<button class="opt${optHe?' he':''}"${optHe?'':' style="font-size:17px"'} data-i="${i}">${optHe?hn(o):o}</button>`).join('')}</div>
+    <div class="feedback" id="fb"></div>`;
+  let done=false;
+  body.querySelectorAll('.opt').forEach((btn,i)=>btn.addEventListener('click',()=>{
+    if(done)return; done=true;
+    const ok=opts[i]===correct;
+    btn.classList.add(ok?'correct':'wrong');
+    body.querySelectorAll('.opt').forEach((b,j)=>{if(opts[j]===correct)b.classList.add('correct');else if(b!==btn)b.classList.add('dim');});
+    if(ok)sess.right++;
+    logAttempt(vid,t,p,ok,'na',{k:kk,lat:Math.round(performance.now()-t0)});
+    const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
+    fb.innerHTML=(ok?'Right — ':'It\'s ')+(it.kind==='gender'?`${correct} · `:'')+`<b class="he">${hn(speakTxt)}</b> <button class="spk" data-speak="${esc(speakTxt)}">🔊</button>`;
     fb.insertAdjacentHTML('afterend',nextBtnRow()); bindNext();
   }));
 }
@@ -1328,8 +1551,9 @@ function statBar(label,r,w){
 function renderBstat(){
   const broot=document.getElementById('bstat-root'), troot=document.getElementById('tstat-root');
   if(!broot) return;
-  const byB={}, byT={past:{r:0,w:0},present:{r:0,w:0},future:{r:0,w:0}};
+  const byB={}, byT={past:{r:0,w:0},present:{r:0,w:0},future:{r:0,w:0}}, byM={};
   for(const e of state.log){
+    if(e.m){ const mm=byM[e.m]=byM[e.m]||{r:0,w:0}; e.ok?mm.r++:mm.w++; }
     const v=VERB_BY_ID[e.v]; if(!v) continue;
     const bb=byB[v.b]=byB[v.b]||{r:0,w:0};
     e.ok?bb.r++:bb.w++;
@@ -1340,12 +1564,16 @@ function renderBstat(){
     :'<p class="muted" style="font-size:14px">Complete a quiz to see your per-binyan breakdown.</p>';
   if(troot) troot.innerHTML=any?['past','present','future'].map(t=>statBar(TENSES[t].en,byT[t].r,byT[t].w)).join('')
     :'<p class="muted" style="font-size:14px">No data yet.</p>';
+  const mroot=document.getElementById('mstat-root');
+  const MODE_LABEL={mcq:'Quiz',type:'Type it',cloze:'Sentences',listen:'Listening',na:'Nouns & adj'};
+  if(mroot) mroot.innerHTML=(any&&Object.keys(byM).length)?Object.keys(MODE_LABEL).filter(m=>byM[m]).map(m=>statBar(MODE_LABEL[m],byM[m].r,byM[m].w)).join('')
+    :'<p class="muted" style="font-size:14px">No data yet.</p>';
   renderWeak();
 }
 function renderWeak(){
   const root=document.getElementById('weak-root'); if(!root) return;
   const skill=skillCells();
-  const rows=Object.entries(skill).filter(([k,s])=>s.n>=2&&s.acc<0.85)
+  const rows=Object.entries(skill).filter(([k,s])=>s.n>=2&&s.acc<0.85&&VERB_BY_ID[k.split('|')[0]])
     .sort((a,b)=>a[1].acc-b[1].acc).slice(0,6)
     .map(([k,s])=>{
       const [vid,t,p]=k.split('|'); const v=VERB_BY_ID[vid];
@@ -1374,7 +1602,8 @@ function renderStats(){
   const lifeEl=document.getElementById('life-line');
   if(lifeEl){
     const tr=state.stats.totalReviews||0, tc=state.stats.totalCorrect||0, ls=state.stats.longestStreak||0;
-    lifeEl.textContent=tr?`${tr} answers all time · ${Math.round(tc/tr*100)}% correct · longest streak ${ls} day${ls===1?'':'s'}`:'No answers yet.';
+    let lats=0,latn=0; for(const e of state.log) if(e.lat){lats+=e.lat;latn++;}
+    lifeEl.textContent=tr?`${tr} answers all time · ${Math.round(tc/tr*100)}% correct · longest streak ${ls} day${ls===1?'':'s'}`+(latn?` · avg answer ${(lats/latn/1000).toFixed(1)}s`:''):'No answers yet.';
   }
 }
 function renderAll(){ renderStats(); renderVocab(); }
@@ -1406,6 +1635,21 @@ document.getElementById('restore-file').addEventListener('change',e=>{
       state={srs:{},custom:[],log:[],stats:{streak:0,lastDay:null,days:{},totalReviews:0,totalCorrect:0,longestStreak:0},ver:2,...data};
       migrate();
       persist(); renderAll(); badge('Backup restored.');
+    }catch(_){ badge("That file doesn't look like a Shoresh backup."); }
+    e.target.value='';
+  };
+  r.readAsText(f);
+});
+document.getElementById('merge-btn').addEventListener('click',()=>document.getElementById('merge-file').click());
+document.getElementById('merge-file').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const data=JSON.parse(r.result);
+      if(!data||typeof data!=='object'||!('srs' in data)) throw 0;
+      state=mergeStates(state,data);
+      persist(); renderAll(); badge('Backup merged into this device.');
     }catch(_){ badge("That file doesn't look like a Shoresh backup."); }
     e.target.value='';
   };
