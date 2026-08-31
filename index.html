@@ -264,6 +264,8 @@ details.ref[open] summary .car{transform:rotate(90deg)}
       <button class="mode" data-mode="level"><span class="glyph">✓</span>
         <span class="grow"><b>Level check</b><span class="d">3 minutes — where are you right now?</span></span></button>
     </div>
+    <h2 class="sec">AI tutor</h2>
+    <div id="ai-root"></div>
   </section>
 
   <section class="screen" id="tab-cards">
@@ -1402,6 +1404,7 @@ function renderQuestion(){
     if(g==='cloze') return renderCloze(x,body);
     return renderExc(x,body);
   }
+  if(sess.mode==='trans') return renderTrans(it,body);
   if(sess.mode==='mcq') return renderMCQ(it,body);
   if(sess.mode==='type') return renderType(it,body);
   if(sess.mode==='listen') return renderListen(it,body);
@@ -1444,8 +1447,9 @@ function renderMCQ(it,body){
       if(ch) extra.err=ch.t===t?'person':(ch.p===p?'tense':'form');
     }
     logAttempt(v.id,t,p,ok,'mcq',extra);
+    lastQ={en:v.en,b:BINYANIM[v.b].name,t:TENSES[t].en,pl:pl.en,correct};
     const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
-    fb.innerHTML=(ok?'Right — ':'It\'s ')+`<b class="he">${hn(correct)}</b> <button class="spk" data-speak="${esc(correct)}">🔊</button> · ${pl.en}, ${TENSES[t].en} of "${esc(v.en)}"`+(!ok&&extra.err?` — you picked ${ERR_LABEL[extra.err]}`:'')+(v.note?`<br><span class="muted">${esc(v.note)}</span>`:'');
+    fb.innerHTML=(ok?'Right — ':'It\'s ')+`<b class="he">${hn(correct)}</b> <button class="spk" data-speak="${esc(correct)}">🔊</button> · ${pl.en}, ${TENSES[t].en} of "${esc(v.en)}"`+(!ok&&extra.err?` — you picked ${ERR_LABEL[extra.err]}`:'')+(v.note?`<br><span class="muted">${esc(v.note)}</span>`:'')+(!ok?whyBtn():'');
     fb.insertAdjacentHTML('afterend',nextBtnRow()); bindNext();
   }));
 }
@@ -1478,8 +1482,9 @@ function renderType(it,body){
       if(extra.err==='typo') extra.sc=0.5;
     }
     logAttempt(v.id,t,p,ok,'type',extra);
+    lastQ={en:v.en,b:BINYANIM[v.b].name,t:TENSES[t].en,pl:pl.en,correct};
     const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
-    fb.innerHTML=(ok?'Right — ':'The answer: ')+`<b class="he">${hn(correct)}</b> <button class="spk" data-speak="${esc(correct)}">🔊</button>`+(!ok&&extra.err?` — that was ${ERR_LABEL[extra.err]}`:'')+(v.note?`<br><span class="muted">${esc(v.note)}</span>`:'');
+    fb.innerHTML=(ok?'Right — ':'The answer: ')+`<b class="he">${hn(correct)}</b> <button class="spk" data-speak="${esc(correct)}">🔊</button>`+(!ok&&extra.err?` — that was ${ERR_LABEL[extra.err]}`:'')+(v.note?`<br><span class="muted">${esc(v.note)}</span>`:'')+(!ok?whyBtn():'');
     if(revealed){
       fb.innerHTML+=`<div class="row" style="margin-top:10px;gap:8px">
         <button class="btn ghost grow" id="sg-no">I didn't have it</button>
@@ -1997,6 +2002,167 @@ function renderSpeedRound(){
   next();
 }
 
+/* ===== AI tutor (BYOK): the key lives ONLY in this device's localStorage,
+   outside the state object — backups, merges and cloud sync never carry it ===== */
+const AI_MODEL='gpt-4o-mini';
+function aiKey(){ try{return localStorage.getItem('shoresh_key')||'';}catch(e){return'';} }
+function setAiKey(k){ try{k?localStorage.setItem('shoresh_key',k):localStorage.removeItem('shoresh_key');}catch(e){} renderAi(); }
+async function aiChat(messages,maxTok,json){
+  const body={model:AI_MODEL,messages,max_tokens:maxTok||500,temperature:0.7};
+  if(json) body.response_format={type:'json_object'};
+  const r=await fetch('https://api.openai.com/v1/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+aiKey()},
+    body:JSON.stringify(body)});
+  if(!r.ok) throw new Error('API error '+r.status);
+  return (await r.json()).choices[0].message.content;
+}
+function renderAi(){
+  const root=document.getElementById('ai-root'); if(!root) return;
+  if(!aiKey()){
+    root.innerHTML=`<div class="card">
+      <b style="font-size:15px">Plug in an OpenAI key to unlock the tutor</b>
+      <p class="muted" style="margin:6px 0 10px;font-size:13px">Fresh practice sentences and free-form translation grading (GPT-4o-mini — pennies a month). The key is stored only on this device and is never included in backups.</p>
+      <div class="row">
+        <input class="search" id="ai-key" type="password" placeholder="sk-…" style="margin:0" autocomplete="off">
+        <button class="btn" id="ai-save">Save</button>
+      </div></div>`;
+    document.getElementById('ai-save').addEventListener('click',()=>{
+      const k=document.getElementById('ai-key').value.trim();
+      if(k) setAiKey(k);
+    });
+    return;
+  }
+  root.innerHTML=`<div class="stack">
+    <button class="mode" id="ai-sent"><span class="glyph">✨</span>
+      <span class="grow"><b>Fresh sentences</b><span class="d">New AI-written sentences around your weakest forms</span></span></button>
+    <button class="mode" id="ai-trans"><span class="glyph">⇆</span>
+      <span class="grow"><b>Translate</b><span class="d">Type free-form Hebrew — the tutor grades it</span></span></button>
+    <p class="muted" style="font-size:12px;margin:2px 4px">Key saved on this device · <button style="color:var(--accent);font-weight:600" id="ai-remove">remove</button></p>
+  </div>`;
+  document.getElementById('ai-sent').addEventListener('click',startAiSentences);
+  document.getElementById('ai-trans').addEventListener('click',startAiTranslate);
+  document.getElementById('ai-remove').addEventListener('click',()=>setAiKey(''));
+}
+function aiSpinner(msg){
+  lessonRun=null; sessScope=null;
+  $('#session').classList.add('on'); document.documentElement.style.overflow='hidden';
+  $('#sess-bar').style.width='0%'; $('#sess-count').textContent='';
+  $('#sess-body').innerHTML=`<div class="sess-done"><div class="big">🤖</div><h3>${msg}</h3><p class="muted">A second or two…</p></div>`;
+}
+function aiFail(e){
+  $('#sess-body').innerHTML=`<div class="sess-done"><div class="big">🤖</div><h3>Tutor unavailable</h3>
+    <p class="muted">${esc(String(e&&e.message||e))} — check your connection or key.</p>
+    <div class="sess-actions" style="max-width:280px;margin:18px auto 0"><button class="btn wide" id="d-close">Close</button></div></div>`;
+  $('#d-close').addEventListener('click',closeSession);
+}
+/* AI sentences: the app picks the cells and conjugates them itself; the
+   model only writes context AROUND a blank — the tested grammar stays
+   engine-correct even if the model's Hebrew wobbles */
+async function startAiSentences(){
+  aiSpinner('Writing sentences for your weak spots');
+  try{
+    const cells=pickWeighted(5);
+    const lines=cells.map((c,i)=>{
+      const pl=personLabel(c.t,c.p);
+      return `${i+1}. verb "${c.v.en}" (${BINYANIM[c.v.b].name}), ${TENSES[c.t].en} tense, subject: ${pl.en} (${pl.he}) — the blank will hold the Hebrew form ${c.v.forms[c.t][c.p]}`;
+    }).join('\n');
+    const out=await aiChat([
+      {role:'system',content:'You write short Hebrew practice sentences for a learner. Everyday spoken register. You never write the verb form itself — you leave a blank.'},
+      {role:'user',content:`For each item write one natural Hebrew sentence of 4-9 words with ____ where the verb form goes, plus an English translation. Context (pronouns, time words) must make the given subject and tense unambiguous. Hebrew without niqqud is fine. Return JSON: {"items":[{"pre":"text before the blank","post":"text after the blank","en":"English translation"}]} in order, ${cells.length} items.\n\n${lines}`}
+    ],900,true);
+    const items=JSON.parse(out).items;
+    if(!Array.isArray(items)||!items.length) throw new Error('bad response');
+    sess.mode='cloze'; sess.i=0; sess.right=0;
+    sess.items=items.slice(0,cells.length).map((s,i)=>({pre:String(s.pre||''),post:String(s.post||''),en:String(s.en||''),v:cells[i].v.id,t:cells[i].t,p:cells[i].p}));
+    renderQuestion();
+  }catch(e){ aiFail(e); }
+}
+/* Translate: free-form production, graded by the model, logged to real cells */
+async function startAiTranslate(){
+  aiSpinner('Preparing translation prompts');
+  try{
+    const cells=pickWeighted(5);
+    const lines=cells.map((c,i)=>{
+      const pl=personLabel(c.t,c.p);
+      return `${i+1}. verb "${c.v.en}" (${BINYANIM[c.v.b].name}), ${TENSES[c.t].en} tense, subject ${pl.en}; correct Hebrew form: ${c.v.forms[c.t][c.p]}`;
+    }).join('\n');
+    const out=await aiChat([
+      {role:'system',content:'You create English sentences for Hebrew translation practice, everyday spoken register.'},
+      {role:'user',content:`For each item write a short natural English sentence (5-10 words) that requires exactly that verb, tense and subject when translated to Hebrew, plus a reference Hebrew translation (no niqqud) using the given form. Return JSON {"items":[{"en":"…","he":"…"}]} in order, ${cells.length} items.\n\n${lines}`}
+    ],900,true);
+    const items=JSON.parse(out).items;
+    if(!Array.isArray(items)||!items.length) throw new Error('bad response');
+    sess.mode='trans'; sess.i=0; sess.right=0;
+    sess.items=items.slice(0,cells.length).map((s,i)=>({en:String(s.en||''),ref:String(s.he||''),v:cells[i].v.id,t:cells[i].t,p:cells[i].p}));
+    renderQuestion();
+  }catch(e){ aiFail(e); }
+}
+function renderTrans(it,body){
+  const t0=performance.now();
+  const v=VERB_BY_ID[it.v]; const pl=personLabel(it.t,it.p);
+  body.innerHTML=`<div class="qcard">
+      <div class="qkicker">Translate · ${BINYANIM[v.b].name}</div>
+      <div class="qbig" style="font-size:clamp(20px,5.5vw,26px);font-family:'Heebo',sans-serif;font-weight:600">${esc(it.en)}</div>
+      <div class="qhint">Type it in Hebrew, your own words — the tutor grades meaning and grammar</div>
+    </div>
+    <div class="typebox"><input id="ans" autocomplete="off" autocapitalize="off" placeholder="Your Hebrew…"></div>
+    <div class="sess-actions">
+      <button class="btn ghost" id="q-show">Show one way</button>
+      <button class="btn" id="q-check">Check</button>
+    </div>
+    <div class="feedback" id="fb"></div>`;
+  const input=$('#ans'); input.focus();
+  let done=false;
+  $('#q-check').addEventListener('click',async()=>{
+    if(done)return;
+    const u=(input.value||'').trim(); if(!u){input.focus();return;}
+    done=true;
+    const btn=$('#q-check'); btn.disabled=true; btn.textContent='Grading…';
+    let g;
+    try{
+      const out=await aiChat([
+        {role:'system',content:"You grade a Hebrew learner's translation. Encouraging but honest. Judge meaning and grammar; ignore missing niqqud and reasonable spelling variants."},
+        {role:'user',content:`English: "${it.en}"\nExpected verb form: ${v.forms[it.t][it.p]} ("${v.en}", ${TENSES[it.t].en}, ${pl.en})\nReference translation: ${it.ref}\nLearner wrote: ${u}\nReturn JSON {"score":0|0.5|1,"feedback":"one or two short sentences"}`}
+      ],300,true);
+      g=JSON.parse(out);
+    }catch(e){ g={score:null,feedback:'Grading failed — '+String(e&&e.message||e)}; }
+    const ok=g.score===1;
+    if(ok)sess.right++;
+    if(g.score!=null){
+      const extra={lat:Math.round(performance.now()-t0)};
+      if(g.score===0.5) extra.sc=0.5;
+      logAttempt(it.v,it.t,it.p,ok,'trans',extra);
+    }
+    const fb=$('#fb'); fb.className='feedback on '+(g.score>=0.5?'good':'bad');
+    fb.innerHTML=`${esc(String(g.feedback||''))}<br><span class="muted">One way to say it: <span class="he" style="font-size:18px">${hn(esc(it.ref))}</span> <button class="spk" data-speak="${esc(it.ref)}">🔊</button></span>`;
+    fb.insertAdjacentHTML('afterend',nextBtnRow()); bindNext();
+  });
+  input.addEventListener('keydown',e=>{if(e.key==='Enter')$('#q-check').click();});
+  $('#q-show').addEventListener('click',()=>{
+    if(done)return; done=true;
+    logAttempt(it.v,it.t,it.p,false,'trans',{lat:Math.round(performance.now()-t0)});
+    const fb=$('#fb'); fb.className='feedback on bad';
+    fb.innerHTML=`One way: <span class="he" style="font-size:19px">${hn(esc(it.ref))}</span> <button class="spk" data-speak="${esc(it.ref)}">🔊</button>`;
+    fb.insertAdjacentHTML('afterend',nextBtnRow()); bindNext();
+  });
+}
+/* "Why?" — one-tap grammar explanation on a miss */
+let lastQ=null;
+function whyBtn(){ return aiKey()?' <button class="whybtn" style="color:var(--accent);font-weight:600;font-size:13px">Why? 🤖</button>':''; }
+document.addEventListener('click',async e=>{
+  const b=e.target.closest('.whybtn'); if(!b||!lastQ) return;
+  b.disabled=true; b.textContent='Thinking…';
+  try{
+    const out=await aiChat([
+      {role:'system',content:'You are a concise Hebrew grammar tutor. Two or three short sentences, plain language.'},
+      {role:'user',content:`The learner practiced the verb "${lastQ.en}" (${lastQ.b}), ${lastQ.t} tense, subject ${lastQ.pl}. The correct form is ${lastQ.correct}. Explain briefly why it takes this form and give one memory hook.`}
+    ],220);
+    b.insertAdjacentHTML('afterend',`<div class="note" style="margin-top:8px">${esc(out)}</div>`);
+    b.remove();
+  }catch(err){ b.textContent='Unavailable'; b.disabled=true; }
+});
+
 /* ===== level check: a fixed-composition sample across every skill area;
    answers log as normal events so the whole app adapts from them ===== */
 function buildLevelItems(){
@@ -2446,7 +2612,7 @@ function renderBstat(){
   if(troot) troot.innerHTML=any?['past','present','future'].map(t=>statBar(TENSES[t].en,byT[t].r,byT[t].w)).join('')
     :'<p class="muted" style="font-size:14px">No data yet.</p>';
   const mroot=document.getElementById('mstat-root');
-  const MODE_LABEL={mcq:'Quiz',type:'Type it',cloze:'Sentences',listen:'Dictation',ear:'Sharp ear',order:'Word order',vocab:'Vocab',roots:'Roots',num:'Numbers',speed:'Speed',na:'Nouns & adj',exc:'Rules'};
+  const MODE_LABEL={mcq:'Quiz',type:'Type it',cloze:'Sentences',listen:'Dictation',ear:'Sharp ear',order:'Word order',vocab:'Vocab',roots:'Roots',num:'Numbers',speed:'Speed',na:'Nouns & adj',exc:'Rules',trans:'Translate'};
   if(mroot) mroot.innerHTML=(any&&Object.keys(byM).length)?Object.keys(MODE_LABEL).filter(m=>byM[m]).map(m=>statBar(MODE_LABEL[m],byM[m].r,byM[m].w)).join('')
     :'<p class="muted" style="font-size:14px">No data yet.</p>';
   renderWeak();
@@ -2487,7 +2653,7 @@ function renderStats(){
     lifeEl.textContent=tr?`${tr} answers all time · ${Math.round(tc/tr*100)}% correct · longest streak ${ls} day${ls===1?'':'s'}`+(latn?` · avg answer ${(lats/latn/1000).toFixed(1)}s`:''):'No answers yet.';
   }
 }
-function renderAll(){ renderStats(); renderVocab(); renderLessons(); renderOnboard(); }
+function renderAll(){ renderStats(); renderVocab(); renderLessons(); renderOnboard(); renderAi(); }
 (function(){
   const d=new Date();
   $('#daymark').textContent=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
