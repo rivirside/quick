@@ -56,7 +56,8 @@ header.top{display:flex;align-items:baseline;justify-content:space-between;margi
 .brand .he{font-weight:700;color:var(--accent);margin-inline-start:6px;font-size:22px}
 .daymark{font-size:13px;color:var(--muted)}
 .top-right{display:flex;align-items:center;gap:8px}
-#nikud-btn{font-size:13px;padding:4px 10px;border-radius:20px;background:var(--surface2);border:1px solid var(--line);font-weight:600;color:var(--ink)}
+#nikud-btn,#gear-btn{font-size:13px;padding:4px 10px;border-radius:20px;background:var(--surface2);border:1px solid var(--line);font-weight:600;color:var(--ink)}
+.setsel{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;font-size:14px;color:var(--ink)}
 #nikud-btn.off{color:var(--muted)}
 nav.tabs{position:fixed;bottom:0;left:0;right:0;background:var(--surface);
   border-top:1px solid var(--line);display:flex;justify-content:center;gap:2px;
@@ -229,6 +230,7 @@ details.ref[open] summary .car{transform:rotate(90deg)}
     <div class="brand">Shoresh<span class="he">שֹׁרֶשׁ</span></div>
     <div class="top-right">
       <button id="nikud-btn" onclick="toggleNikud()">אָ niqqud</button>
+      <button id="gear-btn" aria-label="Settings">⚙️</button>
       <div class="daymark" id="daymark"></div>
     </div>
   </header>
@@ -240,10 +242,7 @@ details.ref[open] summary .car{transform:rotate(90deg)}
       <div class="stat"><div class="n tnum" id="st-today">–</div><div class="l">today</div></div>
     </div>
     <div id="onboard-root"></div>
-    <div style="margin-top:16px">
-      <button class="mode" data-mode="mix" style="border-color:var(--accent)"><span class="glyph">✦</span>
-        <span class="grow"><b>Daily Mix</b><span class="d">Ten questions aimed at your weak spots — every game</span></span></button>
-    </div>
+    <div id="hero-root" style="margin-top:16px"></div>
     <h2 class="sec">Lessons</h2>
     <div class="stack" id="lessons-root"></div>
     <h2 class="sec">Games</h2>
@@ -293,26 +292,9 @@ details.ref[open] summary .car{transform:rotate(90deg)}
         <button class="btn" id="add-btn">Add to my vocab</button>
       </div>
     </div>
-    <div class="card" style="margin-top:12px">
-      <b style="font-size:15px">Already know some of these?</b>
-      <p class="muted" style="margin:6px 0 10px;font-size:13px">Sweep through the built-in words and mark what you know — known words skip lesson flashcards and start with long review intervals.</p>
-      <button class="btn ghost wide" id="sweep-btn">Mark what you know</button>
-    </div>
     <h2 class="sec">Browse</h2>
     <input class="search" id="vsearch" placeholder="Search Hebrew or English…">
     <div class="stack" id="vocab-list"></div>
-    <h2 class="sec">Your data</h2>
-    <div class="card">
-      <p class="muted" style="margin:0 0 12px;font-size:13.5px">Progress and vocab live on this device. Export a backup to move between devices — Restore replaces everything, Merge combines a backup with this device's progress.</p>
-      <div class="row">
-        <button class="btn ghost grow" id="backup-btn">Export</button>
-        <button class="btn ghost grow" id="restore-btn">Restore</button>
-        <button class="btn ghost grow" id="merge-btn">Merge</button>
-        <input type="file" id="restore-file" accept="application/json,.json" hidden>
-        <input type="file" id="merge-file" accept="application/json,.json" hidden>
-      </div>
-    </div>
-    <p class="savebadge" id="savebadge"></p>
   </section>
 
   <section class="screen" id="tab-stats">
@@ -330,6 +312,51 @@ details.ref[open] summary .car{transform:rotate(90deg)}
     <div class="card"><p class="muted" style="font-size:14px" id="life-line">–</p></div>
     <h2 class="sec">Activity</h2>
     <div class="card"><p class="muted" style="font-size:14px" id="act-line">–</p></div>
+  </section>
+
+  <section class="screen" id="tab-settings">
+    <h2 class="sec">Display</h2>
+    <div class="card">
+      <div class="row" style="margin-bottom:12px"><span class="grow" style="font-size:14.5px">Theme</span>
+        <select class="setsel" id="set-theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+      <div class="row"><span class="grow" style="font-size:14.5px">Niqqud (vowel marks)</span>
+        <button class="chip on" id="set-nikud">shown</button></div>
+    </div>
+    <h2 class="sec">Audio</h2>
+    <div class="card">
+      <div class="row"><span class="grow" style="font-size:14.5px">Speech speed</span><span class="muted tnum" id="rate-val">0.85×</span></div>
+      <input type="range" id="set-rate" min="0.6" max="1.2" step="0.05" value="0.85" style="width:100%;margin-top:8px">
+      <button class="btn ghost wide" id="rate-test" style="margin-top:10px">▶ Hear a sample</button>
+    </div>
+    <h2 class="sec">Practice</h2>
+    <div class="card">
+      <div class="row" style="margin-bottom:12px"><span class="grow" style="font-size:14.5px">Daily goal</span>
+        <select class="setsel" id="set-goal"><option value="10">10 answers</option><option value="20">20 answers</option><option value="30">30 answers</option><option value="50">50 answers</option></select></div>
+      <div class="row" style="margin-bottom:12px"><span class="grow" style="font-size:14.5px">Questions per round</span>
+        <select class="setsel" id="set-len"><option value="5">5</option><option value="10">10</option><option value="15">15</option></select></div>
+      <div class="row"><span class="grow" style="font-size:14.5px">Pu'al &amp; Huf'al<br><span class="muted" style="font-size:12px">Literary binyanim — rare in speech</span></span>
+        <select class="setsel" id="set-lit"><option value="light">Rare (default)</option><option value="off">Skip them</option><option value="full">Full weight</option></select></div>
+    </div>
+    <h2 class="sec">AI tutor</h2>
+    <div class="card" id="set-ai"></div>
+    <h2 class="sec">Data</h2>
+    <div class="card">
+      <p class="muted" style="margin:0 0 12px;font-size:13.5px">Progress and vocab live on this device. Export a backup to move between devices — Restore replaces everything, Merge combines a backup with this device's progress.</p>
+      <div class="row">
+        <button class="btn ghost grow" id="backup-btn">Export</button>
+        <button class="btn ghost grow" id="restore-btn">Restore</button>
+        <button class="btn ghost grow" id="merge-btn">Merge</button>
+        <input type="file" id="restore-file" accept="application/json,.json" hidden>
+        <input type="file" id="merge-file" accept="application/json,.json" hidden>
+      </div>
+    </div>
+    <div class="stack" style="margin-top:12px">
+      <button class="mode" id="sweep-btn"><span class="glyph">✓</span>
+        <span class="grow"><b>Mark vocabulary you know</b><span class="d">Known words skip lesson flashcards</span></span></button>
+      <button class="mode" id="set-level"><span class="glyph">📈</span>
+        <span class="grow"><b>Level check</b><span class="d">Re-evaluate anytime — 3 minutes</span></span></button>
+    </div>
+    <p class="savebadge" id="savebadge"></p>
   </section>
 </div>
 
@@ -354,7 +381,7 @@ details.ref[open] summary .car{transform:rotate(90deg)}
 <script>
 'use strict';
 /* ===== TTS ===== */
-function speak(t){ if(!t) return; const u=new SpeechSynthesisUtterance(t); u.lang='he-IL'; u.rate=0.85; speechSynthesis.cancel(); speechSynthesis.speak(u); }
+function speak(t){ if(!t) return; const u=new SpeechSynthesisUtterance(t); u.lang='he-IL'; u.rate=(typeof state!=='undefined'&&state.prefs&&state.prefs.rate)||0.85; speechSynthesis.cancel(); speechSynthesis.speak(u); }
 document.addEventListener('click',e=>{ const b=e.target.closest('.spk'); if(b&&b.dataset.speak) speak(b.dataset.speak); });
 
 /* ===== niqqud toggle ===== */
@@ -1001,7 +1028,7 @@ function acceptedAnswers(v,t,p){
 /* ===== state & persistence ===== */
 const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
 const dayDiff=(a,b)=>Math.round((new Date(b)-new Date(a))/864e5);
-let state={srs:{},custom:[],log:[],stats:{streak:0,lastDay:null,days:{},totalReviews:0,totalCorrect:0,longestStreak:0},lessons:{started:[]},ver:3};
+let state={srs:{},custom:[],log:[],stats:{streak:0,lastDay:null,days:{},totalReviews:0,totalCorrect:0,longestStreak:0},lessons:{started:[]},prefs:{},ver:3};
 let DBdoc=null, saveTimer=null;
 const badge=t=>{const el=document.getElementById('savebadge'); if(el) el.textContent=t;};
 
@@ -1034,6 +1061,7 @@ function migrateObj(o){
   }
   if(!Array.isArray(o.log)) o.log=[];
   if(!o.lessons||!Array.isArray(o.lessons.started)) o.lessons={started:[]};
+  o.prefs=o.prefs||{};
   st.days=st.days||{};
   st.totalReviews=st.totalReviews||0; st.totalCorrect=st.totalCorrect||0;
   st.longestStreak=Math.max(st.longestStreak||0,st.streak||0);
@@ -1239,6 +1267,56 @@ document.querySelectorAll('nav.tabs button').forEach(b=>{
   });
 });
 
+/* ===== settings ===== */
+function applyTheme(){
+  const t=(state.prefs&&state.prefs.theme)||'system';
+  if(t==='system') delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme=t;
+}
+function openSettings(){
+  document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById('tab-settings').classList.add('on');
+  renderSettings();
+}
+document.getElementById('gear-btn').addEventListener('click',openSettings);
+function renderSettings(){
+  const P=state.prefs=state.prefs||{};
+  $('#set-theme').value=P.theme||'system';
+  $('#set-nikud').textContent=nikudOn?'shown':'hidden';
+  $('#set-nikud').classList.toggle('on',nikudOn);
+  $('#set-rate').value=P.rate||0.85;
+  $('#rate-val').textContent=((P.rate||0.85)).toFixed(2)+'×';
+  $('#set-goal').value=String(P.goal||20);
+  $('#set-len').value=String(P.len||10);
+  $('#set-lit').value=P.lit||'light';
+  renderSettingsAi();
+}
+function renderSettingsAi(){
+  const el=document.getElementById('set-ai'); if(!el) return;
+  if(aiKey()){
+    el.innerHTML=`<p style="font-size:14px;margin:0">OpenAI key saved on this device.</p>
+      <p class="muted" style="font-size:12.5px;margin:6px 0 10px">It is never included in backups, merges, or sync.</p>
+      <button class="btn ghost wide" id="set-ai-remove">Remove key</button>`;
+    document.getElementById('set-ai-remove').addEventListener('click',()=>{setAiKey('');});
+  }else{
+    el.innerHTML=`<p class="muted" style="font-size:13px;margin:0 0 10px">Unlocks AI sentences, translation grading, and "Why?" explanations (GPT-4o-mini). Stored only on this device.</p>
+      <div class="row"><input class="search" id="set-ai-key" type="password" placeholder="sk-…" style="margin:0" autocomplete="off">
+      <button class="btn" id="set-ai-save">Save</button></div>`;
+    document.getElementById('set-ai-save').addEventListener('click',()=>{
+      const k=document.getElementById('set-ai-key').value.trim(); if(k) setAiKey(k);
+    });
+  }
+}
+$('#set-theme').addEventListener('change',e=>{(state.prefs=state.prefs||{}).theme=e.target.value;persist();applyTheme();});
+$('#set-nikud').addEventListener('click',()=>{toggleNikud();$('#set-nikud').textContent=nikudOn?'shown':'hidden';$('#set-nikud').classList.toggle('on',nikudOn);});
+$('#set-rate').addEventListener('input',e=>{(state.prefs=state.prefs||{}).rate=+e.target.value;$('#rate-val').textContent=(+e.target.value).toFixed(2)+'×';persist();});
+$('#rate-test').addEventListener('click',()=>speak('שָׁלוֹם, מָה נִשְׁמָע?'));
+$('#set-goal').addEventListener('change',e=>{(state.prefs=state.prefs||{}).goal=+e.target.value;persist();renderStats();});
+$('#set-len').addEventListener('change',e=>{(state.prefs=state.prefs||{}).len=+e.target.value;persist();});
+$('#set-lit').addEventListener('change',e=>{(state.prefs=state.prefs||{}).lit=e.target.value;persist();});
+$('#set-level').addEventListener('click',()=>openSession('level'));
+
 /* ===== binyan filter chips ===== */
 let focusBinyan=null;
 (function(){
@@ -1268,6 +1346,7 @@ function weightedSample(cells,n){
   return out;
 }
 const cellWgt=(skill,key)=>{const s=skill[key];return s?0.4+3*(1-s.acc):1.4;};
+const sessLen=()=>(state.prefs&&+state.prefs.len)||10;
 function pickWeighted(n){
   const skill=skillCells(), cells=[];
   let verbs=quizVerbs(), tenses=['past','present','future'];
@@ -1278,10 +1357,15 @@ function pickWeighted(n){
     }
     if(sessScope.tenses&&sessScope.tenses.length) tenses=sessScope.tenses;
   }
+  const litPref=(state.prefs&&state.prefs.lit)||'light';
   for(const v of verbs){
-    /* pu'al & huf'al are written Hebrew — nobody says them, so drill them
-       lightly unless the user focuses them on purpose */
-    const lit=(v.b==='pual'||v.b==='hufal')&&!sessScope&&!focusBinyan?0.35:1;
+    /* pu'al & huf'al are written Hebrew — drill weight follows the setting
+       unless the user focuses them on purpose */
+    let lit=1;
+    if((v.b==='pual'||v.b==='hufal')&&!sessScope&&!focusBinyan){
+      if(litPref==='off') continue;
+      lit=litPref==='full'?1:0.35;
+    }
     for(const t of tenses){
       if(!v.forms[t]) continue;
       for(const p in v.forms[t])
@@ -1303,30 +1387,30 @@ function openSession(mode){
     renderSpeedRound(); return;
   }
   if(mode==='mcq'||mode==='type'||mode==='listen'||mode==='ear'){
-    sess.items=pickWeighted(10);
+    sess.items=pickWeighted(sessLen());
   }else if(mode==='mix'){
-    sess.items=buildMixItems(10);
+    sess.items=buildMixItems(sessLen());
   }else if(mode==='level'){
     sess.items=buildLevelItems();
     sess.logStart=state.log.length;
   }else if(mode==='vocab'){
-    sess.items=buildVocabItems(10);
+    sess.items=buildVocabItems(sessLen());
   }else if(mode==='roots'){
-    sess.items=buildRootItems(10);
+    sess.items=buildRootItems(sessLen());
   }else if(mode==='order'){
-    sess.items=buildOrderItems(8);
+    sess.items=buildOrderItems(sessLen());
   }else if(mode==='num'){
-    sess.items=buildNumItems(10);
+    sess.items=buildNumItems(sessLen());
   }else if(mode==='na'){
-    sess.items=buildNaItems(10);
+    sess.items=buildNaItems(sessLen());
   }else if(mode==='cloze'){
     const pool=sessScope&&sessScope.verbs?SENTENCES.filter(s=>sessScope.verbs.includes(s.v)):SENTENCES;
     const base=pool.length?pool:SENTENCES;
     const skill=skillCells();
-    sess.items=weightedSample(base.map(s=>({...s,wgt:cellWgt(skill,s.v+'|'+s.t+'|'+s.p)})),10);
+    sess.items=weightedSample(base.map(s=>({...s,wgt:cellWgt(skill,s.v+'|'+s.t+'|'+s.p)})),sessLen());
   }else{
     const skill=skillCells();
-    sess.items=weightedSample(EXCEPTIONS.map(q=>({...q,wgt:cellWgt(skill,q.id+'|rule|-')})),10);
+    sess.items=weightedSample(EXCEPTIONS.map(q=>({...q,wgt:cellWgt(skill,q.id+'|rule|-')})),sessLen());
   }
   $('#session').classList.add('on'); document.documentElement.style.overflow='hidden';
   renderQuestion();
@@ -2008,7 +2092,7 @@ function renderSpeedRound(){
    outside the state object — backups, merges and cloud sync never carry it ===== */
 const AI_MODEL='gpt-4o-mini';
 function aiKey(){ try{return localStorage.getItem('shoresh_key')||'';}catch(e){return'';} }
-function setAiKey(k){ try{k?localStorage.setItem('shoresh_key',k):localStorage.removeItem('shoresh_key');}catch(e){} renderAi(); }
+function setAiKey(k){ try{k?localStorage.setItem('shoresh_key',k):localStorage.removeItem('shoresh_key');}catch(e){} renderAi(); renderSettingsAi(); }
 async function aiChat(messages,maxTok,json){
   const body={model:AI_MODEL,messages,max_tokens:maxTok||500,temperature:0.7};
   if(json) body.response_format={type:'json_object'};
@@ -2022,17 +2106,7 @@ async function aiChat(messages,maxTok,json){
 function renderAi(){
   const root=document.getElementById('ai-root'); if(!root) return;
   if(!aiKey()){
-    root.innerHTML=`<div class="card">
-      <b style="font-size:15px">Plug in an OpenAI key to unlock the tutor</b>
-      <p class="muted" style="margin:6px 0 10px;font-size:13px">Fresh practice sentences and free-form translation grading (GPT-4o-mini — pennies a month). The key is stored only on this device and is never included in backups.</p>
-      <div class="row">
-        <input class="search" id="ai-key" type="password" placeholder="sk-…" style="margin:0" autocomplete="off">
-        <button class="btn" id="ai-save">Save</button>
-      </div></div>`;
-    document.getElementById('ai-save').addEventListener('click',()=>{
-      const k=document.getElementById('ai-key').value.trim();
-      if(k) setAiKey(k);
-    });
+    root.innerHTML=`<div class="card"><p class="muted" style="font-size:13.5px;margin:0">Add an OpenAI key in <b>Settings ⚙️</b> to unlock AI-written sentences, translation grading, and one-tap "Why?" explanations.</p></div>`;
     return;
   }
   root.innerHTML=`<div class="ggrid">
@@ -2644,11 +2718,36 @@ function renderWeak(){
 }
 
 /* ===== stats & boot ===== */
+function renderHero(due){
+  const root=document.getElementById('hero-root'); if(!root) return;
+  const goal=(state.prefs&&state.prefs.goal)||20;
+  const today=state.stats.days[todayStr()]||0;
+  let inner;
+  if(due>=8){
+    inner=`<button class="mode" id="hero-btn" data-hero="cards" style="border-color:var(--gold)"><span class="glyph" style="background:var(--gold-soft);color:var(--gold)">🃏</span>
+      <span class="grow"><b>${due} cards waiting</b><span class="d">Clear the review queue first — then play</span></span></button>`;
+  }else if(today<goal){
+    inner=`<button class="mode" id="hero-btn" data-hero="mix" style="border-color:var(--accent)"><span class="glyph">✦</span>
+      <span class="grow"><b>Daily Mix</b><span class="d">${goal-today} to go today — aimed at your weak spots</span></span></button>`;
+  }else{
+    inner=`<button class="mode" id="hero-btn" data-hero="mix"><span class="glyph" style="background:var(--good-soft);color:var(--good)">✓</span>
+      <span class="grow"><b>Goal met — nice.</b><span class="d">Another Daily Mix won't hurt</span></span></button>`;
+  }
+  root.innerHTML=inner;
+  document.getElementById('hero-btn').addEventListener('click',function(){
+    if(this.dataset.hero==='cards') $('#cards-start').click();
+    else openSession('mix');
+  });
+}
 function renderStats(){
   const today=todayStr();
-  $('#st-due').textContent=dueCards().length;
+  const due=dueCards().length;
+  const goal=(state.prefs&&state.prefs.goal)||20, tn=state.stats.days[today]||0;
+  $('#st-due').textContent=due;
   $('#st-streak').textContent=state.stats.streak||0;
-  $('#st-today').textContent=state.stats.days[today]||0;
+  const te=$('#st-today'); te.textContent=tn+'/'+goal;
+  te.style.color=tn>=goal?'var(--good)':'';
+  renderHero(due);
   renderCardsHome();
   const actEl=document.getElementById('act-line');
   if(actEl){
@@ -2666,7 +2765,7 @@ function renderAll(){ renderStats(); renderVocab(); renderLessons(); renderOnboa
 (function(){
   const d=new Date();
   $('#daymark').textContent=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-  loadLocal(); renderReference(); renderAll();
+  loadLocal(); applyTheme(); renderReference(); renderAll();
   badge('Everything is stored on this device.');
   initDb();
 })();
