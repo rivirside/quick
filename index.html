@@ -201,6 +201,10 @@ details.ref[open] summary .car{transform:rotate(90deg)}
 .bstat-bar{height:100%;border-radius:6px;transition:width .3s ease}
 .bstat-pct{font-size:12px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
 .cat-label{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:14px 2px 6px}
+.tiles{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;direction:rtl;margin-top:14px;min-height:44px}
+.tile{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;font-size:20px;font-family:'David Libre',serif;box-shadow:var(--shadow)}
+.tile:active{transform:scale(.95)}
+.answer-row{min-height:48px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;direction:rtl;background:var(--surface2);border-radius:12px;padding:8px;margin-top:14px}
 </style>
 </head>
 <body>
@@ -218,6 +222,10 @@ details.ref[open] summary .car{transform:rotate(90deg)}
       <div class="stat"><div class="n tnum" id="st-due">–</div><div class="l">cards due</div></div>
       <div class="stat"><div class="n tnum" id="st-streak">–</div><div class="l">day streak</div></div>
       <div class="stat"><div class="n tnum" id="st-today">–</div><div class="l">today</div></div>
+    </div>
+    <div style="margin-top:16px">
+      <button class="mode" data-mode="mix" style="border-color:var(--accent)"><span class="glyph">✦</span>
+        <span class="grow"><b>Daily Mix</b><span class="d">Ten questions aimed at your weak spots — every game</span></span></button>
     </div>
     <h2 class="sec">Lessons</h2>
     <div class="stack" id="lessons-root"></div>
@@ -237,6 +245,21 @@ details.ref[open] summary .car{transform:rotate(90deg)}
         <span class="grow"><b>Listen &amp; type</b><span class="d">Dictation — type the form you hear</span></span></button>
       <button class="mode" data-mode="na"><span class="glyph">ה</span>
         <span class="grow"><b>Nouns &amp; adjectives</b><span class="d">Plurals, gender, and agreement</span></span></button>
+    </div>
+    <h2 class="sec">More games</h2>
+    <div class="stack">
+      <button class="mode" data-mode="vocab"><span class="glyph">✎</span>
+        <span class="grow"><b>Vocab recall</b><span class="d">See the English, type the Hebrew</span></span></button>
+      <button class="mode" data-mode="roots"><span class="glyph">שׁ</span>
+        <span class="grow"><b>Root families</b><span class="d">One root, seven binyanim — match form to meaning</span></span></button>
+      <button class="mode" data-mode="order"><span class="glyph">⇄</span>
+        <span class="grow"><b>Word order</b><span class="d">Rebuild the sentence from scrambled tiles</span></span></button>
+      <button class="mode" data-mode="ear"><span class="glyph">👂</span>
+        <span class="grow"><b>Sharp ear</b><span class="d">Hear a form, spot it in writing</span></span></button>
+      <button class="mode" data-mode="num"><span class="glyph">3</span>
+        <span class="grow"><b>Numbers</b><span class="d">Counting, and which gender the numeral takes</span></span></button>
+      <button class="mode" data-mode="speed"><span class="glyph">⚡</span>
+        <span class="grow"><b>Speed round</b><span class="d">60 seconds — answer as many as you can</span></span></button>
     </div>
   </section>
 
@@ -703,6 +726,12 @@ const ADJS=[
 ];
 const AGREE_PRONOUNS={ms:{he:'הוּא',en:'he'},fs:{he:'הִיא',en:'she'},mp:{he:'הֵם',en:'they (m)'},fp:{he:'הֵן',en:'they (f)'}};
 
+/* Hebrew numerals: feminine forms double as plain counting; masculine forms
+   (the longer, feminine-LOOKING ones) go with masculine nouns. */
+const NUM_F={1:['אַחַת','akhat'],2:['שְׁתַּיִם','shtayim'],3:['שָׁלוֹשׁ','shalosh'],4:['אַרְבַּע','arba'],5:['חָמֵשׁ','khamesh'],6:['שֵׁשׁ','shesh'],7:['שֶׁבַע','sheva'],8:['שְׁמוֹנֶה','shmone'],9:['תֵּשַׁע','tesha'],10:['עֶשֶׂר','eser']};
+const NUM_M={1:['אֶחָד','ekhad'],2:['שְׁנַיִם','shnayim'],3:['שְׁלוֹשָׁה','shlosha'],4:['אַרְבָּעָה','arbaa'],5:['חֲמִשָּׁה','khamisha'],6:['שִׁשָּׁה','shisha'],7:['שִׁבְעָה','shiva'],8:['שְׁמוֹנָה','shmona'],9:['תִּשְׁעָה','tisha'],10:['עֲשָׂרָה','asara']};
+const NUM_TENS={20:['עֶשְׂרִים','esrim'],30:['שְׁלוֹשִׁים','shloshim'],40:['אַרְבָּעִים','arbaim'],50:['חֲמִשִּׁים','khamishim'],60:['שִׁשִּׁים','shishim'],70:['שִׁבְעִים','shivim'],80:['שְׁמוֹנִים','shmonim'],90:['תִּשְׁעִים','tishim'],100:['מֵאָה','mea']};
+
 /* ===== curriculum: a lesson is a set of stable ids + an optional tense scope.
    Completion is DERIVED from the event log & SRS — no lesson progress state. */
 const LESSONS=[
@@ -986,8 +1015,10 @@ function logAttempt(vid,t,p,ok,mode,extra){
   if(state.log.length>LOG_CAP) state.log=state.log.slice(-LOG_CAP);
   bumpTotals(ok);
   if(!ok){
-    const card=state.srs['verb_'+vid];
-    if(card&&card.due>todayStr()) card.due=todayStr();
+    for(const cid of ['verb_'+vid,vid,'v'+vid]){
+      const card=state.srs[cid];
+      if(card&&card.due>todayStr()){ card.due=todayStr(); break; }
+    }
   }
   persist();
 }
@@ -1055,6 +1086,8 @@ function cardPool(){
   VOCAB_SEED.forEach(w=>pool.push({id:'v'+w.id,kind:'vocab',w}));
   state.custom.forEach(w=>pool.push({id:'c'+w.cid,kind:'vocab',w}));
   ALL_VERBS.forEach(v=>pool.push({id:'verb_'+v.id,kind:'verb',v}));
+  NOUNS.forEach(w=>pool.push({id:w.id,kind:'noun',w}));
+  ADJS.forEach(a=>pool.push({id:a.id,kind:'adj',a}));
   return pool;
 }
 /* fresh cards enter the deck through lessons: once any lesson is started,
@@ -1065,6 +1098,8 @@ function startedLessonCardIds(){
     if(!state.lessons.started.includes(L.id)) continue;
     (L.vocab||[]).forEach(id=>s.add('v'+id));
     (L.verbs||[]).forEach(id=>s.add('verb_'+id));
+    (L.nouns||[]).forEach(id=>s.add(id));
+    (L.adjs||[]).forEach(id=>s.add(id));
   }
   return s;
 }
@@ -1172,12 +1207,27 @@ function pickWeighted(n){
 
 /* ===== session runner ===== */
 const sess={items:[],i:0,right:0,mode:null};
-let lessonRun=null, sessScope=null;
+let lessonRun=null, sessScope=null, speedTimer=null;
 function openSession(mode){
   sess.mode=mode; sess.i=0; sess.right=0;
   sessScope=lessonRun?lessonRun.L:null;
-  if(mode==='mcq'||mode==='type'||mode==='listen'){
+  if(mode==='speed'){
+    sess.items=pickWeighted(40);
+    $('#session').classList.add('on'); document.documentElement.style.overflow='hidden';
+    renderSpeedRound(); return;
+  }
+  if(mode==='mcq'||mode==='type'||mode==='listen'||mode==='ear'){
     sess.items=pickWeighted(10);
+  }else if(mode==='mix'){
+    sess.items=buildMixItems(10);
+  }else if(mode==='vocab'){
+    sess.items=buildVocabItems(10);
+  }else if(mode==='roots'){
+    sess.items=buildRootItems(10);
+  }else if(mode==='order'){
+    sess.items=buildOrderItems(8);
+  }else if(mode==='num'){
+    sess.items=buildNumItems(10);
   }else if(mode==='na'){
     sess.items=buildNaItems(10);
   }else if(mode==='cloze'){
@@ -1192,7 +1242,7 @@ function openSession(mode){
   $('#session').classList.add('on'); document.documentElement.style.overflow='hidden';
   renderQuestion();
 }
-function closeSession(){ lessonRun=null; sessScope=null; $('#session').classList.remove('on'); document.documentElement.style.overflow=''; renderStats(); renderLessons(); }
+function closeSession(){ lessonRun=null; sessScope=null; if(speedTimer){clearInterval(speedTimer);speedTimer=null;} $('#session').classList.remove('on'); document.documentElement.style.overflow=''; renderStats(); renderLessons(); }
 $('#sess-quit').addEventListener('click',closeSession);
 
 function sessHead(){
@@ -1240,9 +1290,25 @@ function renderQuestion(){
   if(sess.i>=sess.items.length) return finishSession();
   sessHead();
   const it=sess.items[sess.i], body=$('#sess-body');
+  if(sess.mode==='mix'){
+    const g=it.game, x=it.it;
+    if(g==='mcq') return renderMCQ(x,body);
+    if(g==='type') return renderType(x,body);
+    if(g==='ear') return renderEar(x,body);
+    if(g==='vocab') return renderVocabQ(x,body);
+    if(g==='na') return renderNa(x,body);
+    if(g==='num') return renderNum(x,body);
+    if(g==='cloze') return renderCloze(x,body);
+    return renderExc(x,body);
+  }
   if(sess.mode==='mcq') return renderMCQ(it,body);
   if(sess.mode==='type') return renderType(it,body);
   if(sess.mode==='listen') return renderListen(it,body);
+  if(sess.mode==='ear') return renderEar(it,body);
+  if(sess.mode==='vocab') return renderVocabQ(it,body);
+  if(sess.mode==='roots') return renderRoot(it,body);
+  if(sess.mode==='order') return renderOrder(it,body);
+  if(sess.mode==='num') return renderNum(it,body);
   if(sess.mode==='na') return renderNa(it,body);
   if(sess.mode==='cloze') return renderCloze(it,body);
   return renderExc(it,body);
@@ -1501,11 +1567,339 @@ function renderNa(it,body){
   }));
 }
 
+/* ===== vocab recall: see English, type Hebrew ===== */
+function vocabPool(){
+  let pool=VOCAB_SEED.map(w=>({id:w.id,he:w.he,en:w.en,tr:w.tr}));
+  state.custom.forEach(w=>{if(w.he&&w.en)pool.push({id:'c'+w.cid,he:w.he,en:w.en,tr:w.tr});});
+  if(sessScope&&sessScope.vocab&&sessScope.vocab.length){
+    const f=pool.filter(w=>sessScope.vocab.includes(w.id));
+    if(f.length) pool=f;
+  }
+  return pool;
+}
+function buildVocabItems(n){
+  const skill=skillCells();
+  return weightedSample(vocabPool().map(w=>({...w,wgt:cellWgt(skill,w.id+'|word|-')})),n);
+}
+function renderVocabQ(it,body){
+  const t0=performance.now();
+  const correct=it.he;
+  const acc=new Set([strip(correct),maleHeur(correct)]);
+  body.innerHTML=`<div class="qcard">
+      <div class="qkicker">Vocabulary recall</div>
+      <div class="qbig" style="font-size:clamp(24px,7vw,34px)">${esc(it.en)}</div>
+      <div class="qhint">Type it in Hebrew — nikud optional</div>
+    </div>
+    <div class="typebox"><input id="ans" autocomplete="off" autocapitalize="off" placeholder="Your answer…"></div>
+    <div class="sess-actions">
+      <button class="btn ghost" id="q-show">Show answer</button>
+      <button class="btn" id="q-check">Check</button>
+    </div>
+    <div class="feedback" id="fb"></div>`;
+  const input=$('#ans'); input.focus();
+  let done=false;
+  const reveal=`<b class="he">${hn(correct)}</b> <button class="spk" data-speak="${esc(correct)}">🔊</button>${it.tr?' · <i>'+esc(it.tr)+'</i>':''}`;
+  const finish=(ok,u)=>{
+    if(done)return; done=true;
+    if(ok) sess.right++;
+    const extra={k:'vocab',lat:Math.round(performance.now()-t0)};
+    let note='';
+    if(!ok&&u){
+      const other=vocabPool().find(w=>w.id!==it.id&&strip(w.he)===u);
+      if(other){ extra.err='form'; note=` — you wrote "${esc(other.en)}"`; }
+      else if(lev1(u,strip(correct))){ extra.err='typo'; extra.sc=0.5; note=' — a near-miss typo (half credit)'; }
+    }
+    logAttempt(it.id,'word','-',ok,'vocab',extra);
+    const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
+    fb.innerHTML=(ok?'Right — ':'The word: ')+reveal+note;
+    fb.insertAdjacentHTML('afterend',nextBtnRow()); bindNext();
+  };
+  $('#q-check').addEventListener('click',()=>{
+    const u=strip(input.value||''); if(!u){input.focus();return;}
+    finish(acc.has(u),u);
+  });
+  input.addEventListener('keydown',e=>{if(e.key==='Enter')$('#q-check').click();});
+  $('#q-show').addEventListener('click',()=>{
+    if(done)return; done=true;
+    const fb=$('#fb'); fb.className='feedback on good';
+    fb.innerHTML=reveal+`<div class="row" style="margin-top:10px;gap:8px">
+      <button class="btn ghost grow" id="sg-no">Didn't know</button>
+      <button class="btn grow" id="sg-yes">Knew it</button></div>`;
+    $('#sg-yes').addEventListener('click',()=>{logAttempt(it.id,'word','-',true,'vocab',{k:'vocab'});sess.right++;sess.i++;renderQuestion();});
+    $('#sg-no').addEventListener('click',()=>{logAttempt(it.id,'word','-',false,'vocab',{k:'vocab'});sess.i++;renderQuestion();});
+  });
+}
+
+/* ===== root families: one root, seven binyanim ===== */
+function buildRootItems(n){
+  const skill=skillCells();
+  return weightedSample(AUTO_VERBS.map((av,i)=>({av,kind:i%2?'pickform':'pickmeaning',wgt:cellWgt(skill,av.id+'|root|-')})),n);
+}
+function renderRoot(it,body){
+  const t0=performance.now();
+  const av=it.av, V=VERB_BY_ID[av.id];
+  const family=AUTO_VERBS.filter(x=>x.root===av.root);
+  const lemma=x=>VERB_BY_ID[x.id].forms.past.p3ms;
+  let big,sub,correct,opts,optsHe;
+  if(it.kind==='pickform'){
+    big=`<span class="he">${esc(V.root)}</span>`;
+    sub=`Which form means "${esc(av.en)}"?`;
+    const opt=new Set([lemma(av)]);
+    family.forEach(x=>{if(x.id!==av.id)opt.add(lemma(x));});
+    const famB=new Set(family.map(x=>x.b));
+    for(const b of ['paal','piel','hifil','nifal','hitpael','pual','hufal']){
+      if(opt.size>=4)break;
+      if(famB.has(b))continue;
+      opt.add(conj(av.root,TPL[b].past.p3ms));
+    }
+    correct=lemma(av); opts=shuffle([...opt].slice(0,4)); optsHe=true;
+  }else{
+    big=`<span class="he">${hn(lemma(av))}</span>`;
+    sub=`Root <span class="he">${esc(V.root)}</span> — what does this form mean?`;
+    const opt=new Set([av.en]);
+    family.forEach(x=>{if(x.id!==av.id)opt.add(x.en);});
+    let guard=0;
+    while(opt.size<4&&guard++<50) opt.add(pick(AUTO_VERBS).en);
+    correct=av.en; opts=shuffle([...opt].slice(0,4)); optsHe=false;
+  }
+  body.innerHTML=`<div class="qcard">
+      <div class="qkicker">Root families · שֹׁרֶשׁ</div>
+      <div class="qbig">${big}</div>
+      <div class="qsub">${sub}</div>
+    </div>
+    <div class="opts">${opts.map((o,i)=>`<button class="opt${optsHe?' he':''}"${optsHe?'':' style="font-size:17px"'} data-i="${i}">${optsHe?hn(o):esc(o)}</button>`).join('')}</div>
+    <div class="feedback" id="fb"></div>`;
+  let done=false;
+  body.querySelectorAll('.opt').forEach((btn,i)=>btn.addEventListener('click',()=>{
+    if(done)return; done=true;
+    const ok=opts[i]===correct;
+    btn.classList.add(ok?'correct':'wrong');
+    body.querySelectorAll('.opt').forEach((b,j)=>{if(opts[j]===correct)b.classList.add('correct');else if(b!==btn)b.classList.add('dim');});
+    if(ok)sess.right++;
+    logAttempt(av.id,'root','-',ok,'roots',{k:'root',lat:Math.round(performance.now()-t0)});
+    const fam=family.map(x=>`<span class="he">${hn(lemma(x))}</span> ${BINYANIM[x.b].name} — ${esc(x.en)}`).join(' · ');
+    const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
+    fb.innerHTML=(ok?'Right. ':'')+`This root's family: ${fam} <button class="spk" data-speak="${esc(lemma(av))}">🔊</button>`;
+    fb.insertAdjacentHTML('afterend',nextBtnRow()); bindNext();
+  }));
+}
+
+/* ===== word order: rebuild the sentence from tiles ===== */
+function buildOrderItems(n){
+  const skill=skillCells();
+  const pool=sessScope&&sessScope.verbs?SENTENCES.filter(s=>sessScope.verbs.includes(s.v)):SENTENCES;
+  const base=pool.length?pool:SENTENCES;
+  return weightedSample(base.map(s=>({...s,wgt:cellWgt(skill,s.v+'|order|-')})),n);
+}
+function renderOrder(it,body){
+  const t0=performance.now();
+  const v=VERB_BY_ID[it.v]; const form=v.forms[it.t][it.p];
+  const full=(it.pre+' '+form+' '+it.post).replace(/\s+/g,' ').trim();
+  const tokens=full.split(' ');
+  let done=false;
+  let pool=shuffle(tokens.map((w,i)=>({w,i})));
+  let placed=[];
+  body.innerHTML=`<div class="qcard">
+      <div class="qkicker">Word order · סֵדֶר מִלִּים</div>
+      <div class="qsub" style="font-size:16px;margin-top:6px">${esc(it.en)}</div>
+      <div class="answer-row" id="o-ans"></div>
+      <div class="tiles" id="o-pool"></div>
+    </div>
+    <div class="sess-actions">
+      <button class="btn ghost" id="o-clear">Clear</button>
+      <button class="btn" id="o-check" disabled>Check</button>
+    </div>
+    <div class="feedback" id="fb"></div>`;
+  const paint=()=>{
+    $('#o-ans').innerHTML=placed.map((x,k)=>`<button class="tile he" data-k="${k}">${hn(x.w)}</button>`).join('')||'<span class="muted" style="font-size:13px;direction:ltr">Tap the words in order</span>';
+    $('#o-pool').innerHTML=pool.map((x,k)=>`<button class="tile he" data-k="${k}">${hn(x.w)}</button>`).join('');
+    $('#o-check').disabled=pool.length>0;
+    $('#o-ans').querySelectorAll('.tile').forEach(b=>b.addEventListener('click',()=>{
+      if(done)return; pool.push(placed.splice(+b.dataset.k,1)[0]); paint();
+    }));
+    $('#o-pool').querySelectorAll('.tile').forEach(b=>b.addEventListener('click',()=>{
+      if(done)return; placed.push(pool.splice(+b.dataset.k,1)[0]); paint();
+    }));
+  };
+  paint();
+  $('#o-clear').addEventListener('click',()=>{ if(done)return; pool=shuffle([...pool,...placed]); placed=[]; paint(); });
+  $('#o-check').addEventListener('click',()=>{
+    if(done||pool.length)return; done=true;
+    const ok=placed.map(x=>x.w).join(' ')===tokens.join(' ');
+    if(ok)sess.right++;
+    logAttempt(it.v,'order','-',ok,'order',{k:'order',lat:Math.round(performance.now()-t0)});
+    const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
+    fb.innerHTML=(ok?'Right — ':'The sentence: ')+`<span class="he" style="font-size:20px">${hn(esc(full))}</span> <button class="spk" data-speak="${esc(full)}">🔊</button>`;
+    fb.insertAdjacentHTML('afterend',nextBtnRow()); bindNext();
+  });
+}
+
+/* ===== sharp ear: hear a form, spot it among lookalikes ===== */
+function renderEar(it,body){
+  const t0=performance.now();
+  const {v,t,p}=it; const correct=v.forms[t][p];
+  const opts=shuffle([correct,...distractors(v,t,p,3)]);
+  body.innerHTML=`<div class="qcard">
+      <div class="qkicker">Sharp ear · ${BINYANIM[v.b].name}</div>
+      <div class="qbig" style="font-size:36px">🔊</div>
+      <div class="qsub">"${esc(v.en)}" — which form did you hear?</div>
+      <div class="sess-actions" style="max-width:200px;margin:14px auto 0">
+        <button class="btn ghost wide" id="q-play">▶ Play again</button>
+      </div>
+    </div>
+    <div class="opts">${opts.map((o,i)=>`<button class="opt he" data-i="${i}">${hn(o)}</button>`).join('')}</div>
+    <div class="feedback" id="fb"></div>`;
+  $('#q-play').addEventListener('click',()=>speak(correct));
+  speak(correct);
+  let done=false;
+  body.querySelectorAll('.opt').forEach((btn,i)=>btn.addEventListener('click',()=>{
+    if(done)return; done=true;
+    const ok=opts[i]===correct;
+    btn.classList.add(ok?'correct':'wrong');
+    body.querySelectorAll('.opt').forEach((b,j)=>{if(opts[j]===correct)b.classList.add('correct');else if(b!==btn)b.classList.add('dim');});
+    if(ok)sess.right++;
+    const extra={lat:Math.round(performance.now()-t0)};
+    if(!ok){
+      const ch=allForms(v).find(f=>f.form===opts[i]);
+      if(ch) extra.err=ch.t===t?'person':(ch.p===p?'tense':'form');
+    }
+    logAttempt(v.id,t,p,ok,'ear',extra);
+    const pl=personLabel(t,p);
+    const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
+    fb.innerHTML=(ok?'Right — ':'It was ')+`<b class="he">${hn(correct)}</b> <button class="spk" data-speak="${esc(correct)}">🔊</button> · ${pl.en}, ${TENSES[t].en}`+(!ok&&extra.err?` — you picked ${ERR_LABEL[extra.err]}`:'');
+    fb.insertAdjacentHTML('afterend',nextBtnRow()); bindNext();
+  }));
+}
+
+/* ===== numbers: counting + gendered numerals ===== */
+function buildNumItems(cnt){
+  const skill=skillCells(), cells=[];
+  for(const k in NUM_F) cells.push({kind:'prod',n:+k,g:'f',wgt:cellWgt(skill,'num_'+k+'_f|num|-')});
+  for(const k in NUM_M) cells.push({kind:'prod',n:+k,g:'m',wgt:cellWgt(skill,'num_'+k+'_m|num|-')});
+  for(const k in NUM_TENS) cells.push({kind:'prod',n:+k,g:'t',wgt:cellWgt(skill,'num_'+k+'_t|num|-')});
+  for(let n2=2;n2<=10;n2++) cells.push({kind:'agree',n:n2,wgt:cellWgt(skill,'num_'+n2+'_agree|num|-')});
+  return weightedSample(cells,cnt).map(c=>(c.kind==='prod'&&Math.random()<0.4?{...c,kind:'val'}:c));
+}
+function renderNum(it,body){
+  const t0=performance.now();
+  const SETS={f:NUM_F,m:NUM_M,t:NUM_TENS};
+  let big,sub,correct,opts,cell,speakTxt,why='',optsHe=true;
+  if(it.kind==='agree'){
+    const w=pick(NOUNS);
+    correct=(w.g==='m'?NUM_M:NUM_F)[it.n][0]+' '+w.pl;
+    const wrong=(w.g==='m'?NUM_F:NUM_M)[it.n][0]+' '+w.pl;
+    big=`${it.n} · <span class="he">${hn(esc(w.pl))}</span>`;
+    sub=`"${esc(w.en)}" is ${w.g==='m'?'masculine':'feminine'} — pick the matching numeral`;
+    opts=shuffle([correct,wrong]); cell='num_'+it.n+'_agree'; speakTxt=correct;
+    why=w.g==='m'?'Masculine nouns take the long ־ָה numerals: שְׁלוֹשָׁה סְפָרִים.':'Feminine nouns take the short numerals: שָׁלוֹשׁ שָׁנִים.';
+  }else if(it.kind==='val'){
+    const set=SETS[it.g];
+    big=`<span class="he">${hn(set[it.n][0])}</span>`; sub='What number is this?';
+    correct=String(it.n);
+    opts=shuffle([correct,...shuffle(Object.keys(set).filter(k=>+k!==it.n)).slice(0,3)]);
+    cell='num_'+it.n+'_'+it.g; speakTxt=set[it.n][0]; optsHe=false;
+  }else{
+    const set=SETS[it.g];
+    big=String(it.n);
+    sub=it.g==='f'?'Feminine — also how you count out loud':it.g==='m'?'For masculine nouns':'Round number';
+    correct=set[it.n][0];
+    opts=shuffle([correct,...shuffle(Object.keys(set).filter(k=>+k!==it.n)).slice(0,3).map(k=>set[k][0])]);
+    cell='num_'+it.n+'_'+it.g; speakTxt=correct;
+    if(it.g==='f') why='Counting with no noun uses the feminine forms: אַחַת, שְׁתַּיִם, שָׁלוֹשׁ…';
+    if(it.g==='m') why='Masculine nouns take the longer forms that look feminine: שְׁלוֹשָׁה בָּנִים.';
+  }
+  body.innerHTML=`<div class="qcard">
+      <div class="qkicker">Numbers · מִסְפָּרִים</div>
+      <div class="qbig">${big}</div>
+      <div class="qsub">${sub}</div>
+    </div>
+    <div class="opts">${opts.map((o,i)=>`<button class="opt${optsHe?' he':''}"${optsHe?'':' style="font-size:22px"'} data-i="${i}">${optsHe?hn(o):esc(o)}</button>`).join('')}</div>
+    <div class="feedback" id="fb"></div>`;
+  let done=false;
+  body.querySelectorAll('.opt').forEach((btn,i)=>btn.addEventListener('click',()=>{
+    if(done)return; done=true;
+    const ok=opts[i]===correct;
+    btn.classList.add(ok?'correct':'wrong');
+    body.querySelectorAll('.opt').forEach((b,j)=>{if(opts[j]===correct)b.classList.add('correct');else if(b!==btn)b.classList.add('dim');});
+    if(ok)sess.right++;
+    logAttempt(cell,'num','-',ok,'num',{k:'num',lat:Math.round(performance.now()-t0)});
+    const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
+    fb.innerHTML=(ok?'Right — ':'It\'s ')+`<b class="he">${hn(speakTxt)}</b> <button class="spk" data-speak="${esc(speakTxt)}">🔊</button>`+(why?`<br><span class="muted">${why}</span>`:'');
+    fb.insertAdjacentHTML('afterend',nextBtnRow()); bindNext();
+  }));
+}
+
+/* ===== daily mix: the weakest cells across every game ===== */
+function buildMixItems(n){
+  const skill=skillCells(), items=[];
+  const vGames=['mcq','type','ear'];
+  pickWeighted(4).forEach((it,i)=>items.push({game:vGames[i%vGames.length],it}));
+  buildVocabItems(2).forEach(it=>items.push({game:'vocab',it}));
+  buildNaItems(2).forEach(it=>items.push({game:'na',it}));
+  weightedSample(EXCEPTIONS.map(q=>({...q,wgt:cellWgt(skill,q.id+'|rule|-')})),1).forEach(it=>items.push({game:'exc',it}));
+  buildNumItems(1).forEach(it=>items.push({game:'num',it}));
+  return shuffle(items).slice(0,n);
+}
+
+/* ===== speed round: 60 seconds of rapid MCQ ===== */
+function renderSpeedRound(){
+  let left=60, answered=0, qi=0;
+  sess.right=0;
+  const body=$('#sess-body');
+  $('#sess-count').textContent='60s';
+  $('#sess-bar').style.width='100%';
+  speedTimer=setInterval(()=>{
+    left--;
+    $('#sess-count').textContent=left+'s';
+    $('#sess-bar').style.width=(left/60*100)+'%';
+    if(left<=0) end();
+  },1000);
+  function end(){
+    if(speedTimer){clearInterval(speedTimer);speedTimer=null;}
+    body.innerHTML=`<div class="sess-done"><div class="big">⚡</div>
+      <h3>${sess.right} right · ${answered} answered</h3>
+      <p class="muted">${sess.right>=15?'Blazing.':sess.right>=8?'Solid pace — go again?':'Speed comes with reps.'}</p>
+      <div class="sess-actions" style="max-width:340px;margin:18px auto 0">
+        <button class="btn ghost" id="d-close">Done</button>
+        <button class="btn" id="d-again">Go again</button></div></div>`;
+    $('#d-close').addEventListener('click',closeSession);
+    $('#d-again').addEventListener('click',()=>openSession('speed'));
+    if(answered) bumpActivity(answered);
+  }
+  function next(){
+    if(left<=0) return;
+    if(qi>=sess.items.length) sess.items.push(...pickWeighted(20));
+    const it=sess.items[qi++];
+    const {v,t,p}=it; const correct=v.forms[t][p];
+    const opts=shuffle([correct,...distractors(v,t,p,3)]);
+    const pl=personLabel(t,p);
+    const t0=performance.now();
+    body.innerHTML=`<div class="qcard">
+        <div class="qkicker">⚡ ${BINYANIM[v.b].name}</div>
+        <div class="qbig" style="font-size:26px">${esc(v.en)}</div>
+        <div class="qsub">${TENSES[t].en} · ${pl.en} <span class="he">${pl.he}</span></div>
+      </div>
+      <div class="opts">${opts.map((o,i)=>`<button class="opt he" data-i="${i}">${hn(o)}</button>`).join('')}</div>`;
+    let done=false;
+    body.querySelectorAll('.opt').forEach((btn,i)=>btn.addEventListener('click',()=>{
+      if(done||left<=0)return; done=true; answered++;
+      const ok=opts[i]===correct;
+      if(ok)sess.right++;
+      btn.classList.add(ok?'correct':'wrong');
+      if(!ok)body.querySelectorAll('.opt').forEach((b,j)=>{if(opts[j]===correct)b.classList.add('correct');});
+      logAttempt(v.id,t,p,ok,'speed',{lat:Math.round(performance.now()-t0)});
+      setTimeout(()=>{if(left>0)next();},ok?250:700);
+    }));
+  }
+  next();
+}
+
 /* ===== lesson driver: intro -> flashcards -> scoped drills ===== */
 function startLesson(L){
   if(!state.lessons.started.includes(L.id)){ state.lessons.started.push(L.id); persist(); }
   const stages=[];
-  if((L.vocab&&L.vocab.length)||(L.verbs&&L.verbs.length)) stages.push('flash');
+  if((L.vocab&&L.vocab.length)||(L.verbs&&L.verbs.length)||(L.nouns&&L.nouns.length)||(L.adjs&&L.adjs.length)) stages.push('flash');
+  if(L.vocab&&L.vocab.length) stages.push('vocab');
   if(L.verbs&&L.verbs.length){ stages.push('mcq'); stages.push('type'); }
   const sents=SENTENCES.filter(s=>(L.verbs||[]).includes(s.v));
   if(sents.length) stages.push('cloze');
@@ -1535,6 +1929,8 @@ function startLessonFlash(){
   const L=lessonRun.L, cards=[];
   (L.vocab||[]).forEach(id=>{const w=VOCAB_BY_ID[id]; if(w) cards.push({id:'v'+id,kind:'vocab',w});});
   (L.verbs||[]).forEach(id=>{const v=VERB_BY_ID[id]; if(v) cards.push({id:'verb_'+id,kind:'verb',v});});
+  (L.nouns||[]).forEach(id=>{const w=NOUNS.find(x=>x.id===id); if(w) cards.push({id,kind:'noun',w});});
+  (L.adjs||[]).forEach(id=>{const a=ADJS.find(x=>x.id===id); if(a) cards.push({id,kind:'adj',a});});
   if(!cards.length) return nextLessonStage();
   deck=shuffle(cards); deckRedo=[]; deckI=0;
   sess.mode='flash';
@@ -1559,7 +1955,8 @@ function lessonProgress(L,skill){
   }
   for(const wid of (L.vocab||[])){ total++;
     const e=state.srs['v'+wid];
-    if(e&&(e.ivl||0)>=3) done++;
+    const s=skill[wid+'|word|-'];
+    if((e&&(e.ivl||0)>=3)||(s&&s.n>=2&&s.acc>=0.7)) done++;
   }
   for(const nid of (L.nouns||[])){ total++;
     let n=0,a=0,c=0;
@@ -1625,8 +2022,8 @@ function renderFlash(){
   $('#sess-count').textContent=(deckI+1)+' / '+deck.length;
   const c=deck[deckI];
   const iv=nextIvls(state.srs[c.id]);
-  const front=c.kind==='vocab'?c.w.he:c.v.lemma;
-  const kick=c.kind==='vocab'?'Vocabulary':BINYANIM[c.v.b].name+' · <span class="he">'+esc(c.v.root)+'</span>';
+  const front=c.kind==='vocab'||c.kind==='noun'?c.w.he:c.kind==='adj'?c.a.ms:c.v.lemma;
+  const kick=c.kind==='vocab'?'Vocabulary':c.kind==='noun'?'Noun · שֵׁם עֶצֶם':c.kind==='adj'?'Adjective · שֵׁם תֹּאַר':BINYANIM[c.v.b].name+' · <span class="he">'+esc(c.v.root)+'</span>';
   $('#sess-body').innerHTML=`<div class="flash">
       <div class="qkicker">${kick}</div>
       <div class="front he">${hn(esc(front))}</div>
@@ -1642,6 +2039,10 @@ function renderFlash(){
     const back=$('#f-back'); back.hidden=false;
     back.innerHTML=c.kind==='vocab'
       ?`<b>${esc(c.w.en)}</b>${c.w.tr?' · <i>'+esc(c.w.tr)+'</i>':''}`
+      :c.kind==='noun'
+      ?`<b>${esc(c.w.en)}</b> · ${c.w.g==='m'?'masculine':'feminine'}<br><span class="muted" style="font-size:13.5px">plural <span class="he" style="font-size:20px">${hn(c.w.pl)}</span></span>`
+      :c.kind==='adj'
+      ?`<b>${esc(c.a.en)}</b><br><span class="he" style="font-size:20px">${hn(c.a.ms)} · ${hn(c.a.fs)} · ${hn(c.a.mp)} · ${hn(c.a.fp)}</span>`
       :`<b>${esc(c.v.en)}</b>${c.v.tr?' · <i>'+esc(c.v.tr)+'</i>':''}<br><span class="muted" style="font-size:13.5px">present <span class="he" style="font-size:19px">${c.v.forms.present?hn(c.v.forms.present.ms):'—'}</span> · future <span class="he" style="font-size:19px">${c.v.forms.future?hn(c.v.forms.future.p3ms):'—'}</span></span>`;
     $('#f-flip').hidden=true; $('#f-grade').hidden=false;
   });
@@ -1803,7 +2204,7 @@ function renderBstat(){
   if(troot) troot.innerHTML=any?['past','present','future'].map(t=>statBar(TENSES[t].en,byT[t].r,byT[t].w)).join('')
     :'<p class="muted" style="font-size:14px">No data yet.</p>';
   const mroot=document.getElementById('mstat-root');
-  const MODE_LABEL={mcq:'Quiz',type:'Type it',cloze:'Sentences',listen:'Listening',na:'Nouns & adj',exc:'Rules'};
+  const MODE_LABEL={mcq:'Quiz',type:'Type it',cloze:'Sentences',listen:'Dictation',ear:'Sharp ear',order:'Word order',vocab:'Vocab',roots:'Roots',num:'Numbers',speed:'Speed',na:'Nouns & adj',exc:'Rules'};
   if(mroot) mroot.innerHTML=(any&&Object.keys(byM).length)?Object.keys(MODE_LABEL).filter(m=>byM[m]).map(m=>statBar(MODE_LABEL[m],byM[m].r,byM[m].w)).join('')
     :'<p class="muted" style="font-size:14px">No data yet.</p>';
   renderWeak();
