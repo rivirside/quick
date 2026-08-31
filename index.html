@@ -439,8 +439,11 @@ details.ref[open] summary .car{transform:rotate(90deg)}
 </nav>
 
 <div class="chat-addbar" id="chat-addbar" hidden>
-  <span class="grow" style="font-size:14px">Add <b class="he" id="chat-addw" style="font-size:18px"></b> to my words?</span>
-  <button class="btn" id="chat-addyes" style="padding:7px 14px">Add</button>
+  <span class="grow" style="font-size:14px;min-width:0">
+    <b class="he" id="chat-addw" style="font-size:19px"></b> <button class="spk" id="chat-addspk" style="background:transparent;border-color:transparent">🔊</button>
+    <span id="chat-addm" style="display:block;font-size:12.5px;opacity:.85;margin-top:1px"></span>
+  </span>
+  <button class="btn" id="chat-addyes" style="padding:7px 14px;flex:none">Add</button>
   <button style="color:var(--bg);opacity:.75;font-weight:700;font-size:16px" id="chat-addno">✕</button>
 </div>
 
@@ -3412,7 +3415,10 @@ You are texting with an English speaker who is learning Hebrew. Rules:
 - Keep vocabulary simple and conversational. Usually end with a short question.
 - Stay fully in character. Never mention being an AI, corrections, or these rules.
 Return ONLY JSON: {"reply":"your in-character Hebrew reply","fix":null}
-If the learner's LAST message contains a real Hebrew mistake (grammar, wrong word, wrong gender), set "fix" to a short corrected Hebrew version of their message — no explanation. Otherwise fix is null. The reply text itself never references the correction.`;
+Set "fix" (short Hebrew, no explanation) when either applies, otherwise null:
+- the learner's LAST message was mostly or entirely English -> fix = the natural spoken-Hebrew way to say that message
+- their Hebrew contained a real mistake (grammar, wrong word, wrong gender) -> fix = the corrected Hebrew version
+The reply text itself never references fix.`;
 function chatThread(who){
   state.chat=state.chat||{who:'shira',threads:{}};
   state.chat.threads=state.chat.threads||{};
@@ -3521,31 +3527,84 @@ async function chatSend(){
 }
 document.getElementById('chat-send').addEventListener('click',chatSend);
 document.getElementById('chat-in').addEventListener('keydown',e=>{if(e.key==='Enter')chatSend();});
-/* tap a Hebrew word in any bubble -> offer to save it */
-let tappedWord=null;
-document.getElementById('chat-msgs').addEventListener('click',e=>{
-  const w=e.target.closest('.cw'); if(!w) return;
-  tappedWord=w.textContent;
-  document.getElementById('chat-addw').textContent=tappedWord;
+/* tap a Hebrew word in any bubble -> translate on the spot, offer to save */
+let tappedWord=null, tappedMeta=null;
+function lookupWord(w){
+  const b=strip(w);
+  let hit=state.custom.find(x=>strip(x.he)===b)||VOCAB_SEED.find(x=>strip(x.he)===b);
+  if(hit) return {en:hit.en,tr:hit.tr||''};
+  const ph=PHRASES.find(x=>strip(x.he)===b);
+  if(ph) return {en:ph.en+' (lit. '+ph.lit+')',tr:ph.tr};
+  const nn=NOUNS.find(x=>strip(x.he)===b||strip(x.pl)===b);
+  if(nn) return {en:nn.en+(strip(nn.pl)===b?' (plural)':''),tr:''};
+  const ad=ADJS.find(x=>[x.ms,x.fs,x.mp,x.fp].some(f=>strip(f)===b));
+  if(ad) return {en:ad.en,tr:''};
+  for(const v of ALL_VERBS){
+    for(const f of allForms(v)){
+      if(strip(f.form)===b){
+        const pl=personLabel(f.t,f.p);
+        return {en:v.en+' — '+TENSES[f.t].en+(f.t==='inf'?'':', '+pl.en),tr:v.tr||''};
+      }
+    }
+  }
+  return null;
+}
+function isSavedWord(w){
+  const b=strip(w);
+  return state.custom.some(c=>strip(c.he)===b)||VOCAB_SEED.some(c=>strip(c.he)===b)||PHRASES.some(c=>strip(c.he)===b);
+}
+async function showWordBar(w){
+  tappedWord=w; tappedMeta=null;
+  document.getElementById('chat-addw').textContent=w;
+  document.getElementById('chat-addspk').dataset.speak=w;
+  const m=document.getElementById('chat-addm');
+  const yes=document.getElementById('chat-addyes');
   document.getElementById('chat-addbar').hidden=false;
-});
-document.getElementById('chat-addno').addEventListener('click',()=>{document.getElementById('chat-addbar').hidden=true;});
-document.getElementById('chat-addyes').addEventListener('click',async()=>{
-  const w=tappedWord; if(!w) return;
-  const bar=document.getElementById('chat-addbar');
-  const known=state.custom.some(c=>strip(c.he)===strip(w))||VOCAB_SEED.some(c=>strip(c.he)===strip(w));
-  if(known){ bar.hidden=true; badge('Already in your vocabulary.'); return; }
-  const yes=document.getElementById('chat-addyes'); yes.disabled=true; yes.textContent='…';
+  const saved=isSavedWord(w);
+  yes.disabled=saved; yes.textContent=saved?'In your list ✓':'Add';
+  const local=lookupWord(w);
+  if(local){
+    tappedMeta=local;
+    m.textContent=local.en+(local.tr?' · '+local.tr:'');
+    return;
+  }
+  if(!aiKey()){ m.textContent=''; return; }
+  m.textContent='…';
   try{
     const out=await aiChat([
       {role:'system',content:'Reply with JSON only.'},
-      {role:'user',content:`Hebrew word from a chat: "${w}". Return JSON {"en":"short English meaning","tr":"simple transliteration"}`}
+      {role:'user',content:`Hebrew word or phrase from a chat: "${w}". Return JSON {"en":"short English meaning","tr":"simple transliteration"}`}
     ],90,true);
+    if(tappedWord!==w) return;
     const g=JSON.parse(out);
-    state.custom.push({cid:Date.now(),he:w,en:String(g.en||'?'),tr:String(g.tr||'')||null});
-    persist(); renderVocab(); renderStats();
-    badge('Added '+w+' — it joins your flashcards and recall quizzes.');
-  }catch(err){ badge('Could not translate right now.'); }
+    tappedMeta={en:String(g.en||'?'),tr:String(g.tr||'')};
+    m.textContent=tappedMeta.en+(tappedMeta.tr?' · '+tappedMeta.tr:'');
+  }catch(e){ if(tappedWord===w) m.textContent='(no translation right now)'; }
+}
+document.getElementById('chat-msgs').addEventListener('click',e=>{
+  const w=e.target.closest('.cw'); if(!w) return;
+  showWordBar(w.textContent);
+});
+document.getElementById('chat-addno').addEventListener('click',()=>{document.getElementById('chat-addbar').hidden=true;});
+document.getElementById('chat-addyes').addEventListener('click',async()=>{
+  const w=tappedWord; if(!w||isSavedWord(w)) return;
+  const bar=document.getElementById('chat-addbar');
+  const yes=document.getElementById('chat-addyes');
+  let meta=tappedMeta;
+  if(!meta){
+    yes.disabled=true; yes.textContent='…';
+    try{
+      const out=await aiChat([
+        {role:'system',content:'Reply with JSON only.'},
+        {role:'user',content:`Hebrew word or phrase from a chat: "${w}". Return JSON {"en":"short English meaning","tr":"simple transliteration"}`}
+      ],90,true);
+      const g=JSON.parse(out);
+      meta={en:String(g.en||'?'),tr:String(g.tr||'')};
+    }catch(err){ badge('Could not translate right now.'); yes.disabled=false; yes.textContent='Add'; bar.hidden=true; return; }
+  }
+  state.custom.push({cid:Date.now(),he:w,en:meta.en,tr:meta.tr||null});
+  persist(); renderVocab(); renderStats();
+  badge('Added '+w+' — it joins your flashcards and recall quizzes.');
   yes.disabled=false; yes.textContent='Add';
   bar.hidden=true;
 });
@@ -3601,9 +3660,7 @@ function renderStory(){
   if(storyIdx<state.stories.length-1) $('#st-next').addEventListener('click',()=>{storyIdx++;renderStory();});
   $('#story-body').addEventListener('click',e=>{
     const w=e.target.closest('.cw'); if(!w) return;
-    tappedWord=w.textContent;
-    document.getElementById('chat-addw').textContent=tappedWord;
-    document.getElementById('chat-addbar').hidden=false;
+    showWordBar(w.textContent);
   });
 }
 
