@@ -685,10 +685,33 @@ const VOCAB_SEED=[
  {id:'kokhav',he:'כּוֹכָב',tr:'kokhav',en:'star',cat:'nature'},{id:'geshem',he:'גֶּשֶׁם',tr:'geshem',en:'rain',cat:'nature'},
  {id:'ruakh',he:'רוּחַ',tr:'ruakh',en:'wind, spirit',cat:'nature'},{id:'nahar',he:'נָהָר',tr:'nahar',en:'river',cat:'nature'},
  {id:'kelev',he:'כֶּלֶב',tr:'kelev',en:'dog',cat:'nature'},{id:'khatul',he:'חָתוּל',tr:'khatul',en:'cat',cat:'nature'},
- {id:'tsipor',he:'צִפּוֹר',tr:'tsipor',en:'bird',cat:'nature'},{id:'sheleg',he:'שֶׁלֶג',tr:'sheleg',en:'snow',cat:'nature'}
+ {id:'tsipor',he:'צִפּוֹר',tr:'tsipor',en:'bird',cat:'nature'},{id:'sheleg',he:'שֶׁלֶג',tr:'sheleg',en:'snow',cat:'nature'},
+ /* street Hebrew — how people actually talk */
+ {id:'sababa',he:'סַבַּבָּה',tr:'sababa',en:'cool, great, fine',cat:'street'},
+ {id:'akhla',he:'אַחְלָה',tr:'akhla',en:'awesome, great',cat:'street'},
+ {id:'yalla',he:'יָאלְלָה',tr:'yalla',en:"let's go, come on",cat:'street'},
+ {id:'beseder',he:'בְּסֵדֶר',tr:'beseder',en:'okay, fine',cat:'street'},
+ {id:'magniv',he:'מַגְנִיב',tr:'magniv',en:'cool, neat',cat:'street'},
+ {id:'walla',he:'וָואלָה',tr:'walla',en:'really?! wow',cat:'street'},
+ {id:'kef',he:'כֵּיף',tr:'kef',en:'fun',cat:'street'},
+ {id:'bali',he:'בָּא לִי',tr:'ba li',en:'I feel like (it)',cat:'street'},
+ {id:'einbeaya',he:'אֵין בְּעָיָה',tr:'ein be-aya',en:'no problem',cat:'street'},
+ {id:'manishma',he:'מָה נִשְׁמָע',tr:'ma nishma',en:"what's up?",cat:'street'},
+ {id:'makore',he:'מָה קוֹרֶה',tr:'ma kore',en:"what's happening?",cat:'street'},
+ {id:'stam',he:'סְתָם',tr:'stam',en:'just because; kidding',cat:'street'},
+ {id:'davka',he:'דַּוְקָא',tr:'davka',en:'actually, of all things',cat:'street'},
+ {id:'nireli',he:'נִרְאֶה לִי',tr:'nir-e li',en:'seems to me, I think',cat:'street'},
+ {id:'shtuyot',he:'שְׁטוּיוֹת',tr:'shtuyot',en:'nonsense',cat:'street'},
+ {id:'lonora',he:'לֹא נוֹרָא',tr:'lo nora',en:'no big deal',cat:'street'},
+ {id:'khavalzman',he:'חֲבָל עַל הַזְּמַן',tr:'khaval al ha-zman',en:'amazing (slang)',cat:'street'},
+ {id:'mamash',he:'מַמָּשׁ',tr:'mamash',en:'really, totally',cat:'street'},
+ {id:'betakh',he:'בֶּטַח',tr:'betakh',en:'sure, obviously',cat:'street'},
+ {id:'nu',he:'נוּ',tr:'nu',en:'well?! come on',cat:'street'},
+ {id:'takhles',he:'תַּכְלֶס',tr:'takhles',en:'bottom line, honestly',cat:'street'},
+ {id:'metoraf',he:'מְטֹרָף',tr:'metoraf',en:'crazy, insane(ly good)',cat:'street'}
 ];
 
-const CAT_LABELS={basics:'Everyday basics',home:'The home · הַבַּיִת',food:'Food & cooking · אֹכֶל',clothing:'Clothing · בְּגָדִים',health:'Health · בְּרִיאוּת',romance:'Romance & social · אַהֲבָה',nature:'Nature · טֶבַע'};
+const CAT_LABELS={basics:'Everyday basics',home:'The home · הַבַּיִת',food:'Food & cooking · אֹכֶל',clothing:'Clothing · בְּגָדִים',health:'Health · בְּרִיאוּת',romance:'Romance & social · אַהֲבָה',nature:'Nature · טֶבַע',street:'Street Hebrew · סְלֶנְג'};
 
 const NOUNS=[
  {id:'n_bayit',he:'בַּיִת',pl:'בָּתִּים',g:'m',en:'house'},
@@ -782,8 +805,47 @@ const LESSONS=[
   vocab:['ets','perakh','yam','har','shemesh','geshem','ruakh','kelev','khatul','tsipor']},
  {id:'L12',title:"Nif'al & the passives",he:'נִפְעַל',sub:'When things happen to you',
   intro:"Nif'al covers passives and happenings: נִכְנַס entered, נִפְגַּשׁ met, נִשְׁבַּר broke. The נ hides as a dagesh in the future.",
-  verbs:['kns3','pgsh3','zkr3','shbr3','nafal']}
+  verbs:['kns3','pgsh3','zkr3','shbr3','nafal']},
+ {id:'L13',title:'Street Hebrew',he:'סְלֶנְג',sub:'How Israelis actually talk',
+  intro:"Textbook Hebrew gets you reading; these words get you friends. Half of Israeli small talk runs on a couple dozen expressions.",
+  vocab:['sababa','akhla','yalla','beseder','magniv','walla','kef','bali','einbeaya','manishma','makore','stam','davka','nireli','shtuyot','lonora','khavalzman','mamash','betakh','nu','takhles','metoraf']}
 ];
+
+/* per-lesson teaching pages, shown before the drills. b is HTML; ex is
+   [Hebrew, gloss] with a speak button; tbl embeds a conjugation table. */
+const LESSON_TEACH={
+ L1:[
+  {h:'Only four forms',b:'The present tense ignores person completely — it behaves like an adjective. Masculine or feminine, singular or plural: <span class="he">כּוֹתֵב · כּוֹתֶבֶת · כּוֹתְבִים · כּוֹתְבוֹת</span>. A pronoun says who.',ex:['אֲנִי כּוֹתֵב וְהִיא כּוֹתֶבֶת','ani kotev ve-hi kotevet — I write and she writes']},
+  {h:'Hear the melody',b:'Pa\'al present sounds like <b>o–e</b>: kotev, soger, pogesh, bodek. Catch that melody and you can conjugate verbs you\'ve never met.',ex:['הוּא פּוֹגֵשׁ חָבֵר בָּעִיר','hu pogesh khaver ba-ir — he\'s meeting a friend in town']}],
+ L2:[
+  {h:'Suffixes do the work',b:'One ending per person: <span class="he">־תִּי</span> I · <span class="he">־תָּ</span> you (m) · <span class="he">־תְּ</span> you (f) · <span class="he">־נוּ</span> we · <span class="he">־תֶּם</span> you all · <span class="he">־וּ</span> they. The he-form is the bare verb: <span class="he">כָּתַב</span>.',ex:['סָגַרְתִּי אֶת הַדֶּלֶת','sagarti et ha-delet — I closed the door']},
+  {h:'On the street',b:'Everyday speech flattens the fancy stress — <span class="he">כְּתַבְתֶּם</span> comes out "katávtem", not the textbook "ktavtém". Understand the rule, then relax about it; Israelis do.'}],
+ L3:[
+  {h:'Prefixes take over',b:'The future flips the logic: <span class="he">אֶ־</span> I · <span class="he">תִּ־</span> you/she · <span class="he">יִ־</span> he/they · <span class="he">נִ־</span> we. Note that <span class="he">הוּא</span> and <span class="he">אַתָּה</span> share a form — context decides.',ex:['מָחָר אֶגְמֹר אֶת הָעֲבוֹדָה','makhar egmor et ha-avoda — tomorrow I\'ll finish the work']},
+  {h:'Street warning',b:'You will absolutely hear Israelis say <span class="he">אֲנִי יִכְתֹּב</span> — everyone does it and teachers hate it. Recognize it, but learn the standard <span class="he">אֶכְתֹּב</span>: it\'s what you\'ll read and write.'}],
+ L4:[
+  {h:'The dagesh signature',b:'Pi\'el strengthens its middle letter (the dot in <span class="he">דִּבֵּר</span>) and the present opens with <span class="he">מְ־</span>: <span class="he">מְדַבֵּר, מְבַקֵּשׁ, מְלַמֵּד</span>. Communication verbs love this binyan.',ex:['אֲנִי מְדַבֵּר קְצָת עִבְרִית','ani medaber ktsat ivrit — I speak a little Hebrew']}],
+ L5:[
+  {h:'Gender sneaks in',b:'Most house words are masculine, but <span class="he">מִטָּה</span> and <span class="he">אַמְבַּטְיָה</span> are feminine — and adjectives must match: <span class="he">חֶדֶר גָּדוֹל</span> but <span class="he">מִטָּה גְּדוֹלָה</span>.',ex:['הַמִּטְבָּח קָטָן אֲבָל סַבַּבָּה','ha-mitbakh katan aval sababa — the kitchen is small but cool']}],
+ L6:[
+  {h:'Causative = make it happen',b:'<span class="he">דָּלַק</span> burned → <span class="he">הִדְלִיק</span> turned on. The prefix melody: <span class="he">הִ־</span> past, <span class="he">מַ־</span> present, <span class="he">יַ־</span> future, with <span class="he">ִי</span> in the middle.',ex:['תַּדְלִיק אֶת הָאוֹר?','tadlik et ha-or? — will you turn on the light?']}],
+ L7:[
+  {h:'Do it to (or with) yourself',b:'The <span class="he">הִתְ־</span> prefix survives every tense: <span class="he">הִתְלַבֵּשׁ, מִתְלַבֵּשׁ, יִתְלַבֵּשׁ</span>. Reflexive (dress yourself), mutual (call each other), or a process (grow up).',ex:['אֲנַחְנוּ מִתְקַשְּׁרִים כָּל יוֹם','anakhnu mitkashrim kol yom — we call each other every day']}],
+ L8:[
+  {h:'Ordering like a local',b:'<span class="he">אֶפְשָׁר</span> — "is it possible" — does all the work at a café. No verb to conjugate, just point and smile.',ex:['אֶפְשָׁר קָפֶה בְּבַקָּשָׁה?','efshar kafe bevakasha? — could I get a coffee?']},
+  {h:'The א trap',b:'<span class="he">אָכַל</span> is a פ״א verb: in the future the א goes silent and the vowel turns to o — <span class="he">אֹכַל, יֹאכַל</span>, never "e\'ekhol".'}],
+ L9:[
+  {h:'Why they bend',b:'Weak letters — <span class="he">א ה ו י נ</span> — melt away in certain positions. Each irregular here has one trick; the Reference tab has its full table with a note explaining exactly what drops where.',ex:['לֹא רָצִיתִי לָלֶכֶת, אֲבָל הָלַכְתִּי','lo ratsiti lalekhet, aval halakhti — I didn\'t want to go, but I went']}],
+ L10:[
+  {h:'Plural traps',b:'<span class="he">־ים</span> usually means masculine and <span class="he">־ות</span> feminine — usually. <span class="he">לַיְלָה</span> is masculine (plural <span class="he">לֵילוֹת</span>!) and <span class="he">נָשִׁים</span> is feminine. Learn each word with its plural.',ex:['נָשִׁים חֲכָמוֹת','nashim khakhamot — smart women']}],
+ L11:[
+  {h:'The vanishing middle',b:'<span class="he">קָם, שָׂם, בָּא</span> — the weak middle letter hides in past and present, then returns in the future: <span class="he">קָם → יָקוּם</span>.',ex:['קַמְתִּי מֻקְדָּם וְהָלַכְתִּי לַיָּם','kamti mukdam ve-halakhti la-yam — I got up early and went to the sea']}],
+ L12:[
+  {h:'The hidden נ',b:'Past wears the <span class="he">נִ־</span> up front: <span class="he">נִשְׁבַּר</span>. The future swallows it into a dagesh: <span class="he">יִשָּׁבֵר</span> — that dot is the נ\'s footprint.',ex:['הַכּוֹס נִשְׁבְּרָה','ha-kos nishbera — the glass broke']}],
+ L13:[
+  {h:'The essentials',b:'<span class="he">סַבַּבָּה</span> fine/cool · <span class="he">אַחְלָה</span> great · <span class="he">יָאלְלָה</span> let\'s go · <span class="he">תַּכְלֶס</span> honestly · <span class="he">וָואלָה</span> no way?! — these five carry half of Israeli small talk.',ex:['וָואלָה?… סַבַּבָּה','walla?… sababa — no way?… cool']},
+  {h:'Register cheat sheet',b:'Spoken Hebrew says <span class="he">יַגִּיד</span>, not <span class="he">יֹאמַר</span>. Pu\'al and Huf\'al are for reading, not saying. And at the shuk you\'ll hear <span class="he">שָׁלוֹשׁ שֶׁקֶל</span> — wrong, universal, and worth understanding even as you learn the standard <span class="he">שְׁלוֹשָׁה שְׁקָלִים</span>.'}]
+};
 const SENTENCES=[
  {pre:'מָחָר אֲנִי',post:'מִכְתָּב לְסָבְתָא.',en:'Tomorrow I will write a letter to grandma.',v:'ktv1',t:'future',p:'p1s'},
  {pre:'אֶתְמוֹל הִיא',post:'אֶת הַדֶּלֶת.',en:'Yesterday she closed the door.',v:'sgr1',t:'past',p:'p3fs'},
@@ -809,7 +871,13 @@ const SENTENCES=[
  {pre:'הוּא לֹא',post:'בַּכִּיתָּה.',en:'He does not behave in class.',v:'htnhg7',t:'present',p:'ms'},
  {pre:'אֲנִי',post:'עַל הַנּוֹשֵׂא.',en:'I am thinking about the topic.',v:'khshv1',t:'present',p:'ms'},
  {pre:'הִיא',post:'שִׁמְלָה יָפָה.',en:'She is wearing a beautiful dress.',v:'lbsh1',t:'present',p:'fs'},
- {pre:'הוּא',post:'אֶת הַכּוֹס בַּמִּטְבָּח.',en:'He broke the glass in the kitchen.',v:'shbr1',t:'past',p:'p3ms'}
+ {pre:'הוּא',post:'אֶת הַכּוֹס בַּמִּטְבָּח.',en:'He broke the glass in the kitchen.',v:'shbr1',t:'past',p:'p3ms'},
+ {pre:'יָאלְלָה, אֲנַחְנוּ',post:'לַמְּסִבָּה?',en:'Yalla, are we going to the party?',v:'halakh',t:'present',p:'mp'},
+ {pre:'סַבַּבָּה, אֲנִי',post:'אֵלֶיךָ מָחָר.',en:"Cool, I'll call you tomorrow.",v:'kshr7',t:'future',p:'p1s'},
+ {pre:'וָואלָה, לֹא',post:'אֶת זֶה!',en:"Walla, I didn't know that!",v:'yada',t:'past',p:'p1s'},
+ {pre:'מָה קוֹרֶה? מָה אַתָּה',post:'עַכְשָׁו?',en:"What's up? What are you doing now?",v:'asa',t:'present',p:'ms'},
+ {pre:'חֲבָל עַל הַזְּמַן — הִיא',post:'מַמָּשׁ יָפֶה.',en:'Amazing — she dances really beautifully.',v:'rkd1',t:'present',p:'fs'},
+ {pre:'נוּ, מָתַי הֵם כְּבָר',post:'?',en:'Nu, when are they finally coming?',v:'ba',t:'present',p:'mp'}
 ];
 
 const EXCEPTIONS=[
@@ -1196,12 +1264,16 @@ function pickWeighted(n){
     }
     if(sessScope.tenses&&sessScope.tenses.length) tenses=sessScope.tenses;
   }
-  for(const v of verbs)
+  for(const v of verbs){
+    /* pu'al & huf'al are written Hebrew — nobody says them, so drill them
+       lightly unless the user focuses them on purpose */
+    const lit=(v.b==='pual'||v.b==='hufal')&&!sessScope&&!focusBinyan?0.35:1;
     for(const t of tenses){
       if(!v.forms[t]) continue;
       for(const p in v.forms[t])
-        cells.push({v,t,p,wgt:cellWgt(skill,v.id+'|'+t+'|'+p)});
+        cells.push({v,t,p,wgt:cellWgt(skill,v.id+'|'+t+'|'+p)*lit});
     }
+  }
   return weightedSample(cells,n);
 }
 
@@ -1786,12 +1858,14 @@ function renderNum(it,body){
   let big,sub,correct,opts,cell,speakTxt,why='',optsHe=true;
   if(it.kind==='agree'){
     const w=pick(NOUNS);
-    correct=(w.g==='m'?NUM_M:NUM_F)[it.n][0]+' '+w.pl;
-    const wrong=(w.g==='m'?NUM_F:NUM_M)[it.n][0]+' '+w.pl;
+    const mForm=it.n===2?'שְׁנֵי':NUM_M[it.n][0];
+    const fForm=it.n===2?'שְׁתֵּי':NUM_F[it.n][0];
+    correct=(w.g==='m'?mForm:fForm)+' '+w.pl;
+    const wrong=(w.g==='m'?fForm:mForm)+' '+w.pl;
     big=`${it.n} · <span class="he">${hn(esc(w.pl))}</span>`;
     sub=`"${esc(w.en)}" is ${w.g==='m'?'masculine':'feminine'} — pick the matching numeral`;
     opts=shuffle([correct,wrong]); cell='num_'+it.n+'_agree'; speakTxt=correct;
-    why=w.g==='m'?'Masculine nouns take the long ־ָה numerals: שְׁלוֹשָׁה סְפָרִים.':'Feminine nouns take the short numerals: שָׁלוֹשׁ שָׁנִים.';
+    why=it.n===2?'Before a noun, "two" takes its construct form: שְׁנֵי בָּנִים, שְׁתֵּי בָּנוֹת.':w.g==='m'?'Masculine nouns take the long ־ָה numerals: שְׁלוֹשָׁה סְפָרִים.':'Feminine nouns take the short numerals: שָׁלוֹשׁ שָׁנִים.';
   }else if(it.kind==='val'){
     const set=SETS[it.g];
     big=`<span class="he">${hn(set[it.n][0])}</span>`; sub='What number is this?';
@@ -1904,19 +1978,31 @@ function startLesson(L){
   const sents=SENTENCES.filter(s=>(L.verbs||[]).includes(s.v));
   if(sents.length) stages.push('cloze');
   if((L.nouns&&L.nouns.length)||(L.adjs&&L.adjs.length)) stages.push('na');
-  lessonRun={L,stages,i:0};
+  lessonRun={L,stages,i:0,ti:0};
   $('#session').classList.add('on'); document.documentElement.style.overflow='hidden';
-  $('#sess-bar').style.width='0%'; $('#sess-count').textContent='';
+  $('#sess-count').textContent='';
+  showTeachCard();
+}
+function teachCards(L){
   const parts=[(L.verbs||[]).length&&(L.verbs.length+' verbs'),(L.vocab||[]).length&&(L.vocab.length+' words'),
     (L.nouns||[]).length&&(L.nouns.length+' nouns'),(L.adjs||[]).length&&(L.adjs.length+' adjectives')].filter(Boolean).join(' · ');
-  $('#sess-body').innerHTML=`<div class="qcard" style="text-align:start">
-      <div class="qkicker">Lesson</div>
-      <div style="font-size:21px;font-weight:700;margin:6px 0">${L.title} <span class="he" style="color:var(--accent)">${L.he||''}</span></div>
-      <p style="font-size:14.5px;margin:8px 0">${L.intro}</p>
-      <p class="muted" style="font-size:13px">${parts}. Flashcards first, then drills scoped to this lesson.</p>
-    </div>
-    <div class="sess-actions"><button class="btn wide" id="l-go">Let's go</button></div>`;
-  $('#l-go').addEventListener('click',nextLessonStage);
+  return [{h:L.title,heh:L.he,b:L.intro+(parts?`<br><span class="muted" style="font-size:13px">${parts} in this lesson.</span>`:'')},
+    ...(LESSON_TEACH[L.id]||[])];
+}
+function showTeachCard(){
+  const R=lessonRun; if(!R) return;
+  const cards=teachCards(R.L), c=cards[R.ti], last=R.ti>=cards.length-1;
+  $('#sess-bar').style.width=((R.ti+1)/(cards.length+1)*30)+'%';
+  let html=`<div class="qcard" style="text-align:start">
+      <div class="qkicker">Lesson${cards.length>1?' · page '+(R.ti+1)+' of '+cards.length:''}</div>
+      <div style="font-size:20px;font-weight:700;margin:6px 0">${c.h}${c.heh?' <span class="he" style="color:var(--accent)">'+c.heh+'</span>':''}</div>
+      <p style="font-size:14.5px;margin:8px 0">${c.b}</p>`;
+  if(c.tbl) html+=refTableFull(c.tbl.root,c.tbl.b);
+  if(c.ex) html+=`<div class="note"><span class="he" style="font-size:18px">${c.ex[0]}</span> <button class="spk" data-speak="${esc(c.ex[0])}">🔊</button><br><span class="muted" style="font-size:12.5px">${c.ex[1]}</span></div>`;
+  html+=`</div><div class="sess-actions">${R.ti>0?'<button class="btn ghost" id="l-back">Back</button>':''}<button class="btn grow" id="l-go">${last?"Let's go":'Next'}</button></div>`;
+  $('#sess-body').innerHTML=html;
+  const bk=$('#l-back'); if(bk) bk.addEventListener('click',()=>{R.ti--;showTeachCard();});
+  $('#l-go').addEventListener('click',()=>{ if(last) nextLessonStage(); else {R.ti++;showTeachCard();} });
 }
 function nextLessonStage(){
   if(!lessonRun) return;
