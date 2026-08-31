@@ -219,7 +219,9 @@ details.ref[open] summary .car{transform:rotate(90deg)}
       <div class="stat"><div class="n tnum" id="st-streak">–</div><div class="l">day streak</div></div>
       <div class="stat"><div class="n tnum" id="st-today">–</div><div class="l">today</div></div>
     </div>
-    <h2 class="sec">Focus</h2>
+    <h2 class="sec">Lessons</h2>
+    <div class="stack" id="lessons-root"></div>
+    <h2 class="sec">Free play — focus</h2>
     <div class="chips" id="binyan-chips"></div>
     <h2 class="sec">Practice</h2>
     <div class="stack">
@@ -700,6 +702,59 @@ const ADJS=[
  {id:'a_ayef',ms:'עָיֵף',fs:'עֲיֵפָה',mp:'עֲיֵפִים',fp:'עֲיֵפוֹת',en:'tired'}
 ];
 const AGREE_PRONOUNS={ms:{he:'הוּא',en:'he'},fs:{he:'הִיא',en:'she'},mp:{he:'הֵם',en:'they (m)'},fp:{he:'הֵן',en:'they (f)'}};
+
+/* ===== curriculum: a lesson is a set of stable ids + an optional tense scope.
+   Completion is DERIVED from the event log & SRS — no lesson progress state. */
+const LESSONS=[
+ {id:'L1',title:"First steps — Pa'al present",he:'הֹוֶה',sub:'The everyday tense of everyday verbs',
+  intro:"Pa'al is the plainest binyan, and the present tense has only four forms — masculine/feminine, singular/plural. Person comes from context: אֲנִי כּוֹתֵב, הִיא כּוֹתֶבֶת.",
+  verbs:['ktv1','sgr1','pgsh1','bdk1'],tenses:['present'],
+  vocab:['hayom','akhshav','toda','bevakasha','slikha','sheela','tshuva','tov']},
+ {id:'L2',title:"Pa'al past",he:'עָבָר',sub:'Suffixes carry the person',
+  intro:"The past tense builds on suffixes: ־תִּי for I, ־תָּ for you, ־נוּ for we. כָּתַבְתִּי — one word says who and when.",
+  verbs:['ktv1','sgr1','zkr1','shmr1','gmr1'],tenses:['past'],
+  vocab:['etmol','shana','shavua','yom','layla','boker','erev']},
+ {id:'L3',title:"Pa'al future",he:'עָתִיד',sub:'Prefixes take over',
+  intro:"The future flips the logic: prefixes mark the person — אֶכְתֹּב, תִּכְתֹּב, יִכְתֹּב, נִכְתֹּב. Note that הוּא and אַתָּה share a form.",
+  verbs:['ktv1','sgr1','gmr1','khshv1','spr1'],tenses:['future'],
+  vocab:['makhar','zman','ulay','tamid']},
+ {id:'L4',title:"Pi'el — speak, teach, tell",he:'פִּעֵל',sub:'The strengthened middle letter',
+  intro:"Pi'el doubles its middle root letter (that dagesh in דִּבֵּר) and opens the present with מְ. Many everyday communication verbs live here.",
+  verbs:['dbr2','bksh2','spr2','lmd2','kbl2'],
+  vocab:['mila','safa','shiur','sefer']},
+ {id:'L5',title:'Around the house',he:'הַבַּיִת',sub:'Home vocab + paying & cooking',
+  intro:"Topical break: the rooms and furniture you live with, plus the Pi'el verbs for cooking and paying.",
+  verbs:['bshl2','shlm2'],
+  vocab:['delet','khalon','mita','shulkhan','kise','mitbakh','kheder','mafteakh'],
+  nouns:['n_bayit','n_shulchan','n_chalon'],adjs:['a_gadol','a_katan']},
+ {id:'L6',title:"Hif'il — making it happen",he:'הִפְעִיל',sub:'The causative binyan',
+  intro:"Hif'il makes someone or something do: הִדְלִיק turned on, הִסְבִּיר explained (made clear), הִתְחִיל began.",
+  verbs:['zmn5','dlk5','psk5','sbr5','rgsh5','tkhl5'],
+  vocab:['avoda','kesef']},
+ {id:'L7',title:"Hitpa'el — reflexives & romance",he:'הִתְפַּעֵל',sub:'Doing it to (or with) yourself',
+  intro:"Hitpa'el is reflexive or mutual: הִתְלַבֵּשׁ got dressed, הִתְקַשֵּׁר called, הִתְחַתֵּן got married. The הִתְ prefix survives every tense.",
+  verbs:['lbsh7','rgsh7','kshr7','khtn7','htnhg7'],
+  vocab:['ahava','neshika','pgisha','kesher','khatuna','zug']},
+ {id:'L8',title:'Food & cooking',he:'אֹכֶל',sub:'Eat your way through the vocab',
+  intro:"Everything for the kitchen and the table — plus אָכַל, the פ״א irregular whose future is יֹאכַל.",
+  verbs:['bshl2','akhal'],
+  vocab:['lekhem','gvina','beytsa','basar','dag','mits','kafe','khalav','tapuakh','melakh'],
+  nouns:['n_beitsa','n_kos'],adjs:['a_tov']},
+ {id:'L9',title:'Irregular heavyweights',he:'חֲרִיגִים',sub:'The verbs you cannot avoid',
+  intro:"The most common verbs are the least regular: עשה, רצה, היה, הלך, ידע, נתן, לקח, בא. Each has its own trick — the Reference tab explains every one.",
+  verbs:['asa','ratsa','haya','halakh','yada','natan','lakakh','ba']},
+ {id:'L10',title:'Nouns & agreement',he:'הַתְאָמָה',sub:'Gender, plurals, matching adjectives',
+  intro:"Every noun has a gender, adjectives must match it, and the irregular plurals (אִשָּׁה → נָשִׁים, עִיר → עָרִים) simply have to be learned.",
+  nouns:['n_ish','n_isha','n_yeled','n_yalda','n_ir','n_layla','n_mila','n_derech'],
+  adjs:['a_yafe','a_chadash','a_yashan','a_kal','a_chacham','a_ayef']},
+ {id:'L11',title:'Nature & the weekend',he:'טֶבַע',sub:'Getting up, out, and about',
+  intro:"קָם gets up and שָׂם puts — two verbs whose weak middle letter vanishes — plus the outdoors vocabulary.",
+  verbs:['kam','sam'],
+  vocab:['ets','perakh','yam','har','shemesh','geshem','ruakh','kelev','khatul','tsipor']},
+ {id:'L12',title:"Nif'al & the passives",he:'נִפְעַל',sub:'When things happen to you',
+  intro:"Nif'al covers passives and happenings: נִכְנַס entered, נִפְגַּשׁ met, נִשְׁבַּר broke. The נ hides as a dagesh in the future.",
+  verbs:['kns3','pgsh3','zkr3','shbr3','nafal']}
+];
 const SENTENCES=[
  {pre:'מָחָר אֲנִי',post:'מִכְתָּב לְסָבְתָא.',en:'Tomorrow I will write a letter to grandma.',v:'ktv1',t:'future',p:'p1s'},
  {pre:'אֶתְמוֹל הִיא',post:'אֶת הַדֶּלֶת.',en:'Yesterday she closed the door.',v:'sgr1',t:'past',p:'p3fs'},
@@ -800,6 +855,7 @@ const ALL_VERBS=[
   ...EXPLICIT_VERBS.map(v=>({id:v.id,b:v.b,root:v.root,en:v.en,tr:v.tr,giz:v.giz,note:v.note,forms:v.f,lemma:v.f.past.p3ms}))
 ];
 const VERB_BY_ID=Object.fromEntries(ALL_VERBS.map(v=>[v.id,v]));
+const VOCAB_BY_ID=Object.fromEntries(VOCAB_SEED.map(w=>[w.id,w]));
 
 function allForms(v){
   const out=[];
@@ -834,7 +890,7 @@ function acceptedAnswers(v,t,p){
 /* ===== state & persistence ===== */
 const todayStr=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
 const dayDiff=(a,b)=>Math.round((new Date(b)-new Date(a))/864e5);
-let state={srs:{},custom:[],log:[],stats:{streak:0,lastDay:null,days:{},totalReviews:0,totalCorrect:0,longestStreak:0},ver:2};
+let state={srs:{},custom:[],log:[],stats:{streak:0,lastDay:null,days:{},totalReviews:0,totalCorrect:0,longestStreak:0},lessons:{started:[]},ver:3};
 let DBdoc=null, saveTimer=null;
 const badge=t=>{const el=document.getElementById('savebadge'); if(el) el.textContent=t;};
 
@@ -859,11 +915,18 @@ function migrateObj(o){
     }
     o.srs=srs2;
   }
+  if((o.ver||1)<3){
+    for(const k in o.srs){
+      const e=o.srs[k];
+      if(e&&e.box!=null) o.srs[k]={ef:2.5,ivl:INTERVALS[e.box]||0,due:e.due||todayStr(),lapses:0,reps:e.box||0};
+    }
+  }
   if(!Array.isArray(o.log)) o.log=[];
+  if(!o.lessons||!Array.isArray(o.lessons.started)) o.lessons={started:[]};
   st.days=st.days||{};
   st.totalReviews=st.totalReviews||0; st.totalCorrect=st.totalCorrect||0;
   st.longestStreak=Math.max(st.longestStreak||0,st.streak||0);
-  o.ver=2;
+  o.ver=3;
   return o;
 }
 function migrate(){ migrateObj(state); }
@@ -890,7 +953,8 @@ function mergeStates(a,b){
   out.stats.lastDay=[sa.lastDay,sb.lastDay].filter(Boolean).sort().pop()||null;
   out.stats.days={...sb.days,...sa.days};
   for(const d in sb.days) out.stats.days[d]=Math.max(sa.days[d]||0,sb.days[d]);
-  out.ver=2;
+  out.lessons={started:[...new Set([...a.lessons.started,...b.lessons.started])]};
+  out.ver=3;
   return out;
 }
 function persist(){
@@ -921,6 +985,10 @@ function logAttempt(vid,t,p,ok,mode,extra){
   state.log.push(e);
   if(state.log.length>LOG_CAP) state.log=state.log.slice(-LOG_CAP);
   bumpTotals(ok);
+  if(!ok){
+    const card=state.srs['verb_'+vid];
+    if(card&&card.due>todayStr()) card.due=todayStr();
+  }
   persist();
 }
 /* recency-weighted accuracy per (verb|tense|person) cell — newest attempts count most */
@@ -981,7 +1049,7 @@ function bumpActivity(n){
 }
 
 /* ===== SRS ===== */
-const INTERVALS=[0,1,3,7,14,30,60];
+const INTERVALS=[0,1,3,7,14,30,60]; /* legacy Leitner ladder, kept for v2->v3 migration */
 function cardPool(){
   const pool=[];
   VOCAB_SEED.forEach(w=>pool.push({id:'v'+w.id,kind:'vocab',w}));
@@ -989,21 +1057,52 @@ function cardPool(){
   ALL_VERBS.forEach(v=>pool.push({id:'verb_'+v.id,kind:'verb',v}));
   return pool;
 }
+/* fresh cards enter the deck through lessons: once any lesson is started,
+   introduction is limited to started lessons' items (custom words always flow) */
+function startedLessonCardIds(){
+  const s=new Set();
+  for(const L of LESSONS){
+    if(!state.lessons.started.includes(L.id)) continue;
+    (L.vocab||[]).forEach(id=>s.add('v'+id));
+    (L.verbs||[]).forEach(id=>s.add('verb_'+id));
+  }
+  return s;
+}
 function dueCards(){
   const today=todayStr(); const due=[],fresh=[];
+  const allow=state.lessons.started.length?startedLessonCardIds():null;
   for(const c of cardPool()){
     const e=state.srs[c.id];
-    if(!e) fresh.push(c);
+    if(!e){ if(!allow||allow.has(c.id)||c.id[0]==='c') fresh.push(c); }
     else if(e.due<=today) due.push(c);
   }
   return due.concat(fresh.slice(0,10)).slice(0,20);
 }
 function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');}
+/* SM-2 (Anki-style): per-card ease factor, multiplicative intervals.
+   0 again: lapse, ease -0.2, relearn today · 1 good: ivl x ease
+   2 easy: ease +0.15, ivl x ease x 1.3 · intervals capped at a year */
 function gradeCard(id,g){
-  const e=state.srs[id]||{box:0};
-  e.box=g===0?0:Math.min(e.box+(g===2?2:1),INTERVALS.length-1);
-  e.due=addDays(todayStr(),INTERVALS[e.box]);
+  const e=state.srs[id]||{ef:2.5,ivl:0,lapses:0,reps:0};
+  if(e.box!=null){ e.ef=2.5; e.ivl=INTERVALS[e.box]||0; e.lapses=0; e.reps=e.box||0; delete e.box; }
+  if(g===0){
+    e.lapses=(e.lapses||0)+1;
+    e.ef=Math.max(1.3,(e.ef||2.5)-0.2);
+    e.ivl=0;
+  }else if(g===1){
+    e.ivl=e.ivl<1?1:Math.min(365,Math.round(e.ivl*e.ef));
+  }else{
+    e.ef=Math.min(3,(e.ef||2.5)+0.15);
+    e.ivl=e.ivl<1?3:Math.min(365,Math.round(e.ivl*e.ef*1.3));
+  }
+  e.reps=(e.reps||0)+1;
+  e.due=addDays(todayStr(),e.ivl);
   state.srs[id]=e; bumpTotals(g>0); persist();
+}
+function nextIvls(e){
+  const ef=(e&&e.ef)||2.5, ivl=(e&&e.ivl)||0;
+  const fmt=d=>d<1?'today':d===1?'1 day':d+' days';
+  return {good:fmt(ivl<1?1:Math.min(365,Math.round(ivl*ef))),easy:fmt(ivl<1?3:Math.min(365,Math.round(ivl*ef*1.3)))};
 }
 
 /* ===== helpers ===== */
@@ -1042,8 +1141,16 @@ function quizVerbs(){
    get an exploration bonus, mastered cells stay warm but rare */
 function pickWeighted(n){
   const skill=skillCells(), cells=[];
-  for(const v of quizVerbs())
-    for(const t of ['past','present','future']){
+  let verbs=quizVerbs(), tenses=['past','present','future'];
+  if(sessScope){
+    if(sessScope.verbs&&sessScope.verbs.length){
+      const sv=ALL_VERBS.filter(v=>sessScope.verbs.includes(v.id));
+      if(sv.length) verbs=sv;
+    }
+    if(sessScope.tenses&&sessScope.tenses.length) tenses=sessScope.tenses;
+  }
+  for(const v of verbs)
+    for(const t of tenses){
       if(!v.forms[t]) continue;
       for(const p in v.forms[t]){
         const s=skill[v.id+'|'+t+'|'+p];
@@ -1062,21 +1169,24 @@ function pickWeighted(n){
 
 /* ===== session runner ===== */
 const sess={items:[],i:0,right:0,mode:null};
+let lessonRun=null, sessScope=null;
 function openSession(mode){
   sess.mode=mode; sess.i=0; sess.right=0;
+  sessScope=lessonRun?lessonRun.L:null;
   if(mode==='mcq'||mode==='type'||mode==='listen'){
     sess.items=pickWeighted(10);
   }else if(mode==='na'){
     sess.items=buildNaItems(10);
   }else if(mode==='cloze'){
-    sess.items=shuffle(SENTENCES).slice(0,10);
+    const pool=sessScope&&sessScope.verbs?SENTENCES.filter(s=>sessScope.verbs.includes(s.v)):SENTENCES;
+    sess.items=shuffle(pool.length?pool:SENTENCES).slice(0,10);
   }else{
     sess.items=shuffle(EXCEPTIONS).slice(0,10);
   }
   $('#session').classList.add('on'); document.documentElement.style.overflow='hidden';
   renderQuestion();
 }
-function closeSession(){ $('#session').classList.remove('on'); document.documentElement.style.overflow=''; renderStats(); }
+function closeSession(){ lessonRun=null; sessScope=null; $('#session').classList.remove('on'); document.documentElement.style.overflow=''; renderStats(); renderLessons(); }
 $('#sess-quit').addEventListener('click',closeSession);
 
 function sessHead(){
@@ -1087,6 +1197,20 @@ function finishSession(){
   $('#sess-bar').style.width='100%'; $('#sess-count').textContent='';
   const pct=Math.round(sess.right/sess.items.length*100);
   const word=pct===100?'מְצֻיָּן!':pct>=70?'כָּל הַכָּבוֹד!':'עוֹד פַּעַם?';
+  if(lessonRun){
+    const more=lessonRun.i<lessonRun.stages.length;
+    $('#sess-body').innerHTML=`<div class="sess-done">
+      <div class="big he">${word}</div><h3>${sess.right} of ${sess.items.length}</h3>
+      <p class="muted">${more?'Stage '+lessonRun.i+' of '+lessonRun.stages.length+' done.':'Lesson round complete!'}</p>
+      <div class="sess-actions" style="max-width:340px;margin:18px auto 0">
+        <button class="btn ghost" id="d-close">Stop</button>
+        <button class="btn" id="d-next">${more?'Continue':'Finish'}</button>
+      </div></div>`;
+    $('#d-close').addEventListener('click',closeSession);
+    $('#d-next').addEventListener('click',nextLessonStage);
+    bumpActivity(sess.items.length);
+    return;
+  }
   const sub=pct===100?'Perfect round.':pct>=70?'Nice work — keep the streak going.':'Tough round — the reference tab is your friend.';
   $('#sess-body').innerHTML=`<div class="sess-done">
     <div class="big he">${word}</div><h3>${sess.right} of ${sess.items.length}</h3>
@@ -1315,12 +1439,20 @@ function renderListen(it,body){
 
 /* nouns & adjectives: plurals, gender, agreement */
 function buildNaItems(n){
+  let NS=NOUNS, AS=ADJS;
+  if(sessScope){
+    if(sessScope.nouns&&sessScope.nouns.length) NS=NOUNS.filter(x=>sessScope.nouns.includes(x.id));
+    if(sessScope.adjs&&sessScope.adjs.length) AS=ADJS.filter(x=>sessScope.adjs.includes(x.id));
+    if(sessScope.nouns&&!sessScope.nouns.length) NS=[];
+    if(sessScope.adjs&&!sessScope.adjs.length) AS=[];
+    if(!NS.length&&!AS.length){ NS=NOUNS; AS=ADJS; }
+  }
   const items=[];
   for(let i=0;i<n;i++){
     const r=Math.random();
-    if(r<0.4) items.push({kind:'plural',w:pick(NOUNS)});
-    else if(r<0.65) items.push({kind:'gender',w:pick(NOUNS)});
-    else items.push({kind:'agree',a:pick(ADJS),f:pick(['ms','fs','mp','fp'])});
+    if(NS.length&&(!AS.length||r<0.4)) items.push({kind:'plural',w:pick(NS)});
+    else if(NS.length&&(!AS.length||r<0.65)) items.push({kind:'gender',w:pick(NS)});
+    else items.push({kind:'agree',a:pick(AS),f:pick(['ms','fs','mp','fp'])});
   }
   return items;
 }
@@ -1363,7 +1495,98 @@ function renderNa(it,body){
   }));
 }
 
-document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>openSession(b.dataset.mode)));
+/* ===== lesson driver: intro -> flashcards -> scoped drills ===== */
+function startLesson(L){
+  if(!state.lessons.started.includes(L.id)){ state.lessons.started.push(L.id); persist(); }
+  const stages=[];
+  if((L.vocab&&L.vocab.length)||(L.verbs&&L.verbs.length)) stages.push('flash');
+  if(L.verbs&&L.verbs.length){ stages.push('mcq'); stages.push('type'); }
+  const sents=SENTENCES.filter(s=>(L.verbs||[]).includes(s.v));
+  if(sents.length) stages.push('cloze');
+  if((L.nouns&&L.nouns.length)||(L.adjs&&L.adjs.length)) stages.push('na');
+  lessonRun={L,stages,i:0};
+  $('#session').classList.add('on'); document.documentElement.style.overflow='hidden';
+  $('#sess-bar').style.width='0%'; $('#sess-count').textContent='';
+  const parts=[(L.verbs||[]).length&&(L.verbs.length+' verbs'),(L.vocab||[]).length&&(L.vocab.length+' words'),
+    (L.nouns||[]).length&&(L.nouns.length+' nouns'),(L.adjs||[]).length&&(L.adjs.length+' adjectives')].filter(Boolean).join(' · ');
+  $('#sess-body').innerHTML=`<div class="qcard" style="text-align:start">
+      <div class="qkicker">Lesson</div>
+      <div style="font-size:21px;font-weight:700;margin:6px 0">${L.title} <span class="he" style="color:var(--accent)">${L.he||''}</span></div>
+      <p style="font-size:14.5px;margin:8px 0">${L.intro}</p>
+      <p class="muted" style="font-size:13px">${parts}. Flashcards first, then drills scoped to this lesson.</p>
+    </div>
+    <div class="sess-actions"><button class="btn wide" id="l-go">Let's go</button></div>`;
+  $('#l-go').addEventListener('click',nextLessonStage);
+}
+function nextLessonStage(){
+  if(!lessonRun) return;
+  if(lessonRun.i>=lessonRun.stages.length){ closeSession(); return; }
+  const st=lessonRun.stages[lessonRun.i++];
+  if(st==='flash') startLessonFlash();
+  else openSession(st);
+}
+function startLessonFlash(){
+  const L=lessonRun.L, cards=[];
+  (L.vocab||[]).forEach(id=>{const w=VOCAB_BY_ID[id]; if(w) cards.push({id:'v'+id,kind:'vocab',w});});
+  (L.verbs||[]).forEach(id=>{const v=VERB_BY_ID[id]; if(v) cards.push({id:'verb_'+id,kind:'verb',v});});
+  if(!cards.length) return nextLessonStage();
+  deck=shuffle(cards); deckRedo=[]; deckI=0;
+  sess.mode='flash';
+  renderFlash();
+}
+/* lesson completion is derived: verbs need >=6 attempts at >=75% weighted
+   accuracy in the lesson's tenses; vocab graduates at interval >=3 days;
+   nouns/adjs need >=2 attempts at >=70% */
+function lessonProgress(L,skill){
+  let done=0,total=0;
+  for(const vid of (L.verbs||[])){ total++;
+    const v=VERB_BY_ID[vid]; if(!v) continue;
+    let n=0,accSum=0,cells=0;
+    for(const t of (L.tenses||['past','present','future'])){
+      if(!v.forms[t]) continue;
+      for(const p in v.forms[t]){
+        const s=skill[vid+'|'+t+'|'+p];
+        if(s){ n+=s.n; accSum+=s.acc; cells++; }
+      }
+    }
+    if(n>=6&&cells&&accSum/cells>=0.75) done++;
+  }
+  for(const wid of (L.vocab||[])){ total++;
+    const e=state.srs['v'+wid];
+    if(e&&(e.ivl||0)>=3) done++;
+  }
+  for(const nid of (L.nouns||[])){ total++;
+    let n=0,a=0,c=0;
+    for(const t of ['plural','gender']){ const s=skill[nid+'|'+t+'|-']; if(s){n+=s.n;a+=s.acc;c++;} }
+    if(n>=2&&c&&a/c>=0.7) done++;
+  }
+  for(const aid of (L.adjs||[])){ total++;
+    let n=0,a=0,c=0;
+    for(const f of ['ms','fs','mp','fp']){ const s=skill[aid+'|agree|'+f]; if(s){n+=s.n;a+=s.acc;c++;} }
+    if(n>=2&&c&&a/c>=0.7) done++;
+  }
+  return {done,total,pct:total?Math.round(done/total*100):0};
+}
+function renderLessons(){
+  const root=document.getElementById('lessons-root'); if(!root) return;
+  const skill=skillCells();
+  root.innerHTML=LESSONS.map((L,i)=>{
+    const pr=lessonProgress(L,skill);
+    const full=pr.total&&pr.done===pr.total;
+    const started=state.lessons.started.includes(L.id);
+    const pill=full?'<span class="pill" style="background:var(--good-soft);color:var(--good)">✓</span>'
+      :started?`<span class="pill acc">${pr.pct}%</span>`
+      :'<span class="pill">new</span>';
+    return `<button class="mode lesson-btn" data-lesson="${L.id}">
+      <span class="glyph" style="font-size:16px;font-family:'Heebo',sans-serif">${i+1}</span>
+      <span class="grow"><b>${L.title}</b><span class="d">${L.sub||''}</span></span>${pill}</button>`;
+  }).join('');
+  root.querySelectorAll('.lesson-btn').forEach(b=>b.addEventListener('click',()=>{
+    const L=LESSONS.find(x=>x.id===b.dataset.lesson); if(L) startLesson(L);
+  }));
+}
+
+document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>{if(!b.dataset.lesson)openSession(b.dataset.mode);}));
 /* ===== flashcards ===== */
 let deck=[],deckI=0,deckRedo=[];
 $('#cards-start').addEventListener('click',()=>{
@@ -1376,6 +1599,14 @@ function renderFlash(){
   if(deckI>=deck.length){
     if(deckRedo.length){deck=shuffle(deckRedo);deckRedo=[];deckI=0;}
     else{
+      if(lessonRun){
+        $('#sess-body').innerHTML=`<div class="sess-done"><div class="big he">סִיַּמְתָּ!</div>
+          <h3>Cards done</h3><p class="muted">Now drill those forms.</p>
+          <div class="sess-actions" style="max-width:280px;margin:18px auto 0">
+          <button class="btn wide" id="d-next">Continue</button></div></div>`;
+        $('#sess-bar').style.width='100%'; $('#sess-count').textContent='';
+        $('#d-next').addEventListener('click',nextLessonStage); return;
+      }
       $('#sess-body').innerHTML=`<div class="sess-done"><div class="big he">סִיַּמְתָּ!</div>
         <h3>Deck clear</h3><p class="muted">Come back tomorrow — spaced repetition does the rest.</p>
         <div class="sess-actions" style="max-width:280px;margin:18px auto 0">
@@ -1387,6 +1618,7 @@ function renderFlash(){
   $('#sess-bar').style.width=(deckI/deck.length*100)+'%';
   $('#sess-count').textContent=(deckI+1)+' / '+deck.length;
   const c=deck[deckI];
+  const iv=nextIvls(state.srs[c.id]);
   const front=c.kind==='vocab'?c.w.he:c.v.lemma;
   const kick=c.kind==='vocab'?'Vocabulary':BINYANIM[c.v.b].name+' · <span class="he">'+esc(c.v.root)+'</span>';
   $('#sess-body').innerHTML=`<div class="flash">
@@ -1396,9 +1628,9 @@ function renderFlash(){
       <div class="back" id="f-back" hidden></div>
       <button class="btn ghost" id="f-flip" style="margin-top:8px">Show answer</button>
     </div><div class="grade" id="f-grade" hidden>
-      <button class="again">Again<small>right now</small></button>
-      <button class="good">Good<small>soon-ish</small></button>
-      <button class="easy">Easy<small>much later</small></button>
+      <button class="again">Again<small>today</small></button>
+      <button class="good">Good<small>${iv.good}</small></button>
+      <button class="easy">Easy<small>${iv.easy}</small></button>
     </div>`;
   $('#f-flip').addEventListener('click',()=>{
     const back=$('#f-back'); back.hidden=false;
@@ -1606,7 +1838,7 @@ function renderStats(){
     lifeEl.textContent=tr?`${tr} answers all time · ${Math.round(tc/tr*100)}% correct · longest streak ${ls} day${ls===1?'':'s'}`+(latn?` · avg answer ${(lats/latn/1000).toFixed(1)}s`:''):'No answers yet.';
   }
 }
-function renderAll(){ renderStats(); renderVocab(); }
+function renderAll(){ renderStats(); renderVocab(); renderLessons(); }
 (function(){
   const d=new Date();
   $('#daymark').textContent=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
