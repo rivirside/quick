@@ -204,6 +204,9 @@ details.ref[open] summary .car{transform:rotate(90deg)}
 .bstat-bar{height:100%;border-radius:6px;transition:width .3s ease}
 .bstat-pct{font-size:12px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
 .cat-label{font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:14px 2px 6px}
+.segs{display:flex;background:var(--surface2);border-radius:12px;padding:3px;margin-bottom:14px}
+.segs button{flex:1;padding:8px;border-radius:9px;font-size:13px;font-weight:600;color:var(--muted)}
+.segs button.on{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
 .tiles{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;direction:rtl;margin-top:14px;min-height:44px}
 .tile{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;font-size:20px;font-family:'David Libre',serif;box-shadow:var(--shadow)}
 .tile:active{transform:scale(.95)}
@@ -266,67 +269,88 @@ details.ref[open] summary .car{transform:rotate(90deg)}
     </div>
   </header>
 
-  <section class="screen on" id="tab-practice">
+  <section class="screen on" id="tab-home">
     <div class="statstrip">
       <div class="stat"><div class="n tnum" id="st-due">–</div><div class="l">cards due</div></div>
       <div class="stat"><div class="n tnum" id="st-streak">–</div><div class="l">day streak</div></div>
       <div class="stat"><div class="n tnum" id="st-today">–</div><div class="l">today</div></div>
     </div>
     <div id="onboard-root"></div>
-    <div id="hero-root" style="margin-top:16px"></div>
-    <h2 class="sec">Lessons</h2>
-    <div class="stack" id="lessons-root"></div>
-    <h2 class="sec">Games</h2>
-    <div class="ggrid">
-      <button class="gtile" data-mode="mcq"><span class="glyph">אָ</span><b>Quiz</b><span class="d">Pick the right form</span></button>
-      <button class="gtile" data-mode="type"><span class="glyph">⌨</span><b>Type it</b><span class="d">Produce the form</span></button>
-      <button class="gtile" data-mode="cloze"><span class="glyph">…</span><b>Sentences</b><span class="d">Fill the blank</span></button>
-      <button class="gtile" data-mode="order"><span class="glyph">⇄</span><b>Word order</b><span class="d">Rebuild from tiles</span></button>
-      <button class="gtile" data-mode="listen"><span class="glyph">🔊</span><b>Dictation</b><span class="d">Type what you hear</span></button>
-      <button class="gtile" data-mode="ear"><span class="glyph">👂</span><b>Sharp ear</b><span class="d">Spot the heard form</span></button>
-      <button class="gtile" data-mode="vocab"><span class="glyph">✎</span><b>Vocab recall</b><span class="d">English → Hebrew</span></button>
-      <button class="gtile" data-mode="roots"><span class="glyph">שׁ</span><b>Root families</b><span class="d">One root, 7 binyanim</span></button>
-      <button class="gtile" data-mode="na"><span class="glyph">ה</span><b>Nouns &amp; adj</b><span class="d">Plurals &amp; agreement</span></button>
-      <button class="gtile" data-mode="num"><span class="glyph">3</span><b>Numbers</b><span class="d">Gendered numerals</span></button>
-      <button class="gtile" data-mode="exc"><span class="glyph">!</span><b>Rules</b><span class="d">Exceptions &amp; patterns</span></button>
-      <button class="gtile" data-mode="spell"><span class="glyph">אב</span><b>Spelling</b><span class="d">ב or ו? ח or כ?</span></button>
-      <button class="gtile" data-mode="prep"><span class="glyph">לִי</span><b>Little words</b><span class="d">יש לי, שלי, איתך…</span></button>
-      <button class="gtile" data-mode="speed"><span class="glyph">⚡</span><b>Speed round</b><span class="d">60-second sprint</span></button>
-      <button class="gtile" data-mode="level" style="grid-column:1/-1;flex-direction:row;align-items:center"><span class="glyph">✓</span><span><b>Level check</b><span class="d" style="display:block">3 minutes — where are you right now?</span></span></button>
-    </div>
-    <details class="ref" style="margin-top:12px">
-      <summary><b style="font-size:14px">Focus on one binyan</b><span class="car">›</span></summary>
-      <div class="refbody" style="padding-top:4px"><div class="chips" id="binyan-chips"></div></div>
-    </details>
-    <h2 class="sec">AI tutor</h2>
-    <div id="ai-root"></div>
-  </section>
-
-  <section class="screen" id="tab-cards">
-    <div class="card" id="cards-home">
-      <b style="font-size:17px">Flashcards</b>
-      <p class="muted" id="cards-due-line" style="margin:6px 0 14px"></p>
-      <button class="btn wide" id="cards-start">Start review</button>
-      <p class="muted" style="margin:10px 0 0;font-size:13px">Cards you miss come back sooner; cards you know drift further out.</p>
-    </div>
-  </section>
-
-  <section class="screen" id="tab-reference">
-    <div class="stack" id="ref-root"></div>
-  </section>
-
-  <section class="screen" id="tab-vocab">
-    <div class="card">
-      <b style="font-size:16px">Add a word</b>
-      <div class="addform" style="margin-top:10px">
-        <input class="hein" id="add-he" placeholder="Hebrew — עברית" autocomplete="off">
-        <input id="add-en" placeholder="Meaning" autocomplete="off">
-        <input id="add-tr" placeholder="Transliteration (optional)" autocomplete="off">
-        <button class="btn" id="add-btn">Add to my vocab</button>
+    <div id="hero-root" style="margin-top:14px"></div>
+    <div class="card" id="cards-home" style="margin-top:12px;padding:13px 16px">
+      <div class="row">
+        <span class="grow" style="min-width:0"><b style="font-size:15px">Review deck</b>
+          <span class="muted" id="cards-due-line" style="display:block;font-size:12.5px"></span></span>
+        <button class="btn" id="cards-start" style="flex:none;padding:9px 18px">Review</button>
       </div>
     </div>
-    <h2 class="sec">Browse</h2>
-    <input class="search" id="vsearch" placeholder="Search Hebrew or English…">
+    <div id="home-lesson" style="margin-top:12px"></div>
+  </section>
+
+  <section class="screen" id="tab-learn">
+    <div class="segs" id="learn-segs">
+      <button data-seg="lessons" class="on">Lessons</button>
+      <button data-seg="games">Games</button>
+      <button data-seg="grammar">Grammar</button>
+    </div>
+    <div id="seg-lessons">
+      <div class="stack" id="lessons-root"></div>
+    </div>
+    <div id="seg-games" hidden>
+      <h2 class="sec" style="margin-top:2px">Verbs</h2>
+      <div class="ggrid">
+        <button class="gtile" data-mode="mcq"><span class="glyph">אָ</span><b>Quiz</b><span class="d">Pick the right form</span></button>
+        <button class="gtile" data-mode="type"><span class="glyph">⌨</span><b>Type it</b><span class="d">Produce the form</span></button>
+        <button class="gtile" data-mode="cloze"><span class="glyph">…</span><b>Sentences</b><span class="d">Fill the blank</span></button>
+        <button class="gtile" data-mode="order"><span class="glyph">⇄</span><b>Word order</b><span class="d">Rebuild from tiles</span></button>
+        <button class="gtile" data-mode="listen"><span class="glyph">🔊</span><b>Dictation</b><span class="d">Type what you hear</span></button>
+        <button class="gtile" data-mode="ear"><span class="glyph">👂</span><b>Sharp ear</b><span class="d">Spot the heard form</span></button>
+        <button class="gtile" data-mode="roots"><span class="glyph">שׁ</span><b>Root families</b><span class="d">One root, 7 binyanim</span></button>
+        <button class="gtile" data-mode="speed"><span class="glyph">⚡</span><b>Speed round</b><span class="d">60-second sprint</span></button>
+      </div>
+      <h2 class="sec">Words</h2>
+      <div class="ggrid">
+        <button class="gtile" data-mode="vocab"><span class="glyph">✎</span><b>Vocab recall</b><span class="d">English → Hebrew</span></button>
+        <button class="gtile" data-mode="spell"><span class="glyph">אב</span><b>Spelling</b><span class="d">ב or ו? ח or כ?</span></button>
+      </div>
+      <h2 class="sec">Building blocks</h2>
+      <div class="ggrid">
+        <button class="gtile" data-mode="na"><span class="glyph">ה</span><b>Nouns &amp; adj</b><span class="d">Plurals &amp; agreement</span></button>
+        <button class="gtile" data-mode="num"><span class="glyph">3</span><b>Numbers</b><span class="d">Gendered numerals</span></button>
+        <button class="gtile" data-mode="prep"><span class="glyph">לִי</span><b>Little words</b><span class="d">יש לי, שלי, איתך…</span></button>
+        <button class="gtile" data-mode="exc"><span class="glyph">!</span><b>Rules</b><span class="d">Exceptions &amp; patterns</span></button>
+      </div>
+      <details class="ref" style="margin-top:14px">
+        <summary><b style="font-size:14px">Focus on one binyan</b><span class="car">›</span></summary>
+        <div class="refbody" style="padding-top:4px"><div class="chips" id="binyan-chips"></div></div>
+      </details>
+      <h2 class="sec">AI tutor</h2>
+      <div id="ai-root"></div>
+      <div style="margin-top:14px">
+        <button class="gtile" data-mode="level" style="width:100%;flex-direction:row;align-items:center"><span class="glyph">✓</span><span><b>Level check</b><span class="d" style="display:block">3 minutes — where are you right now?</span></span></button>
+      </div>
+    </div>
+    <div id="seg-grammar" hidden>
+      <div class="stack" id="ref-root"></div>
+    </div>
+  </section>
+
+  <section class="screen" id="tab-words">
+    <input class="search" id="vsearch" placeholder="Search Hebrew, English, or literal…">
+    <div class="row" style="margin-bottom:12px;gap:8px;align-items:stretch">
+      <details class="ref grow">
+        <summary style="padding:10px 14px"><b style="font-size:13.5px">＋ Add a word</b><span class="car">›</span></summary>
+        <div class="refbody" style="padding-top:2px">
+          <div class="addform">
+            <input class="hein" id="add-he" placeholder="Hebrew — עברית" autocomplete="off">
+            <input id="add-en" placeholder="Meaning" autocomplete="off">
+            <input id="add-tr" placeholder="Transliteration (optional)" autocomplete="off">
+            <button class="btn" id="add-btn">Add to my vocab</button>
+          </div>
+        </div>
+      </details>
+      <button class="chip" id="sweep-btn2" style="flex:none;padding:0 14px" title="Mark words you already know">✓ Sweep</button>
+    </div>
     <div class="stack" id="vocab-list"></div>
   </section>
 
@@ -351,16 +375,16 @@ details.ref[open] summary .car{transform:rotate(90deg)}
   <section class="screen" id="tab-stats">
     <h2 class="sec">Calendar</h2>
     <div class="card" id="cal-root"></div>
+    <h2 class="sec">Forms to drill</h2>
+    <div class="card" id="weak-root"><p class="muted" style="font-size:14px">Answer a few quiz questions and your shakiest forms will surface here.</p></div>
+    <h2 class="sec">Review load — next 7 days</h2>
+    <div class="card" id="fstat-root"></div>
     <h2 class="sec">Your level</h2>
     <div class="card" id="level-root"></div>
     <h2 class="sec">Vocabulary</h2>
     <div class="card" id="vstat-root"></div>
-    <h2 class="sec">Review load — next 7 days</h2>
-    <div class="card" id="fstat-root"></div>
     <h2 class="sec">Card maturity</h2>
     <div class="card" id="matstat-root"></div>
-    <h2 class="sec">Forms to drill</h2>
-    <div class="card" id="weak-root"><p class="muted" style="font-size:14px">Answer a few quiz questions and your shakiest forms will surface here.</p></div>
     <h2 class="sec">Accuracy by binyan</h2>
     <div class="card" id="bstat-root"><p class="muted" style="font-size:14px">Complete a quiz to see your per-binyan breakdown.</p></div>
     <h2 class="sec">Accuracy by tense</h2>
@@ -430,11 +454,10 @@ details.ref[open] summary .car{transform:rotate(90deg)}
 </div>
 
 <nav class="tabs" aria-label="Sections">
-  <button data-tab="practice" class="on"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".5"/></svg>Practice</button>
-  <button data-tab="cards"><svg viewBox="0 0 24 24"><rect x="4" y="7" width="14" height="12" rx="2"/><path d="M8 4h12v12"/></svg>Cards</button>
-  <button data-tab="reference"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h6v18H6a2 2 0 0 0-2 2z"/><path d="M20 5a2 2 0 0 0-2-2h-6v18h6a2 2 0 0 1 2 2z"/></svg>Reference</button>
-  <button data-tab="vocab"><svg viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h8"/><path d="M18 15v6M15 18h6"/></svg>Vocab</button>
+  <button data-tab="home" class="on"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Home</button>
+  <button data-tab="learn"><svg viewBox="0 0 24 24"><path d="M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M8 7h7M8 11h7"/></svg>Learn</button>
   <button data-tab="chat"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-8 8H5l-2 2V12a8 8 0 0 1 8-8h2a8 8 0 0 1 8 8z"/></svg>Chat</button>
+  <button data-tab="words"><svg viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h8"/><path d="M18 15v6M15 18h6"/></svg>Words</button>
   <button data-tab="stats"><svg viewBox="0 0 24 24"><path d="M3 18h3v-6H3zm4 0h3v-9H7zm4 0h3V6h-3zm4 0h3v-3h-3z"/></svg>Stats</button>
 </nav>
 
@@ -2187,6 +2210,7 @@ document.querySelectorAll('nav.tabs button').forEach(b=>{
     document.body.dataset.tab=b.dataset.tab;
     if(b.dataset.tab==='stats') renderBstat();
     if(b.dataset.tab==='chat') renderChat();
+    if(b.dataset.tab==='learn') renderLearn();
   });
 });
 
@@ -2362,6 +2386,31 @@ $('#set-lit').addEventListener('change',e=>{(state.prefs=state.prefs||{}).lit=e.
 $('#set-rampto').addEventListener('change',setRamp);
 $('#set-rampby').addEventListener('change',setRamp);
 $('#set-level').addEventListener('click',()=>openSession('level'));
+
+/* ===== Learn tab segments ===== */
+let learnSeg='lessons';
+function renderLearn(){
+  document.querySelectorAll('#learn-segs button').forEach(b=>b.classList.toggle('on',b.dataset.seg===learnSeg));
+  ['lessons','games','grammar'].forEach(s=>{const el=document.getElementById('seg-'+s); if(el) el.hidden=s!==learnSeg;});
+  if(learnSeg==='lessons') renderLessons();
+  if(learnSeg==='games') renderAi();
+}
+document.querySelectorAll('#learn-segs button').forEach(b=>b.addEventListener('click',()=>{learnSeg=b.dataset.seg;renderLearn();}));
+
+/* Home: the one next lesson */
+function renderHomeLesson(){
+  const root=document.getElementById('home-lesson'); if(!root) return;
+  const skill=skillCells();
+  const prs=LESSONS.map(L=>lessonProgress(L,skill));
+  const i=Math.max(0,prs.findIndex(pr=>!pr.total||pr.done<pr.total));
+  const L=LESSONS[i], pr=prs[i];
+  const started=state.lessons.started.includes(L.id);
+  root.innerHTML=`<button class="mode" id="home-lesson-btn" style="padding:13px 16px">
+    <span class="glyph" style="font-size:16px;font-family:'Heebo',sans-serif">${i+1}</span>
+    <span class="grow"><b>${L.title}</b><span class="d">${started?pr.pct+'% — keep going':'Up next in your path'}</span></span>
+    <span class="pill gold">lesson</span></button>`;
+  document.getElementById('home-lesson-btn').addEventListener('click',()=>startLesson(L));
+}
 
 /* ===== binyan filter chips ===== */
 let focusBinyan=null;
@@ -4018,7 +4067,7 @@ function renderFlash(){
 }
 function renderCardsHome(){
   const n=dueCards().length;
-  $('#cards-due-line').textContent=n?`${n} card${n===1?'':'s'} waiting for you.`:'Nothing due right now — nicely done.';
+  $('#cards-due-line').textContent=n?`${n} card${n===1?'':'s'} due`:'Nothing due — nicely done';
   $('#cards-start').disabled=!n;
 }
 
@@ -4143,6 +4192,7 @@ function renderVocab(){
 }
 $('#vsearch').addEventListener('input',renderVocab);
 $('#sweep-btn').addEventListener('click',startSweep);
+$('#sweep-btn2').addEventListener('click',startSweep);
 $('#add-btn').addEventListener('click',()=>{
   const he=$('#add-he').value.trim(), en=$('#add-en').value.trim(), tr=$('#add-tr').value.trim();
   if(!he||!en)return;
@@ -4323,6 +4373,8 @@ function renderHero(due){
       <span class="grow"><b>Goal met — nice.</b><span class="d">Another Daily Mix won't hurt</span></span></button>`;
   }
   root.innerHTML=inner;
+  const ch=document.getElementById('cards-home');
+  if(ch) ch.hidden=due>=8;
   document.getElementById('hero-btn').addEventListener('click',function(){
     if(this.dataset.hero==='cards') $('#cards-start').click();
     else openSession('mix');
@@ -4338,6 +4390,7 @@ function renderStats(){
   te.style.color=goal>0&&tn>=goal?'var(--good)':'';
   renderHero(due);
   renderCardsHome();
+  renderHomeLesson();
   const lifeEl=document.getElementById('life-line');
   if(lifeEl){
     const tr=state.stats.totalReviews||0, tc=state.stats.totalCorrect||0, ls=state.stats.longestStreak||0;
@@ -4347,7 +4400,7 @@ function renderStats(){
 }
 function renderAll(){ renderStats(); renderVocab(); renderLessons(); renderOnboard(); renderAi(); }
 (function(){
-  document.body.dataset.tab='practice';
+  document.body.dataset.tab='home';
   loadLocal(); applyTheme(); freezeGoals(); renderReference(); renderAll();
   badge('Everything is stored on this device.');
   initDb();
