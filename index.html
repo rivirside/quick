@@ -232,6 +232,7 @@ details.ref[open] summary .car{transform:rotate(90deg)}
 .cal-day.part{background:var(--gold-soft);color:var(--gold);font-weight:700}
 .cal-day.rest{background:transparent;border:1px dashed var(--line)}
 .cal-day.today{outline:2px solid var(--accent);outline-offset:1px}
+.cal-day.sel{outline:2px solid var(--gold);outline-offset:1px}
 .cal-day.future{opacity:.35}
 .pchips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:6px}
 .pchip{flex:none;display:flex;align-items:center;gap:7px;padding:8px 13px;border-radius:14px;
@@ -384,6 +385,11 @@ details.ref[open] summary .car{transform:rotate(90deg)}
     <div class="card">
       <p class="muted" style="margin:0 0 10px;font-size:13px">Set a goal per weekday — go harder some days, rest on others. Rest days never break your streak.</p>
       <div id="sched-rows"></div>
+      <div class="row" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--line)">
+        <span class="grow" style="font-size:14.5px">Goal ramp<br><span class="muted" style="font-size:12px" id="ramp-line">off</span></span>
+        <select class="setsel" id="set-rampto"><option value="">Off</option><option value="30">→ 30</option><option value="50">→ 50</option><option value="80">→ 80</option><option value="100">→ 100</option></select>
+        <select class="setsel" id="set-rampby"><option value="3">3 mo</option><option value="6">6 mo</option><option value="12">12 mo</option></select>
+      </div>
     </div>
     <h2 class="sec">AI tutor</h2>
     <div class="card" id="set-ai"></div>
@@ -1159,6 +1165,7 @@ function mergeStates(a,b){
   out.stats.lastDay=[sa.lastDay,sb.lastDay].filter(Boolean).sort().pop()||null;
   out.stats.days={...sb.days,...sa.days};
   for(const d in sb.days) out.stats.days[d]=Math.max(sa.days[d]||0,sb.days[d]);
+  out.stats.goals={...(sb.goals||{}),...(sa.goals||{})};
   out.lessons={started:[...new Set([...a.lessons.started,...b.lessons.started])]};
   const ta=a.chat.threads, tb=b.chat.threads;
   const threads={...tb,...ta};
@@ -1254,9 +1261,40 @@ const ERR_LABEL={spell:'right sounds, wrong letters (half credit)',typo:'a near-
 /* per-day goal: the weekday schedule wins, 0 means a rest day,
    otherwise the plain daily goal applies */
 function goalFor(ds){
-  const P=state.prefs||{}, s=P.sched||{};
-  const v=s[new Date(ds+'T12:00:00').getDay()];
-  return v===0?0:(v==null?(P.goal||20):v);
+  const P=state.prefs||{};
+  const dg=(P.dayGoals||{})[ds];
+  if(dg!=null) return dg;
+  const v=(P.sched||{})[new Date(ds+'T12:00:00').getDay()];
+  if(v===0) return 0;
+  if(v!=null) return v;
+  const r=P.ramp;
+  if(r){
+    if(ds>=r.end) return r.to;
+    if(ds>=r.start){
+      const total=dayDiff(r.start,r.end), done=dayDiff(r.start,ds);
+      if(total>0) return Math.max(1,Math.round((r.from+(r.to-r.from)*done/total)/5)*5);
+    }
+  }
+  return P.goal||20;
+}
+const dOf=ts=>{const d=new Date(ts);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+/* the goal each day actually had, frozen as days pass — schedule changes
+   never rewrite history */
+function frozenGoal(ds){
+  const gz=state.stats.goals&&state.stats.goals[ds];
+  return gz!=null?gz:goalFor(ds);
+}
+function freezeGoals(){
+  const st=state.stats; st.goals=st.goals||{};
+  const today=todayStr();
+  let from=st.goalsFrozenTo||Object.keys(st.days).sort()[0]||today;
+  const d=new Date(from+'T12:00:00'), end=new Date(today+'T12:00:00');
+  for(let i=0;i<400&&d<end;i++){
+    const ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    if(st.goals[ds]==null) st.goals[ds]=goalFor(ds);
+    d.setDate(d.getDate()+1);
+  }
+  st.goalsFrozenTo=today;
 }
 /* a streak survives a gap if every skipped day was a scheduled rest day */
 function restGapOk(last,today){
@@ -1265,7 +1303,7 @@ function restGapOk(last,today){
     d.setDate(d.getDate()+1);
     if(d>=end) return true;
     const ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    if(goalFor(ds)!==0) return false;
+    if(frozenGoal(ds)!==0) return false;
   }
   return false;
 }
@@ -1277,6 +1315,7 @@ function bumpActivity(n){
     st.longestStreak=Math.max(st.longestStreak||0,st.streak);
   }
   st.days[today]=(st.days[today]||0)+n;
+  st.goals=st.goals||{}; st.goals[today]=goalFor(today);
   persist(); renderStats();
 }
 
@@ -1389,8 +1428,24 @@ function renderSettings(){
   $('#set-goal').value=String(P.goal||20);
   $('#set-len').value=String(P.len||10);
   $('#set-lit').value=P.lit||'light';
+  const rmp=P.ramp;
+  $('#set-rampto').value=rmp?String(rmp.to):'';
+  $('#set-rampby').value=rmp?String(rmp.mo||6):'6';
+  $('#ramp-line').textContent=rmp?`${rmp.from} → ${rmp.to} by ${new Date(rmp.end+'T12:00:00').toLocaleDateString('en-US',{month:'short',year:'numeric'})}`:'off — goals stay flat';
   renderSched();
   renderSettingsAi();
+}
+function setRamp(){
+  const P=state.prefs=state.prefs||{};
+  const to=$('#set-rampto').value, mo=+$('#set-rampby').value||6;
+  if(!to) delete P.ramp;
+  else{
+    const start=todayStr();
+    const d=new Date(start+'T12:00:00'); d.setMonth(d.getMonth()+mo);
+    const end=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    P.ramp={from:P.goal||20,to:+to,start,end,mo};
+  }
+  persist(); renderSettings(); renderStats(); renderCal();
 }
 function renderSettingsAi(){
   const el=document.getElementById('set-ai'); if(!el) return;
@@ -1408,7 +1463,38 @@ function renderSettingsAi(){
     });
   }
 }
-let calOffset=0;
+let calOffset=0, calSel=null;
+function calDayGoal(ds){ return ds<todayStr()?frozenGoal(ds):goalFor(ds); }
+function calDetailHtml(ds){
+  const todayS=todayStr();
+  const n=state.stats.days[ds]||0;
+  const g=calDayGoal(ds);
+  const nice=new Date(ds+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  const chips=[['🌴 rest',0],['10',10],['20',20],['30',30],['50',50]].map(([l,v])=>`<button class="chip dg-set" data-v="${v}">${l}</button>`).join('')+'<button class="chip dg-set" data-v="">auto</button>';
+  if(ds>todayS){
+    const custom=(state.prefs.dayGoals||{})[ds]!=null;
+    return `<div style="margin-top:12px;border-top:1px solid var(--line);padding-top:10px">
+      <div class="row"><b class="grow" style="font-size:14px">${nice}</b><span class="pill acc">planned: ${g===0?'rest 🌴':g}</span></div>
+      <p class="muted" style="font-size:12px;margin:6px 0 8px">${custom?'Custom goal for this specific day':'From your schedule/ramp'} — set just this day:</p>
+      <div class="chips">${chips}</div></div>`;
+  }
+  const evs=state.log.filter(e=>e.ts&&dOf(e.ts)===ds);
+  const r=evs.filter(e=>e.ok).length;
+  const flash=Math.max(0,n-evs.length);
+  const met=g>0&&n>=g;
+  let modes='';
+  if(evs.length){
+    const bm={}; evs.forEach(e=>{if(e.m)bm[e.m]=(bm[e.m]||0)+1;});
+    modes=Object.entries(bm).map(([m,c])=>`${MODE_LABEL[m]||m} ${c}`).join(' · ');
+  }
+  return `<div style="margin-top:12px;border-top:1px solid var(--line);padding-top:10px">
+    <div class="row"><b class="grow" style="font-size:14px">${nice}</b><span class="pill" style="${met?'background:var(--good-soft);color:var(--good)':''}">${n} / ${g===0?'rest 🌴':g}${met?' ✓':''}</span></div>
+    ${evs.length?`<p class="muted" style="font-size:12.5px;margin:6px 0 0">Quiz accuracy ${Math.round(r/evs.length*100)}% (${r}/${evs.length})${flash>0?` · ~${flash} flashcards`:''}</p>
+      <p class="muted" style="font-size:12px;margin:4px 0 0">${modes}</p>`
+      :`<p class="muted" style="font-size:12.5px;margin:6px 0 0">${n?n+' answers (detail is beyond the log window)':'No practice this day.'}</p>`}
+    ${ds===todayS?`<div class="chips" style="margin-top:8px">${chips}</div>`:''}
+  </div>`;
+}
 function renderCal(){
   const root=document.getElementById('cal-root'); if(!root) return;
   const now=new Date();
@@ -1424,26 +1510,38 @@ function renderCal(){
   for(let d=1;d<=dim;d++){
     const ds=fmt(d);
     const n=state.stats.days[ds]||0;
-    const g=goalFor(ds);
+    const g=calDayGoal(ds);
     let cls='cal-day';
     if(g===0) cls+=' rest';
     else if(g>0&&n>=g) cls+=' full';
     else if(n>0) cls+=' part';
     if(ds===todayS) cls+=' today';
     if(ds>todayS) cls+=' future';
-    cells+=`<div class="${cls}" title="${n} answers">${g===0&&!n?'🌴':d}</div>`;
+    if(ds===calSel) cls+=' sel';
+    cells+=`<div class="${cls}" data-ds="${ds}" title="${n} answers">${g===0&&!n?'🌴':d}</div>`;
   }
   const st=state.stats;
   root.innerHTML=`<div class="cal-head">
       <button class="chip" id="cal-prev">‹</button>
       <b style="font-size:14px">${monthName}</b>
-      <button class="chip" id="cal-next"${calOffset>=0?' disabled style="opacity:.4"':''}>›</button>
+      <button class="chip" id="cal-next">›</button>
     </div>
     <div class="cal-grid" style="margin-bottom:4px">${['S','M','T','W','T','F','S'].map(x=>`<div class="cal-dow">${x}</div>`).join('')}</div>
     <div class="cal-grid">${cells}</div>
+    ${calSel?calDetailHtml(calSel):'<p class="muted" style="font-size:12px;margin:10px 0 0;text-align:center">Tap a day for details — or a future day to plan it.</p>'}
     <p class="muted" style="font-size:12.5px;margin:12px 0 0;text-align:center">🔥 ${st.streak||0} day streak · longest ${st.longestStreak||0} · <span style="color:var(--good)">■</span> goal met · <span style="color:var(--gold)">■</span> some · 🌴 rest</p>`;
-  document.getElementById('cal-prev').addEventListener('click',()=>{calOffset--;renderCal();});
-  if(calOffset<0) document.getElementById('cal-next').addEventListener('click',()=>{calOffset++;renderCal();});
+  document.getElementById('cal-prev').addEventListener('click',()=>{calOffset--;calSel=null;renderCal();});
+  document.getElementById('cal-next').addEventListener('click',()=>{calOffset++;calSel=null;renderCal();});
+  root.querySelectorAll('.cal-day[data-ds]').forEach(c=>c.addEventListener('click',()=>{
+    calSel=c.dataset.ds===calSel?null:c.dataset.ds; renderCal();
+  }));
+  root.querySelectorAll('.dg-set').forEach(b=>b.addEventListener('click',()=>{
+    if(!calSel) return;
+    const P=state.prefs=state.prefs||{}; const dgs=P.dayGoals=P.dayGoals||{};
+    if(b.dataset.v==='') delete dgs[calSel]; else dgs[calSel]=+b.dataset.v;
+    if(calSel<=todayStr()){ state.stats.goals=state.stats.goals||{}; state.stats.goals[calSel]=goalFor(calSel); }
+    persist(); renderCal(); renderStats();
+  }));
 }
 const DOW=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 function renderSched(){
@@ -1475,6 +1573,8 @@ $('#rate-test').addEventListener('click',()=>speak('שָׁלוֹם, מָה נִ�
 $('#set-goal').addEventListener('change',e=>{(state.prefs=state.prefs||{}).goal=+e.target.value;persist();renderStats();});
 $('#set-len').addEventListener('change',e=>{(state.prefs=state.prefs||{}).len=+e.target.value;persist();});
 $('#set-lit').addEventListener('change',e=>{(state.prefs=state.prefs||{}).lit=e.target.value;persist();});
+$('#set-rampto').addEventListener('change',setRamp);
+$('#set-rampby').addEventListener('change',setRamp);
 $('#set-level').addEventListener('click',()=>openSession('level'));
 
 /* ===== binyan filter chips ===== */
@@ -3006,6 +3106,7 @@ $('#add-btn').addEventListener('click',()=>{
 });
 
 /* ===== binyan chart ===== */
+const MODE_LABEL={mcq:'Quiz',type:'Type it',cloze:'Sentences',listen:'Dictation',ear:'Sharp ear',order:'Word order',vocab:'Vocab',roots:'Roots',num:'Numbers',speed:'Speed',na:'Nouns & adj',exc:'Rules',trans:'Translate',spell:'Spelling',sweep:'Sweep'};
 function statBar(label,r,w){
   const tot=r+w;
   const pct=tot?Math.round(r/tot*100):null;
@@ -3036,7 +3137,6 @@ function renderBstat(){
   if(troot) troot.innerHTML=any?['past','present','future'].map(t=>statBar(TENSES[t].en,byT[t].r,byT[t].w)).join('')
     :'<p class="muted" style="font-size:14px">No data yet.</p>';
   const mroot=document.getElementById('mstat-root');
-  const MODE_LABEL={mcq:'Quiz',type:'Type it',cloze:'Sentences',listen:'Dictation',ear:'Sharp ear',order:'Word order',vocab:'Vocab',roots:'Roots',num:'Numbers',speed:'Speed',na:'Nouns & adj',exc:'Rules',trans:'Translate',spell:'Spelling'};
   if(mroot) mroot.innerHTML=(any&&Object.keys(byM).length)?Object.keys(MODE_LABEL).filter(m=>byM[m]).map(m=>statBar(MODE_LABEL[m],byM[m].r,byM[m].w)).join('')
     :'<p class="muted" style="font-size:14px">No data yet.</p>';
   renderWeak();
@@ -3109,7 +3209,7 @@ function renderAll(){ renderStats(); renderVocab(); renderLessons(); renderOnboa
 (function(){
   const d=new Date();
   $('#daymark').textContent=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-  loadLocal(); applyTheme(); renderReference(); renderAll();
+  loadLocal(); applyTheme(); freezeGoals(); renderReference(); renderAll();
   badge('Everything is stored on this device.');
   initDb();
 })();
