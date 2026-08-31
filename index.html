@@ -340,6 +340,12 @@ details.ref[open] summary .car{transform:rotate(90deg)}
     <div class="card" id="cal-root"></div>
     <h2 class="sec">Your level</h2>
     <div class="card" id="level-root"></div>
+    <h2 class="sec">Vocabulary</h2>
+    <div class="card" id="vstat-root"></div>
+    <h2 class="sec">Review load — next 7 days</h2>
+    <div class="card" id="fstat-root"></div>
+    <h2 class="sec">Card maturity</h2>
+    <div class="card" id="matstat-root"></div>
     <h2 class="sec">Forms to drill</h2>
     <div class="card" id="weak-root"><p class="muted" style="font-size:14px">Answer a few quiz questions and your shakiest forms will surface here.</p></div>
     <h2 class="sec">Accuracy by binyan</h2>
@@ -350,8 +356,8 @@ details.ref[open] summary .car{transform:rotate(90deg)}
     <div class="card" id="mstat-root"><p class="muted" style="font-size:14px">No data yet.</p></div>
     <h2 class="sec">All time</h2>
     <div class="card"><p class="muted" style="font-size:14px" id="life-line">–</p></div>
-    <h2 class="sec">Activity</h2>
-    <div class="card"><p class="muted" style="font-size:14px" id="act-line">–</p></div>
+    <h2 class="sec">Activity — last 14 days</h2>
+    <div class="card" id="act-root"></div>
   </section>
 
   <section class="screen" id="tab-settings">
@@ -1207,10 +1213,213 @@ const VOCAB_SEED=[
  {id:'luachshana',he:'לוּחַ שָׁנָה',tr:'luach shana',en:'calendar',cat:'time'},
  {id:'shaon',he:'שָׁעוֹן',tr:'shaon',en:'clock / watch',cat:'time'},
  {id:'taarich',he:'תַּאֲרִיךְ',tr:'taarich',en:'date (calendar)',cat:'time'},
- {id:'tkufa',he:'תְּקוּפָה',tr:'tkufa',en:'period / era',cat:'time'}
+ {id:'tkufa',he:'תְּקוּפָה',tr:'tkufa',en:'period / era',cat:'time'},
+ {id:'tsahov',he:'צָהֹב',tr:'tsahov',en:'yellow',cat:'colors'},
+ {id:'kakhol',he:'כָּחֹל',tr:'kakhol',en:'blue',cat:'colors'},
+ {id:'lavan',he:'לָבָן',tr:'lavan',en:'white',cat:'colors'},
+ {id:'shakhor',he:'שָׁחֹר',tr:'shakhor',en:'black',cat:'colors'},
+ {id:'varod',he:'וָרֹד',tr:'varod',en:'pink',cat:'colors'},
+ {id:'katom',he:'כָּתֹם',tr:'katom',en:'orange',cat:'colors'},
+ {id:'afor',he:'אָפֹר',tr:'afor',en:'gray',cat:'colors'},
+ {id:'khum',he:'חוּם',tr:'khum',en:'brown',cat:'colors'},
+ {id:'segol',he:'סָגֹל',tr:'segol',en:'purple',cat:'colors'},
+ {id:'bahir',he:'בָּהִיר',tr:'bahir',en:'light (color)',cat:'colors'},
+ {id:'kehe',he:'כֵּהֶה',tr:'kehe',en:'dark (color)',cat:'colors'},
+ {id:'zahav',he:'זָהָב',tr:'zahav',en:'gold',cat:'colors'},
+ {id:'tkhelet',he:'תְּכֵלֶת',tr:'tkhelet',en:'turquoise / sky blue',cat:'colors'},
+ {id:'bezh',he:'בֵּז\'',tr:'bezh',en:'beige',cat:'colors'},
+ {id:'takhol',he:'תָּכֹל',tr:'takhol',en:'light blue / azure',cat:'colors'},
+ {id:'yerakrak',he:'יְרַקְרַק',tr:'yerakrak',en:'greenish',cat:'colors'},
+ {id:'adamdam',he:'אֲדַמְדַּם',tr:'adamdam',en:'reddish',cat:'colors'},
+ {id:'tseva',he:'צֶבַע',tr:'tseva',en:'color',cat:'colors'},
+ {id:'gavan',he:'גָּוֶן',tr:'gavan',en:'shade / hue',cat:'colors'},
+ {id:'kakholbahir',he:'כָּחֹל בָּהִיר',tr:'kakhol bahir',en:'light blue',cat:'colors'},
+ {id:'kakholkehe',he:'כָּחֹל כֵּהֶה',tr:'kakhol kehe',en:'dark blue',cat:'colors'},
+ {id:'yarokbahir',he:'יָרֹק בָּהִיר',tr:'yarok bahir',en:'light green',cat:'colors'},
+ {id:'yarokkehe',he:'יָרֹק כֵּהֶה',tr:'yarok kehe',en:'dark green',cat:'colors'},
+ {id:'varodbahir',he:'וָרֹד בָּהִיר',tr:'varod bahir',en:'light pink',cat:'colors'},
+ {id:'adomkehe',he:'אָדֹם כֵּהֶה',tr:'adom kehe',en:'dark red',cat:'colors'},
+ {id:'khumbahir',he:'חוּם בָּהִיר',tr:'khum bahir',en:'light brown',cat:'colors'},
+ {id:'aforkehe',he:'אָפֹר כֵּהֶה',tr:'afor kehe',en:'dark gray',cat:'colors'},
+ {id:'sus',he:'סוּס',tr:'sus',en:'horse',cat:'animals'},
+ {id:'para',he:'פָּרָה',tr:'para',en:'cow',cat:'animals'},
+ {id:'keves',he:'כֶּבֶשׂ',tr:'keves',en:'sheep',cat:'animals'},
+ {id:'ez',he:'עֵז',tr:'ez',en:'goat',cat:'animals'},
+ {id:'tarnegolet',he:'תַּרְנְגֹלֶת',tr:'tarnegolet',en:'chicken / hen',cat:'animals'},
+ {id:'arye',he:'אַרְיֵה',tr:'arye',en:'lion',cat:'animals'},
+ {id:'pil',he:'פִּיל',tr:'pil',en:'elephant',cat:'animals'},
+ {id:'kof',he:'קוֹף',tr:'kof',en:'monkey',cat:'animals'},
+ {id:'akhbar',he:'עַכְבָּר',tr:'akhbar',en:'mouse',cat:'animals'},
+ {id:'arnav',he:'אַרְנָב',tr:'arnav',en:'rabbit',cat:'animals'},
+ {id:'tsav',he:'צָב',tr:'tsav',en:'turtle',cat:'animals'},
+ {id:'nemala',he:'נְמָלָה',tr:'nemala',en:'ant',cat:'animals'},
+ {id:'zvuv',he:'זְבוּב',tr:'zvuv',en:'fly',cat:'animals'},
+ {id:'gamal',he:'גָּמָל',tr:'gamal',en:'camel',cat:'animals'},
+ {id:'khamor',he:'חֲמוֹר',tr:'khamor',en:'donkey',cat:'animals'},
+ {id:'dov',he:'דֹּב',tr:'dov',en:'bear',cat:'animals'},
+ {id:'namer',he:'נָמֵר',tr:'namer',en:'leopard',cat:'animals'},
+ {id:'girafa',he:'גִּירָפָה',tr:'girafa',en:'giraffe',cat:'animals'},
+ {id:'zebra',he:'זֶבְּרָה',tr:'zebra',en:'zebra',cat:'animals'},
+ {id:'zev',he:'זְאֵב',tr:'zev',en:'wolf',cat:'animals'},
+ {id:'shual',he:'שׁוּעָל',tr:'shual',en:'fox',cat:'animals'},
+ {id:'ayal',he:'אַיָּל',tr:'ayal',en:'deer',cat:'animals'},
+ {id:'khazir',he:'חֲזִיר',tr:'khazir',en:'pig',cat:'animals'},
+ {id:'barvaz',he:'בַּרְוָז',tr:'barvaz',en:'duck',cat:'animals'},
+ {id:'tsfardea',he:'צְפַרְדֵּעַ',tr:'tsfardea',en:'frog',cat:'animals'},
+ {id:'akavish',he:'עַכָּבִישׁ',tr:'akavish',en:'spider',cat:'animals'},
+ {id:'sufa',he:'סוּפָה',tr:'sufa',en:'storm',cat:'weather'},
+ {id:'arafel',he:'עֲרָפֶל',tr:'arafel',en:'fog',cat:'weather'},
+ {id:'lakhut',he:'לַחוּת',tr:'lakhut',en:'humidity',cat:'weather'},
+ {id:'maalot',he:'מַעֲלוֹת',tr:'maalot',en:'degrees',cat:'weather'},
+ {id:'takhazit',he:'תַּחֲזִית',tr:'takhazit',en:'forecast',cat:'weather'},
+ {id:'khamsin',he:'חַמְסִין',tr:'khamsin',en:'khamsin (hot dry wind)',cat:'weather'},
+ {id:'mitriya',he:'מִטְרִיָּה',tr:'mitriya',en:'umbrella',cat:'weather'},
+ {id:'keshet',he:'קֶשֶׁת',tr:'keshet',en:'rainbow',cat:'weather'},
+ {id:'batsoret',he:'בַּצֹּרֶת',tr:'batsoret',en:'drought',cat:'weather'},
+ {id:'shitafon',he:'שִׁטָּפוֹן',tr:'shitafon',en:'flood',cat:'weather'},
+ {id:'kfor',he:'כְּפוֹר',tr:'kfor',en:'frost',cat:'weather'},
+ {id:'kerakh',he:'קֶרַח',tr:'kerakh',en:'ice',cat:'weather'},
+ {id:'barad',he:'בָּרָד',tr:'barad',en:'hail',cat:'weather'},
+ {id:'avir',he:'אֲוִיר',tr:'avir',en:'air',cat:'weather'},
+ {id:'yavesh',he:'יָבֵשׁ',tr:'yavesh',en:'dry',cat:'weather'},
+ {id:'gashum',he:'גָּשׁוּם',tr:'gashum',en:'rainy',cat:'weather'},
+ {id:'meunan',he:'מְעֻנָּן',tr:'meunan',en:'cloudy',cat:'weather'},
+ {id:'tsalul',he:'צָלוּל',tr:'tsalul',en:'clear (sky)',cat:'weather'},
+ {id:'galkhom',he:'גַּל חֹם',tr:'gal khom',en:'heat wave',cat:'weather'},
+ {id:'galkor',he:'גַּל קֹר',tr:'gal kor',en:'cold wave',cat:'weather'},
+ {id:'tal',he:'טַל',tr:'tal',en:'dew',cat:'weather'},
+ {id:'stav',he:'סְתָיו',tr:'stav',en:'autumn',cat:'weather'},
+ {id:'khoref',he:'חֹרֶף',tr:'khoref',en:'winter',cat:'weather'},
+ {id:'kayits',he:'קַיִץ',tr:'kayits',en:'summer',cat:'weather'},
+ {id:'aviv',he:'אָבִיב',tr:'aviv',en:'spring',cat:'weather'},
+ {id:'tipa',he:'טִפָּה',tr:'tipa',en:'drop (of rain)',cat:'weather'},
+ {id:'sagrir',he:'סַגְרִיר',tr:'sagrir',en:'stormy weather',cat:'weather'},
+ {id:'mekhir',he:'מְחִיר',tr:'mekhir',en:'price',cat:'shopping'},
+ {id:'hanakha',he:'הֲנָחָה',tr:'hanakha',en:'discount',cat:'shopping'},
+ {id:'mivtsa',he:'מִבְצָע',tr:'mivtsa',en:'sale / promotion',cat:'shopping'},
+ {id:'agala',he:'עֲגָלָה',tr:'agala',en:'shopping cart',cat:'shopping'},
+ {id:'sakit',he:'שַׂקִּית',tr:'sakit',en:'bag',cat:'shopping'},
+ {id:'mezuman',he:'מְזֻמָּן',tr:'mezuman',en:'cash',cat:'shopping'},
+ {id:'kabala',he:'קַבָּלָה',tr:'kabala',en:'receipt',cat:'shopping'},
+ {id:'zol',he:'זוֹל',tr:'zol',en:'cheap',cat:'shopping'},
+ {id:'yakar',he:'יָקָר',tr:'yakar',en:'expensive',cat:'shopping'},
+ {id:'mocher',he:'מוֹכֵר',tr:'mocher',en:'salesman',cat:'shopping'},
+ {id:'mishlokh',he:'מִשְׁלוֹחַ',tr:'mishlokh',en:'delivery',cat:'shopping'},
+ {id:'kheshbon',he:'חֶשְׁבּוֹן',tr:'kheshbon',en:'bill',cat:'shopping'},
+ {id:'makhsan',he:'מַחְסָן',tr:'makhsan',en:'warehouse',cat:'shopping'},
+ {id:'tokef',he:'תֹּקֶף',tr:'tokef',en:'validity (expiry)',cat:'shopping'},
+ {id:'mida',he:'מִדָּה',tr:'mida',en:'size',cat:'shopping'},
+ {id:'degem',he:'דֶּגֶם',tr:'degem',en:'model / style',cat:'shopping'},
+ {id:'mivkhar',he:'מִבְחָר',tr:'mivkhar',en:'selection / variety',cat:'shopping'},
+ {id:'makholet',he:'מַכ�ּוֹלֶת',tr:'makholet',en:'grocery store',cat:'shopping'},
+ {id:'super',he:'סוּפֶּר',tr:'super',en:'supermarket',cat:'shopping'},
+ {id:'hekhzer',he:'הֶחְזֵר',tr:'hekhzer',en:'refund',cat:'shopping'},
+ {id:'hakhlafa',he:'הַחְלָפָה',tr:'hakhlafa',en:'exchange (of goods)',cat:'shopping'},
+ {id:'akhrayut',he:'אַחֲרָיוּת',tr:'akhrayut',en:'warranty',cat:'shopping'},
+ {id:'kupai',he:'קֻפַּאי',tr:'kupai',en:'cashier',cat:'shopping'},
+ {id:'talmid',he:'תַּלְמִיד',tr:'talmid',en:'student (m)',cat:'school'},
+ {id:'talmida',he:'תַּלְמִידָה',tr:'talmida',en:'student (f)',cat:'school'},
+ {id:'kita',he:'כִּתָּה',tr:'kita',en:'class / classroom',cat:'school'},
+ {id:'mivkhan',he:'מִבְחָן',tr:'mivkhan',en:'test',cat:'school'},
+ {id:'shiureybayit',he:'שִׁעוּרֵי בַּיִת',tr:'shiurey bayit',en:'homework',cat:'school'},
+ {id:'makhberet',he:'מַחְבֶּרֶת',tr:'makhberet',en:'notebook',cat:'school'},
+ {id:'et',he:'עֵט',tr:'et',en:'pen',cat:'school'},
+ {id:'iparon',he:'עִפָּרוֹן',tr:'iparon',en:'pencil',cat:'school'},
+ {id:'amud',he:'עַמּוּד',tr:'amud',en:'page',cat:'school'},
+ {id:'tsiyun',he:'צִיּוּן',tr:'tsiyun',en:'grade',cat:'school'},
+ {id:'toar',he:'תֹּאַר',tr:'toar',en:'degree',cat:'school'},
+ {id:'semester',he:'סֶמֶסְטֶר',tr:'semester',en:'semester',cat:'school'},
+ {id:'more',he:'מוֹרֶה',tr:'more',en:'teacher (m)',cat:'school'},
+ {id:'luakh',he:'לוּחַ',tr:'luakh',en:'board',cat:'school'},
+ {id:'sargel',he:'סַרְגֵּל',tr:'sargel',en:'ruler',cat:'school'},
+ {id:'makhak',he:'מַחַק',tr:'makhak',en:'eraser',cat:'school'},
+ {id:'miktsoa',he:'מִקְצוֹעַ',tr:'miktsoa',en:'subject',cat:'school'},
+ {id:'bkhina',he:'בְּחִינָה',tr:'bkhina',en:'exam',cat:'school'},
+ {id:'teuda',he:'תְּעוּדָה',tr:'teuda',en:'diploma / certificate',cat:'school'},
+ {id:'kalmar',he:'קַלְמָר',tr:'kalmar',en:'pencil case',cat:'school'},
+ {id:'mivkhangemer',he:'מִבְחַן גְּמֶר',tr:'mivkhan gemer',en:'final exam',cat:'school'},
+ {id:'hodaa',he:'הוֹדָעָה',tr:'hodaa',en:'notification / message',cat:'tech'},
+ {id:'aplikatsia',he:'אַפְּלִיקַצְיָה',tr:'aplikatsia',en:'app',cat:'tech'},
+ {id:'atar',he:'אָתָר',tr:'atar',en:'website',cat:'tech'},
+ {id:'mataen',he:'מַטְעֵן',tr:'mataen',en:'charger',cat:'tech'},
+ {id:'ozniyot',he:'אֹזְנִיּוֹת',tr:'ozniyot',en:'headphones',cat:'tech'},
+ {id:'masakh',he:'מָסָךְ',tr:'masakh',en:'screen',cat:'tech'},
+ {id:'makledet',he:'מַקְלֶדֶת',tr:'makledet',en:'keyboard',cat:'tech'},
+ {id:'media',he:'מֵדִיָה',tr:'media',en:'media',cat:'tech'},
+ {id:'seret',he:'סֶרֶט',tr:'seret',en:'video / movie',cat:'tech'},
+ {id:'tmuna',he:'תְּמוּנָה',tr:'tmuna',en:'picture',cat:'tech'},
+ {id:'khibur',he:'חִבּוּר',tr:'khibur',en:'connection',cat:'tech'},
+ {id:'mishtamesh',he:'מִשְׁתַּמֵּשׁ',tr:'mishtamesh',en:'user',cat:'tech'},
+ {id:'kod',he:'קוֹד',tr:'kod',en:'code',cat:'tech'},
+ {id:'tokhna',he:'תָּכְנָה',tr:'tokhna',en:'software',cat:'tech'},
+ {id:'gibui',he:'גִּבּוּי',tr:'gibui',en:'backup',cat:'tech'},
+ {id:'maagar',he:'מַאֲגָר',tr:'ma\'agar',en:'database',cat:'tech'},
+ {id:'reshet',he:'רֶשֶׁת',tr:'reshet',en:'network',cat:'tech'},
+ {id:'kishur',he:'קִישּׁוּר',tr:'kishur',en:'link',cat:'tech'},
+ {id:'gisha',he:'גִּישָׁה',tr:'gisha',en:'access',cat:'tech'},
+ {id:'avtakha',he:'אַבְטָחָה',tr:'avtakha',en:'security',cat:'tech'},
+ {id:'virus',he:'וַירוּס',tr:'virus',en:'virus',cat:'tech'},
+ {id:'meabed',he:'מְעַבֵּד',tr:'meabed',en:'processor',cat:'tech'},
+ {id:'zikaron',he:'זִכָּרוֹן',tr:'zikaron',en:'memory',cat:'tech'},
+ {id:'tag',he:'תָּג',tr:'tag',en:'tag / label',cat:'tech'},
+ {id:'doarelektroni',he:'דֹּאַר אֶלֶקְטְרוֹנִי',tr:'doar elektroni',en:'email',cat:'tech'},
+ {id:'kadur',he:'כַּדּוּר',tr:'kadur',en:'ball',cat:'sports'},
+ {id:'kaduregel',he:'כַּדּוּרֶגֶל',tr:'kaduregel',en:'soccer',cat:'sports'},
+ {id:'kadursal',he:'כַּדּוּרְסַל',tr:'kadursal',en:'basketball',cat:'sports'},
+ {id:'miskhak',he:'מִשְׂחָק',tr:'miskhak',en:'game / match',cat:'sports'},
+ {id:'kvutsa',he:'קְבוּצָה',tr:'kvutsa',en:'team',cat:'sports'},
+ {id:'sakhkan',he:'שַׂחְקָן',tr:'sakhkan',en:'player',cat:'sports'},
+ {id:'nitsakhon',he:'נִצָּחוֹן',tr:'nitsakhon',en:'victory',cat:'sports'},
+ {id:'hefsed',he:'הֶפְסֵד',tr:'hefsed',en:'loss',cat:'sports'},
+ {id:'imun',he:'אִמּוּן',tr:'imun',en:'training / practice',cat:'sports'},
+ {id:'khadarkosher',he:'חֶדֶר כֹּשֶׁר',tr:'khadar kosher',en:'gym',cat:'sports'},
+ {id:'ritsa',he:'רִיצָה',tr:'ritsa',en:'running',cat:'sports'},
+ {id:'skhiya',he:'שְׂחִיָּה',tr:'skhiya',en:'swimming',cat:'sports'},
+ {id:'kaduraf',he:'כַּדּוּרְעָף',tr:'kaduraf',en:'volleyball',cat:'sports'},
+ {id:'tenis',he:'טֶנִיס',tr:'tenis',en:'tennis',cat:'sports'},
+ {id:'madim',he:'מַדִּים',tr:'madim',en:'uniform',cat:'sports'},
+ {id:'ofanayim',he:'אוֹפַנַּיִם',tr:'ofanayim',en:'bicycle',cat:'sports'},
+ {id:'shofet',he:'שׁוֹפֵט',tr:'shofet',en:'referee',cat:'sports'},
+ {id:'sadeh',he:'שָׂדֶה',tr:'sadeh',en:'field',cat:'sports'},
+ {id:'gmar',he:'גְּמָר',tr:'gmar',en:'final (championship)',cat:'sports'},
+ {id:'taharut',he:'תַּחֲרוּת',tr:'taharut',en:'competition',cat:'sports'},
+ {id:'medalya',he:'מֶדַלְיָה',tr:'medalya',en:'medal',cat:'sports'},
+ {id:'gavia',he:'גָּבִיעַ',tr:'gavia',en:'trophy / cup',cat:'sports'},
+ {id:'naaleisport',he:'נַעֲלֵי סְפּוֹרט',tr:'naalei sport',en:'sport shoes',cat:'sports'},
+ {id:'shaonatsira',he:'שְׁעוֹן עֲצִירָה',tr:'shaon atsira',en:'stopwatch',cat:'sports'},
+ {id:'markaton',he:'מָרָתוֹן',tr:'maraton',en:'marathon',cat:'sports'},
+ {id:'kosher',he:'כֹּשֶׁר',tr:'kosher',en:'fitness',cat:'sports'},
+ {id:'sport',he:'סְפּוֹרט',tr:'sport',en:'sports',cat:'sports'},
+ {id:'ohed',he:'אוֹהֵד',tr:'ohed',en:'fan (supporter)',cat:'sports'},
+ {id:'shabat',he:'שַׁבָּת',tr:'shabat',en:'Sabbath',cat:'holidays'},
+ {id:'roshhashana',he:'רֹאשׁ הַשָּׁנָה',tr:'Rosh HaShana',en:'Rosh Hashana',cat:'holidays'},
+ {id:'pesakh',he:'פֶּסַח',tr:'Pesakh',en:'Passover',cat:'holidays'},
+ {id:'khanuka',he:'חֲנֻכָּה',tr:'Khanuka',en:'Hanukkah',cat:'holidays'},
+ {id:'purim',he:'פּוּרִים',tr:'Purim',en:'Purim',cat:'holidays'},
+ {id:'seder',he:'סֵדֶר',tr:'seder',en:'seder (Passover meal)',cat:'holidays'},
+ {id:'matana',he:'מַתָּנָה',tr:'matana',en:'gift',cat:'holidays'},
+ {id:'ner',he:'נֵר',tr:'ner',en:'candle',cat:'holidays'},
+ {id:'sufganiya',he:'סֻפְגָנִיָּה',tr:'sufganiya',en:'jelly donut',cat:'holidays'},
+ {id:'matza',he:'מַצָּה',tr:'matza',en:'matzah',cat:'holidays'},
+ {id:'shofar',he:'שׁוֹפָר',tr:'shofar',en:'shofar (ram\'s horn)',cat:'holidays'},
+ {id:'mesiba',he:'מְסִבָּה',tr:'mesiba',en:'party',cat:'holidays'},
+ {id:'sukot',he:'סֻכּוֹת',tr:'Sukot',en:'Sukkot',cat:'holidays'},
+ {id:'shavuot',he:'שָׁבוּעוֹת',tr:'Shavuot',en:'Shavuot',cat:'holidays'},
+ {id:'yomkipur',he:'יוֹם כִּפּוּר',tr:'Yom Kipur',en:'Yom Kippur',cat:'holidays'},
+ {id:'tubishvat',he:'ט״וּ בִּשְׁבָט',tr:'Tu BiShvat',en:'Tu BiShvat',cat:'holidays'},
+ {id:'lagbaomer',he:'ל״ג בָּעֹמֶר',tr:'Lag BaOmer',en:'Lag BaOmer',cat:'holidays'},
+ {id:'yomhaatsmaut',he:'יוֹם הָעַצְמָאוּת',tr:'Yom HaAtzmaut',en:'Independence Day',cat:'holidays'},
+ {id:'sevivon',he:'סְבִיבוֹן',tr:'sevivon',en:'dreidel',cat:'holidays'},
+ {id:'zikukim',he:'זִקּוּקִים',tr:'zikukim',en:'fireworks',cat:'holidays'},
+ {id:'masekha',he:'מַסֵּכָה',tr:'masekha',en:'mask',cat:'holidays'},
+ {id:'balon',he:'בָּלוֹן',tr:'balon',en:'balloon',cat:'holidays'},
+ {id:'masoret',he:'מָסֹרֶת',tr:'masoret',en:'tradition',cat:'holidays'},
+ {id:'erevkhag',he:'עֶרֶב חַג',tr:'erev khag',en:'holiday eve',cat:'holidays'},
+ {id:'khanukiya',he:'חֲנֻכִּיָּה',tr:'khanukiya',en:'hanukkiah (menorah)',cat:'holidays'},
+ {id:'kiddush',he:'קִדּוּשׁ',tr:'kiddush',en:'kiddush (blessing over wine)',cat:'holidays'}
 ];
 
-const CAT_LABELS={basics:'Everyday basics',home:'The home · הַבַּיִת',food:'Food & cooking · אֹכֶל',clothing:'Clothing · בְּגָדִים',health:'Health · בְּרִיאוּת',romance:'Romance & social · אַהֲבָה',nature:'Nature · טֶבַע',street:'Street Hebrew · סְלֶנְג',work:'Work · עֲבוֹדָה',travel:'Travel · נְסִיעוֹת',city:'In the city · בָּעִיר',feelings:'Feelings · רְגָשׁוֹת',body:'The body · גּוּף',family:'Family · מִשְׁפָּחָה',time:'Time · זְמַן'};
+const CAT_LABELS={basics:'Everyday basics',home:'The home · הַבַּיִת',food:'Food & cooking · אֹכֶל',clothing:'Clothing · בְּגָדִים',health:'Health · בְּרִיאוּת',romance:'Romance & social · אַהֲבָה',nature:'Nature · טֶבַע',street:'Street Hebrew · סְלֶנְג',work:'Work · עֲבוֹדָה',travel:'Travel · נְסִיעוֹת',city:'In the city · בָּעִיר',feelings:'Feelings · רְגָשׁוֹת',body:'The body · גּוּף',family:'Family · מִשְׁפָּחָה',time:'Time · זְמַן',colors:'Colors · צְבָעִים',animals:'Animals · חַיּוֹת',weather:'Weather · מֶזֶג אֲוִיר',shopping:'Shopping · קְנִיּוֹת',school:'School · לִמּוּדִים',tech:'Tech · טֶכְנוֹלוֹגְיָה',sports:'Sports · סְפּוֹרְט',holidays:'Holidays · חַגִּים'};
 
 const NOUNS=[
  {id:'n_bayit',he:'בַּיִת',pl:'בָּתִּים',g:'m',en:'house'},
@@ -3745,10 +3954,12 @@ function renderVocab(){
   const verbs=ALL_VERBS.filter(v=>match({he:v.lemma,en:v.en,tr:v.tr}));
   if(verbs.length) html+=`<div class="card"><b style="font-size:14px">Verbs</b>${verbs.map(v=>row({he:v.lemma,en:v.en+' · '+BINYANIM[v.b].name,tr:v.tr},false)).join('')}</div>`;
   if(!q){
+    const M=vocabMastery();
     const cats=Object.keys(CAT_LABELS);
     for(const cat of cats){
       const words=VOCAB_SEED.filter(w=>(w.cat||'basics')===cat);
-      if(words.length) html+=`<div class="cat-label">${CAT_LABELS[cat]}</div><div class="card">${words.map(w=>row(w,false)).join('')}</div>`;
+      const B=M.by[cat]||{t:0,rc:0};
+      if(words.length) html+=`<div class="cat-label" style="display:flex;justify-content:space-between;align-items:center">${CAT_LABELS[cat]}<span class="pill${B.rc===B.t&&B.t?' ':''}" style="${B.rc===B.t&&B.t?'background:var(--good-soft);color:var(--good)':''}">${B.rc}/${B.t}</span></div><div class="card">${words.map(w=>row(w,false)).join('')}</div>`;
     }
   } else {
     const gen=VOCAB_SEED.filter(match);
@@ -3771,6 +3982,103 @@ $('#add-btn').addEventListener('click',()=>{
 });
 
 /* ===== binyan chart ===== */
+/* vocabulary mastery: recognized (He->En proven) vs recalled (En->He proven) */
+function vocabMastery(){
+  const skill=skillCells();
+  const by={}; let recog=0,recall=0;
+  for(const w of VOCAB_SEED){
+    const cat=w.cat||'basics';
+    const B=by[cat]=by[cat]||{t:0,rec:0,rc:0};
+    B.t++;
+    const f=state.srs['v'+w.id], r=state.srs['r'+w.id], s=skill[w.id+'|word|-'];
+    const knowP=(r&&(r.ivl||0)>=3)||(s&&s.n>=2&&s.acc>=0.7);
+    const knowR=knowP||(f&&(f.ivl||0)>=3);
+    if(knowR){B.rec++;recog++;}
+    if(knowP){B.rc++;recall++;}
+  }
+  return {by,recog,recall,total:VOCAB_SEED.length};
+}
+function renderVstat(){
+  const root=document.getElementById('vstat-root'); if(!root) return;
+  const M=vocabMastery();
+  const rows=Object.keys(CAT_LABELS).map(cat=>{
+    const B=M.by[cat]; if(!B) return '';
+    const rcp=Math.round(B.rc/B.t*100), rep2=Math.round(B.rec/B.t*100);
+    return `<div class="bstat-row" style="grid-template-columns:110px 1fr 52px">
+      <div style="font-size:12px;font-weight:600;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${CAT_LABELS[cat].split(' ·')[0]}</div>
+      <div class="bstat-bar-wrap" style="position:relative">
+        <div class="bstat-bar" style="width:${rep2}%;background:var(--gold);opacity:.45"></div>
+        <div class="bstat-bar" style="position:absolute;top:0;left:0;width:${rcp}%;background:var(--good)"></div>
+      </div>
+      <div class="bstat-pct">${B.rc}/${B.t}</div>
+    </div>`;
+  }).join('');
+  root.innerHTML=`<div class="row" style="margin-bottom:10px">
+      <div class="grow"><span style="font-size:22px;font-weight:700" class="tnum">${M.recall}</span> <span class="muted" style="font-size:12.5px">recalled</span></div>
+      <div class="grow"><span style="font-size:22px;font-weight:700" class="tnum">${M.recog}</span> <span class="muted" style="font-size:12.5px">recognized</span></div>
+      <div><span style="font-size:22px;font-weight:700" class="tnum">${M.total}</span> <span class="muted" style="font-size:12.5px">words</span></div>
+    </div>${rows}
+    <p class="muted" style="font-size:11.5px;margin:10px 0 0"><span style="color:var(--good)">■</span> recalled (can produce it) · <span style="color:var(--gold)">■</span> recognized (know it when shown)</p>`;
+}
+function renderFstat(){
+  const root=document.getElementById('fstat-root'); if(!root) return;
+  const today=todayStr();
+  const days=[0,0,0,0,0,0,0];
+  for(const id in state.srs){
+    const d=state.srs[id].due; if(!d) continue;
+    const off=dayDiff(today,d);
+    if(off<=0) days[0]++; else if(off<7) days[off]++;
+  }
+  const mx=Math.max(...days,1);
+  const names=['today','+1','+2','+3','+4','+5','+6'];
+  root.innerHTML=`<div style="display:flex;gap:6px;align-items:flex-end;height:96px">${days.map((n,i)=>`
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;height:100%">
+      <span class="muted tnum" style="font-size:11px">${n||''}</span>
+      <div style="width:100%;border-radius:6px 6px 0 0;background:${i===0?'var(--accent)':'var(--surface2)'};height:${Math.max(4,Math.round(n/mx*58))}px"></div>
+      <span class="muted" style="font-size:10px">${names[i]}</span>
+    </div>`).join('')}</div>
+  <p class="muted" style="font-size:12px;margin:8px 0 0">Reviews the scheduler already has booked — today includes overdue.</p>`;
+}
+function renderMat(){
+  const root=document.getElementById('matstat-root'); if(!root) return;
+  let learning=0,young=0,mature=0,seen=0;
+  for(const id in state.srs){
+    const iv=state.srs[id].ivl||0; seen++;
+    if(iv<7) learning++; else if(iv<30) young++; else mature++;
+  }
+  const untouched=Math.max(0,cardPool().length-seen);
+  const cells=[['New',untouched,'var(--surface2)','var(--muted)'],['Learning',learning,'var(--bad-soft)','var(--bad)'],['Young',young,'var(--gold-soft)','var(--gold)'],['Mature',mature,'var(--good-soft)','var(--good)']];
+  root.innerHTML=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">${cells.map(([l,n,bg,fg])=>`
+    <div style="background:${bg};border-radius:10px;padding:8px 4px;text-align:center">
+      <div class="tnum" style="font-size:18px;font-weight:700;color:${fg}">${n}</div>
+      <div style="font-size:10.5px;font-weight:600;color:${fg}">${l}</div>
+    </div>`).join('')}</div>
+  <p class="muted" style="font-size:12px;margin:8px 0 0">Learning &lt;7 days · young 7–29 · mature 30+ day intervals.</p>`;
+}
+function renderActRoot(){
+  const root=document.getElementById('act-root'); if(!root) return;
+  const today=new Date(todayStr()+'T12:00:00');
+  const bars=[];
+  for(let i=13;i>=0;i--){
+    const d=new Date(today); d.setDate(d.getDate()-i);
+    const ds=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    bars.push({ds,n:state.stats.days[ds]||0,g:frozenGoal(ds)});
+  }
+  const mx=Math.max(...bars.map(b=>b.n),1);
+  const now=Date.now(), W=7*864e5;
+  let a1=[0,0],a2=[0,0];
+  for(const e of state.log){
+    if(!e.ts) continue;
+    const age=now-e.ts, sc=('sc' in e)?e.sc:e.ok;
+    if(age<W){a1[0]+=sc;a1[1]++;} else if(age<2*W){a2[0]+=sc;a2[1]++;}
+  }
+  const p1=a1[1]?Math.round(a1[0]/a1[1]*100):null, p2=a2[1]?Math.round(a2[0]/a2[1]*100):null;
+  const trend=p1==null?'':`This week: ${p1}% accurate over ${a1[1]} answers${p2!=null?` · ${p1>=p2?'▲ up':'▼ down'} ${Math.abs(p1-p2)} pts vs last week`:''}`;
+  root.innerHTML=`<div style="display:flex;gap:3px;align-items:flex-end;height:72px">${bars.map(b=>`
+    <div style="flex:1;border-radius:3px 3px 0 0;background:${b.g>0&&b.n>=b.g?'var(--good)':b.n>0?'var(--gold)':'var(--surface2)'};height:${Math.max(3,Math.round(b.n/mx*62))}px" title="${b.ds}: ${b.n}"></div>`).join('')}</div>
+  <p class="muted" style="font-size:10.5px;margin:4px 0 0;display:flex;justify-content:space-between"><span>2 weeks ago</span><span>today</span></p>
+  ${trend?`<p class="muted" style="font-size:12.5px;margin:8px 0 0">${trend}</p>`:'<p class="muted" style="font-size:12.5px;margin:8px 0 0">No answers yet this week.</p>'}`;
+}
 const MODE_LABEL={mcq:'Quiz',type:'Type it',cloze:'Sentences',listen:'Dictation',ear:'Sharp ear',order:'Word order',vocab:'Vocab',roots:'Roots',num:'Numbers',speed:'Speed',na:'Nouns & adj',exc:'Rules',trans:'Translate',spell:'Spelling',prep:'Little words',sweep:'Sweep'};
 function statBar(label,r,w){
   const tot=r+w;
@@ -3797,6 +4105,7 @@ function renderBstat(){
   const any=state.log.length>0;
   renderLevelCard();
   renderCal();
+  renderVstat(); renderFstat(); renderMat(); renderActRoot();
   broot.innerHTML=any?Object.keys(BINYANIM).map(k=>{const d=byB[k]||{r:0,w:0};return statBar(BINYANIM[k].name,d.r,d.w);}).join('')
     :'<p class="muted" style="font-size:14px">Complete a quiz to see your per-binyan breakdown.</p>';
   if(troot) troot.innerHTML=any?['past','present','future'].map(t=>statBar(TENSES[t].en,byT[t].r,byT[t].w)).join('')
@@ -3859,11 +4168,6 @@ function renderStats(){
   te.style.color=goal>0&&tn>=goal?'var(--good)':'';
   renderHero(due);
   renderCardsHome();
-  const actEl=document.getElementById('act-line');
-  if(actEl){
-    const days=Object.entries(state.stats.days||{}).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,7);
-    actEl.textContent=days.length?days.map(([d,n])=>d.slice(5)+': '+n+' item'+(n===1?'':'s')).join(' · '):'No activity yet — start a quiz to begin your streak!';
-  }
   const lifeEl=document.getElementById('life-line');
   if(lifeEl){
     const tr=state.stats.totalReviews||0, tc=state.stats.totalCorrect||0, ls=state.stats.longestStreak||0;
