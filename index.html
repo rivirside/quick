@@ -484,6 +484,7 @@ details.ref[open] summary .car{transform:rotate(90deg)}
       <button class="x" id="sess-quit">Quit</button>
       <div class="progress"><i id="sess-bar" style="width:0%"></i></div>
       <div class="sess-count tnum" id="sess-count"></div>
+      <button class="x" id="sess-nikud" title="Toggle niqqud"><span class="he" style="font-size:16px">אָ</span></button>
     </div>
     <div id="sess-body" class="grow"></div>
   </div>
@@ -2170,10 +2171,23 @@ function dueCards(){
   const allow=state.lessons.started.length?startedLessonCardIds():null;
   for(const c of cardPool()){
     const e=state.srs[c.id];
-    if(!e){ if(!allow||allow.has(c.id)||c.id[0]==='c'||c.id.indexOf('ph_')===0||c.id.indexOf('rph_')===0) fresh.push(c); }
+    if(!e){ if(!allow||allow.has(c.id)||c.id[0]==='c'||c.id.slice(0,2)==='rc'||c.id.indexOf('ph_')===0||c.id.indexOf('rph_')===0) fresh.push(c); }
     else if(e.due<=today) due.push(c);
   }
-  return due.concat(fresh.slice(0,10)).slice(0,20);
+  /* introduce new material in BOTH directions together: each word's
+     Hebrew→English card and its English→Hebrew twin enter side by side;
+     reverse cards whose forward twin is already learned jump the queue */
+  const rmap=new Map(), fwd=[];
+  for(const c of fresh){ if(c.kind[0]==='r') rmap.set(c.id,c); else fwd.push(c); }
+  const ridOf=c=>c.kind==='vocab'&&c.id[0]==='v'?'r'+c.id.slice(1):'r'+c.id;
+  const pairs=[];
+  for(const f of fwd){ const r=rmap.get(ridOf(f)); if(r){ rmap.delete(ridOf(f)); pairs.push([f,r]); } else pairs.push([f]); }
+  const orph=[...rmap.values()], ordered=[];
+  while(pairs.length||orph.length){
+    if(orph.length) ordered.push(orph.shift());
+    if(pairs.length) ordered.push(...pairs.shift());
+  }
+  return due.concat(ordered.slice(0,10)).slice(0,20);
 }
 function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');}
 /* SM-2 (Anki-style): per-card ease factor, multiplicative intervals.
@@ -2485,56 +2499,92 @@ function pickWeighted(n){
 const sess={items:[],i:0,right:0,mode:null};
 let lessonRun=null, sessScope=null, speedTimer=null, sweep=null;
 function openSession(mode){
-  sess.mode=mode; sess.i=0; sess.right=0;
+  sess.mode=mode; sess.i=0; sess.right=0; sess.off=0; sess.right0=0; sess.bumped=0;
   sessScope=lessonRun?lessonRun.L:null;
   if(mode==='speed'){
     sess.items=pickWeighted(40);
     $('#session').classList.add('on'); document.documentElement.style.overflow='hidden';
     renderSpeedRound(); return;
   }
+  /* resume a round quit earlier today instead of resetting its counter */
+  let want=sessLen();
+  const sv=!lessonRun&&mode!=='level'&&state.sessSave&&state.sessSave[mode];
+  if(sv&&sv.day===todayStr()&&sv.done>0&&sv.done<sv.len){
+    sess.off=sv.done; sess.right0=sv.right||0; want=sv.len-sv.done;
+  }else if(sv){ delete state.sessSave[mode]; }
   if(mode==='mcq'||mode==='type'||mode==='listen'||mode==='ear'){
-    sess.items=pickWeighted(sessLen());
+    sess.items=pickWeighted(want);
   }else if(mode==='mix'){
-    sess.items=buildMixItems(sessLen());
+    sess.items=buildMixItems(want);
   }else if(mode==='level'){
     sess.items=buildLevelItems();
     sess.logStart=state.log.length;
   }else if(mode==='vocab'){
-    sess.items=buildVocabItems(sessLen());
+    sess.items=buildVocabItems(want);
   }else if(mode==='roots'){
-    sess.items=buildRootItems(sessLen());
+    sess.items=buildRootItems(want);
   }else if(mode==='order'){
-    sess.items=buildOrderItems(sessLen());
+    sess.items=buildOrderItems(want);
   }else if(mode==='num'){
-    sess.items=buildNumItems(sessLen());
+    sess.items=buildNumItems(want);
   }else if(mode==='spell'){
-    sess.items=buildSpellItems(sessLen());
+    sess.items=buildSpellItems(want);
   }else if(mode==='prep'){
-    sess.items=buildPrepItems(sessLen());
+    sess.items=buildPrepItems(want);
   }else if(mode==='na'){
-    sess.items=buildNaItems(sessLen());
+    sess.items=buildNaItems(want);
   }else if(mode==='cloze'){
     const pool=sessScope&&sessScope.verbs?SENTENCES.filter(s=>sessScope.verbs.includes(s.v)):SENTENCES;
     const base=pool.length?pool:SENTENCES;
     const skill=skillCells();
-    sess.items=weightedSample(base.map(s=>({...s,wgt:cellWgt(skill,s.v+'|'+s.t+'|'+s.p)})),sessLen());
+    sess.items=weightedSample(base.map(s=>({...s,wgt:cellWgt(skill,s.v+'|'+s.t+'|'+s.p)})),want);
   }else{
     const skill=skillCells();
-    sess.items=weightedSample(EXCEPTIONS.map(q=>({...q,wgt:cellWgt(skill,q.id+'|rule|-')})),sessLen());
+    sess.items=weightedSample(EXCEPTIONS.map(q=>({...q,wgt:cellWgt(skill,q.id+'|rule|-')})),want);
   }
   $('#session').classList.add('on'); document.documentElement.style.overflow='hidden';
   renderQuestion();
 }
 function closeSession(){ lessonRun=null; sessScope=null; sweep=null; if(speedTimer){clearInterval(speedTimer);speedTimer=null;} $('#session').classList.remove('on'); document.documentElement.style.overflow=''; renderStats(); renderLessons(); renderOnboard(); }
 $('#sess-quit').addEventListener('click',closeSession);
+/* niqqud-off catches ALL session text, incl. bits templates didn't wrap in hn() */
+const NIKUD_RE=/[\u0591-\u05C7]/;
+function stripWalk(node){
+  if(node.nodeType===3){ if(NIKUD_RE.test(node.nodeValue)) node.nodeValue=node.nodeValue.normalize('NFC').replace(/[\u0591-\u05C7]/g,''); return; }
+  if(node.nodeType!==1) return;
+  const w=document.createTreeWalker(node,NodeFilter.SHOW_TEXT); let n;
+  while(n=w.nextNode()){ if(NIKUD_RE.test(n.nodeValue)) n.nodeValue=n.nodeValue.normalize('NFC').replace(/[\u0591-\u05C7]/g,''); }
+}
+new MutationObserver(ms=>{ if(nikudOn) return; for(const m of ms) for(const n of m.addedNodes) stripWalk(n); })
+  .observe(document.getElementById('sess-body'),{childList:true,subtree:true});
+$('#sess-nikud').addEventListener('click',()=>{
+  toggleNikud();
+  $('#sess-nikud').style.opacity=nikudOn?'1':'.45';
+  if(sweep){ renderSweep(); }
+  else if(sess.mode==='flash'){ if(deckI<deck.length) renderFlash(); }
+  else if(sess.mode!=='speed'&&sess.i<sess.items.length) renderQuestion();
+});
 
 function sessHead(){
-  $('#sess-bar').style.width=(sess.i/sess.items.length*100)+'%';
-  $('#sess-count').textContent=(sess.i+1)+' / '+sess.items.length;
+  const off=sess.off||0, tot=off+sess.items.length;
+  $('#sess-bar').style.width=((off+sess.i)/tot*100)+'%';
+  $('#sess-count').textContent=(off+sess.i+1)+' / '+tot;
+}
+/* mid-round progress: the counter survives quitting, and each answer counts
+   toward the daily goal immediately rather than only at round end */
+function saveSess(){
+  if(lessonRun||sweep||sess.mode==='level'||sess.mode==='speed') return;
+  const nb=sess.i-(sess.bumped||0);
+  if(nb>0){ sess.bumped=sess.i; bumpActivity(nb); }
+  const done=(sess.off||0)+sess.i, len=(sess.off||0)+sess.items.length;
+  state.sessSave=state.sessSave||{};
+  if(done>0&&done<len){ state.sessSave[sess.mode]={day:todayStr(),done,right:(sess.right0||0)+sess.right,len}; persist(); }
 }
 function finishSession(){
+  if(state.sessSave&&state.sessSave[sess.mode]){ delete state.sessSave[sess.mode]; persist(); }
   $('#sess-bar').style.width='100%'; $('#sess-count').textContent='';
-  const pct=Math.round(sess.right/sess.items.length*100);
+  const tot=(sess.off||0)+sess.items.length, right=(sess.right0||0)+sess.right;
+  const pct=Math.round(right/tot*100);
   const word=pct===100?'מְצֻיָּן!':pct>=70?'כָּל הַכָּבוֹד!':'עוֹד פַּעַם?';
   if(sess.mode==='level'){
     const evs=state.log.slice(sess.logStart||0);
@@ -2555,7 +2605,7 @@ function finishSession(){
   if(lessonRun){
     const more=lessonRun.i<lessonRun.stages.length;
     $('#sess-body').innerHTML=`<div class="sess-done">
-      <div class="big he">${word}</div><h3>${sess.right} of ${sess.items.length}</h3>
+      <div class="big he">${word}</div><h3>${right} of ${tot}</h3>
       <p class="muted">${more?'Stage '+lessonRun.i+' of '+lessonRun.stages.length+' done.':'Lesson round complete!'}</p>
       <div class="sess-actions" style="max-width:340px;margin:18px auto 0">
         <button class="btn ghost" id="d-close">Stop</button>
@@ -2568,7 +2618,7 @@ function finishSession(){
   }
   const sub=pct===100?'Perfect round.':pct>=70?'Nice work — keep the streak going.':'Tough round — the reference tab is your friend.';
   $('#sess-body').innerHTML=`<div class="sess-done">
-    <div class="big he">${word}</div><h3>${sess.right} of ${sess.items.length}</h3>
+    <div class="big he">${word}</div><h3>${right} of ${tot}</h3>
     <p class="muted">${sub}</p>
     <div class="sess-actions" style="max-width:340px;margin:18px auto 0">
       <button class="btn ghost" id="d-close">Done</button>
@@ -2576,7 +2626,7 @@ function finishSession(){
     </div></div>`;
   $('#d-close').addEventListener('click',closeSession);
   $('#d-again').addEventListener('click',()=>openSession(sess.mode));
-  bumpActivity(sess.items.length);
+  bumpActivity(sess.items.length-(sess.bumped||0));
 }
 
 function distractors(v,t,p,n){
@@ -2593,7 +2643,7 @@ function distractors(v,t,p,n){
 
 function renderQuestion(){
   if(sess.i>=sess.items.length) return finishSession();
-  sessHead();
+  saveSess(); sessHead();
   const it=sess.items[sess.i], body=$('#sess-body');
   if(sess.mode==='mix'||sess.mode==='level'){
     const g=it.game, x=it.it;
@@ -4457,7 +4507,7 @@ document.getElementById('merge-file').addEventListener('change',e=>{
 });
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
-const APP_VER='v22';
+const APP_VER='v23';
 document.getElementById('app-ver').textContent=APP_VER;
 document.getElementById('update-btn').addEventListener('click',async()=>{
   const b=document.getElementById('update-btn'); b.disabled=true; b.textContent='Updating…';
