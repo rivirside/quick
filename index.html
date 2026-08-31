@@ -417,6 +417,8 @@ details.ref[open] summary .car{transform:rotate(90deg)}
         <select class="setsel" id="set-goal"><option value="10">10 answers</option><option value="20">20 answers</option><option value="30">30 answers</option><option value="50">50 answers</option></select></div>
       <div class="row" style="margin-bottom:12px"><span class="grow" style="font-size:14.5px">Questions per round</span>
         <select class="setsel" id="set-len"><option value="5">5</option><option value="10">10</option><option value="15">15</option></select></div>
+      <div class="row" style="margin-bottom:12px"><span class="grow" style="font-size:14.5px">New cards per day<br><span class="muted" style="font-size:12px">Reviews are always all due cards</span></span>
+        <select class="setsel" id="set-newday"><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option></select></div>
       <div class="row"><span class="grow" style="font-size:14.5px">Pu'al &amp; Huf'al<br><span class="muted" style="font-size:12px">Literary binyanim — rare in speech</span></span>
         <select class="setsel" id="set-lit"><option value="light">Rare (default)</option><option value="off">Skip them</option><option value="full">Full weight</option></select></div>
     </div>
@@ -2187,13 +2189,25 @@ function dueCards(){
     if(orph.length) ordered.push(orph.shift());
     if(pairs.length) ordered.push(...pairs.shift());
   }
-  return due.concat(ordered.slice(0,10)).slice(0,20);
+  return due.concat(ordered.slice(0,introBudget())).slice(0,20);
 }
 function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');}
 /* SM-2 (Anki-style): per-card ease factor, multiplicative intervals.
    0 again: lapse, ease -0.2, relearn today · 1 good: ivl x ease
    2 easy: ease +0.15, ivl x ease x 1.3 · intervals capped at a year */
+/* new-card budget: introductions are capped PER DAY, not per deck build —
+   finishing your cards must mean finished, not "here's 10 more" */
+const newPerDay=()=>(state.prefs&&+state.prefs.newDay)||10;
+function introBudget(){
+  const st=state.stats;
+  return st.introDay===todayStr()?Math.max(0,newPerDay()-(st.introN||0)):newPerDay();
+}
 function gradeCard(id,g){
+  if(!state.srs[id]){
+    const st=state.stats;
+    if(st.introDay!==todayStr()){ st.introDay=todayStr(); st.introN=0; }
+    st.introN=(st.introN||0)+1;
+  }
   const e=state.srs[id]||{ef:2.5,ivl:0,lapses:0,reps:0};
   if(e.box!=null){ e.ef=2.5; e.ivl=INTERVALS[e.box]||0; e.lapses=0; e.reps=e.box||0; delete e.box; }
   if(g===0){
@@ -2259,6 +2273,7 @@ function renderSettings(){
   $('#rate-val').textContent=((P.rate||0.85)).toFixed(2)+'×';
   $('#set-goal').value=String(P.goal||20);
   $('#set-len').value=String(P.len||10);
+  $('#set-newday').value=String(P.newDay||10);
   $('#set-lit').value=P.lit||'light';
   const rmp=P.ramp;
   $('#set-rampto').value=rmp?String(rmp.to):'';
@@ -2404,6 +2419,7 @@ $('#set-rate').addEventListener('input',e=>{(state.prefs=state.prefs||{}).rate=+
 $('#rate-test').addEventListener('click',()=>speak('שָׁלוֹם, מָה נִשְׁמָע?'));
 $('#set-goal').addEventListener('change',e=>{(state.prefs=state.prefs||{}).goal=+e.target.value;persist();renderStats();});
 $('#set-len').addEventListener('change',e=>{(state.prefs=state.prefs||{}).len=+e.target.value;persist();});
+$('#set-newday').addEventListener('change',e=>{(state.prefs=state.prefs||{}).newDay=+e.target.value;persist();renderCardsHome();renderStats();});
 $('#set-lit').addEventListener('change',e=>{(state.prefs=state.prefs||{}).lit=e.target.value;persist();});
 $('#set-rampto').addEventListener('change',setRamp);
 $('#set-rampby').addEventListener('change',setRamp);
@@ -4124,9 +4140,12 @@ function renderFlash(){
   $('#f-grade .easy').addEventListener('click',()=>grade(2));
 }
 function renderCardsHome(){
-  const n=dueCards().length;
-  $('#cards-due-line').textContent=n?`${n} card${n===1?'':'s'} due`:'Nothing due — nicely done';
-  $('#cards-start').disabled=!n;
+  const cs=dueCards();
+  const nw=cs.filter(c=>!state.srs[c.id]).length, rv=cs.length-nw;
+  $('#cards-due-line').textContent=cs.length
+    ?(rv&&nw?`${rv} review${rv===1?'':'s'} + ${nw} new`:rv?`${rv} card${rv===1?'':'s'} to review`:`${nw} new card${nw===1?'':'s'}`)
+    :'Nothing due — nicely done';
+  $('#cards-start').disabled=!cs.length;
 }
 
 /* ===== reference ===== */
@@ -4507,7 +4526,7 @@ document.getElementById('merge-file').addEventListener('change',e=>{
 });
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
-const APP_VER='v23';
+const APP_VER='v24';
 document.getElementById('app-ver').textContent=APP_VER;
 document.getElementById('update-btn').addEventListener('click',async()=>{
   const b=document.getElementById('update-btn'); b.disabled=true; b.textContent='Updating…';
