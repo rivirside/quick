@@ -248,7 +248,7 @@ details.ref[open] summary .car{transform:rotate(90deg)}
   padding:8px max(12px,env(safe-area-inset-left));display:flex;gap:8px;z-index:39}
 .chat-inbar input{flex:1;background:var(--surface2);border:none;border-radius:20px;padding:10px 14px;font-size:16px;min-width:0}
 .chat-addbar{position:fixed;left:12px;right:12px;bottom:122px;background:var(--ink);color:var(--bg);
-  border-radius:14px;padding:10px 14px;display:flex;align-items:center;gap:10px;z-index:45;box-shadow:var(--shadow)}
+  border-radius:14px;padding:10px 14px;display:flex;align-items:center;gap:10px;z-index:70;box-shadow:var(--shadow)}
 </style>
 </head>
 <body>
@@ -286,6 +286,7 @@ details.ref[open] summary .car{transform:rotate(90deg)}
       <button class="gtile" data-mode="num"><span class="glyph">3</span><b>Numbers</b><span class="d">Gendered numerals</span></button>
       <button class="gtile" data-mode="exc"><span class="glyph">!</span><b>Rules</b><span class="d">Exceptions &amp; patterns</span></button>
       <button class="gtile" data-mode="spell"><span class="glyph">אב</span><b>Spelling</b><span class="d">ב or ו? ח or כ?</span></button>
+      <button class="gtile" data-mode="prep"><span class="glyph">לִי</span><b>Little words</b><span class="d">יש לי, שלי, איתך…</span></button>
       <button class="gtile" data-mode="speed"><span class="glyph">⚡</span><b>Speed round</b><span class="d">60-second sprint</span></button>
       <button class="gtile" data-mode="level" style="grid-column:1/-1;flex-direction:row;align-items:center"><span class="glyph">✓</span><span><b>Level check</b><span class="d" style="display:block">3 minutes — where are you right now?</span></span></button>
     </div>
@@ -331,11 +332,6 @@ details.ref[open] summary .car{transform:rotate(90deg)}
     <div class="chat-inbar" id="chat-inbar">
       <input id="chat-in" dir="auto" placeholder="Hebrew, English, or both…" autocomplete="off">
       <button class="btn" id="chat-send" style="border-radius:20px;padding:10px 16px">↑</button>
-    </div>
-    <div class="chat-addbar" id="chat-addbar" hidden>
-      <span class="grow" style="font-size:14px">Add <b class="he" id="chat-addw" style="font-size:18px"></b> to my words?</span>
-      <button class="btn" id="chat-addyes" style="padding:7px 14px">Add</button>
-      <button style="color:var(--bg);opacity:.75;font-weight:700;font-size:16px" id="chat-addno">✕</button>
     </div>
   </section>
 
@@ -422,6 +418,12 @@ details.ref[open] summary .car{transform:rotate(90deg)}
   <button data-tab="chat"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-8 8H5l-2 2V12a8 8 0 0 1 8-8h2a8 8 0 0 1 8 8z"/></svg>Chat</button>
   <button data-tab="stats"><svg viewBox="0 0 24 24"><path d="M3 18h3v-6H3zm4 0h3v-9H7zm4 0h3V6h-3zm4 0h3v-3h-3z"/></svg>Stats</button>
 </nav>
+
+<div class="chat-addbar" id="chat-addbar" hidden>
+  <span class="grow" style="font-size:14px">Add <b class="he" id="chat-addw" style="font-size:18px"></b> to my words?</span>
+  <button class="btn" id="chat-addyes" style="padding:7px 14px">Add</button>
+  <button style="color:var(--bg);opacity:.75;font-weight:700;font-size:16px" id="chat-addno">✕</button>
+</div>
 
 <div id="session">
   <div class="sess-wrap">
@@ -545,6 +547,21 @@ const TPL={
    p2mp:['תִּתְ',[1,'ַ',1],[2,'ְ',2],[3,'',0],'וּ'], p3mp:['יִתְ',[1,'ַ',1],[2,'ְ',2],[3,'',0],'וּ']}}
 };
 
+/* infinitive template per binyan (pu'al/huf'al have none) */
+const INF_TPL={
+ paal:['לִ',[1,'ְ',0],[2,'ֹ',1],[3,'',0]],
+ nifal:['לְהִ',[1,'ָ',2],[2,'ֵ',0],[3,'',0]],
+ piel:['לְ',[1,'ַ',0],[2,'ֵ',2],[3,'',0]],
+ hifil:['לְהַ',[1,'ְ',0],[2,'ִי',1],[3,'',0]],
+ hitpael:['לְהִתְ',[1,'ַ',1],[2,'ֵ',2],[3,'',0]]
+};
+const MODALS=[{he:'אֲנִי רוֹצֶה',en:'I want'},{he:'אֲנִי צָרִיךְ',en:'I need'},{he:'אֲנִי יָכוֹל',en:'I can'},{he:'אֶפְשָׁר',en:'is it possible'},{he:'בָּא לִי',en:'I feel like'}];
+/* inflected prepositions — the little words that carry spoken Hebrew */
+const PREP_SETS={
+ l:{he:'לְ־',en:'to / for',forms:{p1s:['לִי','li'],p2ms:['לְךָ','lekha'],p2fs:['לָךְ','lakh'],p3ms:['לוֹ','lo'],p3fs:['לָהּ','lah'],p1p:['לָנוּ','lanu'],p2mp:['לָכֶם','lakhem'],p3mp:['לָהֶם','lahem']}},
+ shel:{he:'שֶׁל',en:'of (possessive)',forms:{p1s:['שֶׁלִּי','sheli'],p2ms:['שֶׁלְּךָ','shelkha'],p2fs:['שֶׁלָּךְ','shelakh'],p3ms:['שֶׁלּוֹ','shelo'],p3fs:['שֶׁלָּהּ','shelah'],p1p:['שֶׁלָּנוּ','shelanu'],p2mp:['שֶׁלָּכֶם','shelakhem'],p3mp:['שֶׁלָּהֶם','shelahem']}},
+ im:{he:'עִם',en:'with',forms:{p1s:['אִתִּי','iti'],p2ms:['אִתְּךָ','itkha'],p2fs:['אִתָּךְ','itakh'],p3ms:['אִתּוֹ','ito'],p3fs:['אִתָּהּ','itah'],p1p:['אִתָּנוּ','itanu'],p2mp:['אִתְּכֶם','itkhem'],p3mp:['אִתָּם','itam']}}
+};
 function conj(root, tpl){
   let w='';
   for(const t of tpl){
@@ -570,7 +587,7 @@ const BINYANIM={
  hufal:{he:'הֻפְעַל',name:"Huf'al",fn:"passive of Hif'il — mostly written and formal speech"},
  hitpael:{he:'הִתְפַּעֵל',name:"Hitpa'el",fn:'reflexive, reciprocal, or an ongoing process'}
 };
-const TENSES={past:{en:'past',he:'עָבָר'},present:{en:'present',he:'הֹוֶה'},future:{en:'future',he:'עָתִיד'}};
+const TENSES={past:{en:'past',he:'עָבָר'},present:{en:'present',he:'הֹוֶה'},future:{en:'future',he:'עָתִיד'},inf:{en:'infinitive',he:'שֵׁם הַפֹּעַל'}};
 const PERSONS={
  p1s:{en:'I',he:'אֲנִי'}, p2ms:{en:'you (m)',he:'אַתָּה'}, p2fs:{en:'you (f)',he:'אַתְּ'},
  p3ms:{en:'he',he:'הוּא'}, p3fs:{en:'she',he:'הִיא'}, p1p:{en:'we',he:'אֲנַחְנוּ'},
@@ -628,7 +645,35 @@ const AUTO_VERBS=[
  {id:'bshl4',root:'בשל',b:'pual',en:'be cooked',tr:'bushal'},
  {id:'zmn6',root:'זמנ',b:'hufal',en:'be invited',tr:'huzman'},
  {id:'psk6',root:'פסק',b:'hufal',en:'be stopped',tr:'hufsak'},
- {id:'dlk6',root:'דלק',b:'hufal',en:'be lit',tr:'hudlak'}
+ {id:'dlk6',root:'דלק',b:'hufal',en:'be lit',tr:'hudlak'},
+ {id:'lmd1',root:'למד',b:'paal',en:'learn',tr:'lamad'},
+ {id:'mkr1',root:'מכר',b:'paal',en:'sell',tr:'makhar'},
+ {id:'skr1',root:'שכר',b:'paal',en:'rent/hire',tr:'sakhar'},
+ {id:'shtf1',root:'שטפ',b:'paal',en:'rinse/wash off',tr:'shataf'},
+ {id:'ksr1',root:'קשר',b:'paal',en:'tie/connect',tr:'kashar'},
+ {id:'msk1',root:'משכ',b:'paal',en:'pull',tr:'mashakh'},
+ {id:'ptr1',root:'פתר',b:'paal',en:'solve',tr:'patar'},
+ {id:'gnv1',root:'גנב',b:'paal',en:'steal',tr:'ganav'},
+ {id:'shtl1',root:'שתל',b:'paal',en:'plant',tr:'shatal'},
+ {id:'klt1',root:'קלט',b:'paal',en:'absorb',tr:'kalat'},
+ {id:'tpl2',root:'טפל',b:'piel',en:'treat/handle',tr:'tipel'},
+ {id:'btl2',root:'בטל',b:'piel',en:'cancel',tr:'bitel'},
+ {id:'sdr2',root:'סדר',b:'piel',en:'organize/arrange',tr:'sider'},
+ {id:'tkn2',root:'תקנ',b:'piel',en:'fix/repair',tr:'tiken'},
+ {id:'kbs2',root:'כבס',b:'piel',en:'do laundry',tr:'kibes'},
+ {id:'smn2',root:'סמנ',b:'piel',en:'mark',tr:'siman'},
+ {id:'kpl2',root:'קפל',b:'piel',en:'fold',tr:'kipel'},
+ {id:'kdm2',root:'קדמ',b:'piel',en:'promote/advance',tr:'kidem'},
+ {id:'nmkr3',root:'מכר',b:'nifal',en:'be sold',tr:'nimkar'},
+ {id:'shkh3',root:'שכח',b:'nifal',en:'be forgotten',tr:'nishkakh'},
+ {id:'ntps3',root:'תפס',b:'nifal',en:'get caught/perceived',tr:'nitpas'},
+ {id:'nlmd3',root:'למד',b:'nifal',en:'be learned/studied',tr:'nilmad'},
+ {id:'rshm5',root:'רשמ',b:'hifil',en:'impress',tr:'hirshim'},
+ {id:'dgsh5',root:'דגש',b:'hifil',en:'emphasize',tr:'hidgish'},
+ {id:'msk5',root:'משכ',b:'hifil',en:'continue',tr:'himshikh'},
+ {id:'dps5',root:'דפס',b:'hifil',en:'print',tr:'hidpis'},
+ {id:'lbt7',root:'לבט',b:'hitpael',en:'hesitate/deliberate',tr:'hitlabet'},
+ {id:'rkz7',root:'רכז',b:'hitpael',en:'concentrate/focus',tr:'hitrakez'}
 ];
 const P6=['p1s','p2ms','p3ms','p3fs','p1p','p3mp'];
 function ex(past,present,future){
@@ -713,7 +758,67 @@ const EXPLICIT_VERBS=[
   note:'Root starts with ס, so הִתְ swaps places with it: הִסְתַּכֵּל.',
   f:ex(['הִסְתַּכַּלְתִּי','הִסְתַּכַּלְתָּ','הִסְתַּכֵּל','הִסְתַּכְּלָה','הִסְתַּכַּלְנוּ','הִסְתַּכְּלוּ'],
       ['מִסְתַּכֵּל','מִסְתַּכֶּלֶת','מִסְתַּכְּלִים','מִסְתַּכְּלוֹת'],
-      ['אֶסְתַּכֵּל','תִּסְתַּכֵּל','יִסְתַּכֵּל','תִּסְתַּכֵּל','נִסְתַּכֵּל','יִסְתַּכְּלוּ'])}
+      ['אֶסְתַּכֵּל','תִּסְתַּכֵּל','יִסְתַּכֵּל','תִּסְתַּכֵּל','נִסְתַּכֵּל','יִסְתַּכְּלוּ'])},
+ {id:'shata',b:'paal',root:'שׁ-ת-ה',giz:'ל"ה',en:'drink',tr:'shata',inf:'לִשְׁתּוֹת',
+  note:'Final-heh (ל"ה) root — the heh drops and vowels contract differently in each tense (e.g. 3rd-fem-sing past שָׁתְתָה, plural שָׁתוּ).',
+  f:ex(['שָׁתִיתִי','שָׁתִיתָ','שָׁתָה','שָׁתְתָה','שָׁתִינוּ','שָׁתוּ'],
+      ['שׁוֹתֶה','שׁוֹתָה','שׁוֹתִים','שׁוֹתוֹת'],
+      ['אֶשְׁתֶּה','תִּשְׁתֶּה','יִשְׁתֶּה','תִּשְׁתֶּה','נִשְׁתֶּה','יִשְׁתּוּ'])},
+ {id:'kara',b:'paal',root:'ק-ר-א',giz:'ל"א',en:'read/call',tr:'kara',inf:'לִקְרוֹא',
+  note:'Final-alef (ל"א) root — the alef is silent and takes no vowel of its own, so past/future forms contract before it (e.g. קָרְאָה, קָרְאוּ).',
+  f:ex(['קָרָאתִי','קָרָאתָ','קָרָא','קָרְאָה','קָרָאנוּ','קָרְאוּ'],
+      ['קוֹרֵא','קוֹרֵאת','קוֹרְאִים','קוֹרְאוֹת'],
+      ['אֶקְרָא','תִּקְרָא','יִקְרָא','תִּקְרָא','נִקְרָא','יִקְרְאוּ'])},
+ {id:'raa',b:'paal',root:'ר-א-ה',giz:'ל"ה (עם א\' באמצע)',en:'see',tr:'ra\'a',inf:'לִרְאוֹת',
+  note:'Doubly irregular — a quiescent medial alef combined with a final-heh ending, so it blends contraction patterns from both weak classes.',
+  f:ex(['רָאִיתִי','רָאִיתָ','רָאָה','רָאֲתָה','רָאִינוּ','רָאוּ'],
+      ['רוֹאֶה','רוֹאָה','רוֹאִים','רוֹאוֹת'],
+      ['אֶרְאֶה','תִּרְאֶה','יִרְאֶה','תִּרְאֶה','נִרְאֶה','יִרְאוּ'])},
+ {id:'gar',b:'paal',root:'ג-ו-ר',giz:'ע"ו',en:'live/reside',tr:'gar',inf:'לָגוּר',
+  note:'Hollow (ע"ו) root — the middle vav disappears in the past tense (leaving a short, two-consonant-looking form) but reappears as a long vowel in the present and future; note the past 3ms גָּר is spelled identically to the present ms.',
+  f:ex(['גַּרְתִּי','גַּרְתָּ','גָּר','גָּרָה','גַּרְנוּ','גָּרוּ'],
+      ['גָּר','גָּרָה','גָּרִים','גָּרוֹת'],
+      ['אָגוּר','תָּגוּר','יָגוּר','תָּגוּר','נָגוּר','יָגוּרוּ'])},
+ {id:'kana',b:'paal',root:'ק-נ-ה',giz:'ל"ה',en:'buy',tr:'kana',inf:'לִקְנוֹת',
+  note:'Final-heh (ל"ה) root — the heh drops before all personal endings, giving contracted forms like קָנְתָה and קָנוּ.',
+  f:ex(['קָנִיתִי','קָנִיתָ','קָנָה','קָנְתָה','קָנִינוּ','קָנוּ'],
+      ['קוֹנֶה','קוֹנָה','קוֹנִים','קוֹנוֹת'],
+      ['אֶקְנֶה','תִּקְנֶה','יִקְנֶה','תִּקְנֶה','נִקְנֶה','יִקְנוּ'])},
+ {id:'ahav',b:'paal',root:'א-ה-ב',giz:'פ"א + גרונית (double guttural)',en:'love',tr:'ahav',inf:'לֶאֱהוֹב',
+  note:'Both the 1st radical (alef) and 2nd radical (heh) are gutturals, so the infinitive and future take compound sheva/patach vowels instead of the strong-verb pattern.',
+  f:ex(['אָהַבְתִּי','אָהַבְתָּ','אָהַב','אָהֲבָה','אָהַבְנוּ','אָהֲבוּ'],
+      ['אוֹהֵב','אוֹהֶבֶת','אוֹהֲבִים','אוֹהֲבוֹת'],
+      ['אֹהַב','תֹּאהַב','יֹאהַב','תֹּאהַב','נֹאהַב','יֹאהֲבוּ'])},
+ {id:'avad',b:'paal',root:'ע-ב-ד',giz:'פ"ע (guttural first radical)',en:'work',tr:'avad',inf:'לַעֲבוֹד',
+  note:'Guttural first radical (ayin) takes a compound sheva, giving a patach-based prefix in infinitive and future (לַעֲבוֹד, יַעֲבֹד) instead of the strong-verb vowel.',
+  f:ex(['עָבַדְתִּי','עָבַדְתָּ','עָבַד','עָבְדָה','עָבַדְנוּ','עָבְדוּ'],
+      ['עוֹבֵד','עוֹבֶדֶת','עוֹבְדִים','עוֹבְדוֹת'],
+      ['אֶעֱבֹד','תַּעֲבֹד','יַעֲבֹד','תַּעֲבֹד','נַעֲבֹד','יַעַבְדוּ'])},
+ {id:'yakhol',b:'paal',root:'י-כ-ל',giz:'פועל פגום/מיוחד (defective modal)',en:'can/be able',tr:'yakhol',inf:null,
+  note:'Defective modal verb — the present-tense form doubles as the dictionary/base form, the infinitive is archaic and almost never used, and the future uses a special אוכל/תוכל/יוכל stem unrelated to the usual root-vowel pattern.',
+  f:ex(['יָכֹלְתִּי','יָכֹלְתָּ','יָכוֹל','יָכְלָה','יָכֹלְנוּ','יָכְלוּ'],
+      ['יָכוֹל','יְכוֹלָה','יְכוֹלִים','יְכוֹלוֹת'],
+      ['אוּכַל','תּוּכַל','יוּכַל','תּוּכַל','נוּכַל','יוּכְלוּ'])},
+ {id:'nasa',b:'paal',root:'נ-ס-ע',giz:'פ"נ',en:'travel',tr:'nasa',inf:'לִנְסֹעַ',
+  note:'First-radical nun (פ"נ) — the nun assimilates and drops out in the future tense, doubling (with a dagesh in) the following consonant: אֶסַּע, יִסְעוּ.',
+  f:ex(['נָסַעְתִּי','נָסַעְתָּ','נָסַע','נָסְעָה','נָסַעְנוּ','נָסְעוּ'],
+      ['נוֹסֵעַ','נוֹסַעַת','נוֹסְעִים','נוֹסְעוֹת'],
+      ['אֶסַּע','תִּסַּע','יִסַּע','תִּסַּע','נִסַּע','יִסְעוּ'])},
+ {id:'amad',b:'paal',root:'ע-מ-ד',giz:'פ"ע (guttural first radical)',en:'stand',tr:'amad',inf:'לַעֲמֹד',
+  note:'Guttural first radical (ayin) forces a compound-sheva/patach prefix in the infinitive and future (לַעֲמֹד, יַעֲמֹד) instead of the strong-verb vowel pattern.',
+  f:ex(['עָמַדְתִּי','עָמַדְתָּ','עָמַד','עָמְדָה','עָמַדְנוּ','עָמְדוּ'],
+      ['עוֹמֵד','עוֹמֶדֶת','עוֹמְדִים','עוֹמְדוֹת'],
+      ['אֶעֱמֹד','תַּעֲמֹד','יַעֲמֹד','תַּעֲמֹד','נַעֲמֹד','יַעַמְדוּ'])},
+ {id:'ana',b:'paal',root:'ע-נ-ה',giz:'ל"ה + פ"ע',en:'answer',tr:'ana',inf:'לַעֲנוֹת',
+  note:'Combines a guttural first radical (ayin) with a final-heh ending, so both the future\'s prefix vowel and the usual final-heh contractions apply together.',
+  f:ex(['עָנִיתִי','עָנִיתָ','עָנָה','עָנְתָה','עָנִינוּ','עָנוּ'],
+      ['עוֹנֶה','עוֹנָה','עוֹנִים','עוֹנוֹת'],
+      ['אֶעֱנֶה','תַּעֲנֶה','יַעֲנֶה','תַּעֲנֶה','נַעֲנֶה','יַעֲנוּ'])},
+ {id:'patakh',b:'paal',root:'פ-ת-ח',giz:'גרונית בסוף השורש (final guttural)',en:'open',tr:'patakh',inf:'לִפְתּוֹחַ',
+  note:'Final guttural (het) takes a \'furtive patach\' glide vowel before it in the infinitive and masculine-singular present (לִפְתּוֹחַ, פּוֹתֵחַ).',
+  f:ex(['פָּתַחְתִּי','פָּתַחְתָּ','פָּתַח','פָּתְחָה','פָּתַחְנוּ','פָּתְחוּ'],
+      ['פּוֹתֵחַ','פּוֹתַחַת','פּוֹתְחִים','פּוֹתְחוֹת'],
+      ['אֶפְתַּח','תִּפְתַּח','יִפְתַּח','תִּפְתַּח','נִפְתַּח','יִפְתְּחוּ'])}
 ];
 const VOCAB_SEED=[
  /* basics */
@@ -804,10 +909,308 @@ const VOCAB_SEED=[
  {id:'betakh',he:'בֶּטַח',tr:'betakh',en:'sure, obviously',cat:'street'},
  {id:'nu',he:'נוּ',tr:'nu',en:'well?! come on',cat:'street'},
  {id:'takhles',he:'תַּכְלֶס',tr:'takhles',en:'bottom line, honestly',cat:'street'},
- {id:'metoraf',he:'מְטֹרָף',tr:'metoraf',en:'crazy, insane(ly good)',cat:'street'}
+ {id:'metoraf',he:'מְטֹרָף',tr:'metoraf',en:'crazy, insane(ly good)',cat:'street'},
+ {id:'ken',he:'כֵּן',tr:'ken',en:'yes',cat:'basics'},
+ {id:'lo',he:'לֹא',tr:'lo',en:'no',cat:'basics'},
+ {id:'ma',he:'מָה',tr:'ma',en:'what',cat:'basics'},
+ {id:'mi',he:'מִי',tr:'mi',en:'who',cat:'basics'},
+ {id:'eifo',he:'אֵיפֹה',tr:'eifo',en:'where',cat:'basics'},
+ {id:'lama',he:'לָמָּה',tr:'lama',en:'why',cat:'basics'},
+ {id:'eich',he:'אֵיךְ',tr:'eich',en:'how',cat:'basics'},
+ {id:'davar',he:'דָּבָר',tr:'davar',en:'thing',cat:'basics'},
+ {id:'adam',he:'אָדָם',tr:'adam',en:'person',cat:'basics'},
+ {id:'olam',he:'עוֹלָם',tr:'olam',en:'world',cat:'basics'},
+ {id:'gam',he:'גַּם',tr:'gam',en:'also / too',cat:'basics'},
+ {id:'mekarer',he:'מְקָרֵר',tr:'mekarer',en:'refrigerator',cat:'home'},
+ {id:'kiriim',he:'כִּירַיִים',tr:'kiriim',en:'stove',cat:'home'},
+ {id:'aron',he:'אָרוֹן',tr:'aron',en:'closet / cabinet',cat:'home'},
+ {id:'megira',he:'מְגֵרָה',tr:'megira',en:'drawer',cat:'home'},
+ {id:'shatiach',he:'שָׁטִיחַ',tr:'shatiach',en:'rug / carpet',cat:'home'},
+ {id:'vilon',he:'וִילוֹן',tr:'vilon',en:'curtain',cat:'home'},
+ {id:'menora',he:'מְנוֹרָה',tr:'menora',en:'lamp',cat:'home'},
+ {id:'ashpa',he:'אַשְׁפָּה',tr:'ashpa',en:'trash / garbage',cat:'home'},
+ {id:'mivreshet',he:'מִבְרֶשֶׁת',tr:'mivreshet',en:'brush',cat:'home'},
+ {id:'sabon',he:'סַבּוֹן',tr:'sabon',en:'soap',cat:'home'},
+ {id:'marak',he:'מָרָק',tr:'marak',en:'soup',cat:'food'},
+ {id:'salat',he:'סָלָט',tr:'salat',en:'salad',cat:'food'},
+ {id:'uga',he:'עוּגָה',tr:'uga',en:'cake',cat:'food'},
+ {id:'ugiya',he:'עוּגִיָּה',tr:'ugiya',en:'cookie',cat:'food'},
+ {id:'mamtak',he:'מַמְתָּק',tr:'mamtak',en:'candy',cat:'food'},
+ {id:'pilpel',he:'פִּלְפֵּל',tr:'pilpel',en:'pepper',cat:'food'},
+ {id:'batsal',he:'בָּצָל',tr:'batsal',en:'onion',cat:'food'},
+ {id:'shum',he:'שׁוּם',tr:'shum',en:'garlic',cat:'food'},
+ {id:'agvania',he:'עַגְבָנִיָּה',tr:'agvania',en:'tomato',cat:'food'},
+ {id:'melafefon',he:'מְלָפְפוֹן',tr:'melafefon',en:'cucumber',cat:'food'},
+ {id:'tapuachadama',he:'תַּפּוּחַ אֲדָמָה',tr:'tapuach adama',en:'potato',cat:'food'},
+ {id:'banana',he:'בָּנָנָה',tr:'banana',en:'banana',cat:'food'},
+ {id:'te',he:'תֵּה',tr:'te',en:'tea',cat:'food'},
+ {id:'arucha',he:'אֲרוּחָה',tr:'arucha',en:'meal',cat:'food'},
+ {id:'kinuach',he:'קִנּוּחַ',tr:'kinuach',en:'dessert',cat:'food'},
+ {id:'jins',he:'גִּ\'ינְס',tr:'jins',en:'jeans',cat:'clothing'},
+ {id:'chatsait',he:'חֲצָאִית',tr:'chatsait',en:'skirt',cat:'clothing'},
+ {id:'tachtonim',he:'תַּחְתּוֹנִים',tr:'tachtonim',en:'underwear',cat:'clothing'},
+ {id:'kfafot',he:'כְּפָפוֹת',tr:'kfafot',en:'gloves',cat:'clothing'},
+ {id:'kis',he:'כִּיס',tr:'kis',en:'pocket',cat:'clothing'},
+ {id:'sharvul',he:'שַׁרְווּל',tr:'sharvul',en:'sleeve',cat:'clothing'},
+ {id:'kaftor',he:'כַּפְתּוֹר',tr:'kaftor',en:'button',cat:'clothing'},
+ {id:'rochsan',he:'רוֹכְסָן',tr:'rochsan',en:'zipper',cat:'clothing'},
+ {id:'pijama',he:'פִּיגָ\'מָה',tr:'pijama',en:'pajamas',cat:'clothing'},
+ {id:'tik',he:'תִּיק',tr:'tik',en:'bag',cat:'clothing'},
+ {id:'alergia',he:'אַלֶרְגְּיָה',tr:'alergia',en:'allergy',cat:'health'},
+ {id:'shiul',he:'שִׁעוּל',tr:'shiul',en:'cough',cat:'health'},
+ {id:'nazelet',he:'נַזֶּלֶת',tr:'nazelet',en:'runny nose / cold',cat:'health'},
+ {id:'ptsia',he:'פְּצִיעָה',tr:'ptsia',en:'injury',cat:'health'},
+ {id:'chisun',he:'חִסּוּן',tr:'chisun',en:'vaccine',cat:'health'},
+ {id:'bdika',he:'בְּדִיקָה',tr:'bdika',en:'checkup / test',cat:'health'},
+ {id:'mirsham',he:'מִרְשָׁם',tr:'mirsham',en:'prescription',cat:'health'},
+ {id:'paramedic',he:'פָּרָמֶדִיק',tr:'paramedic',en:'paramedic',cat:'health'},
+ {id:'tipul',he:'טִיפּוּל',tr:'tipul',en:'treatment',cat:'health'},
+ {id:'petsa',he:'פֶּצַע',tr:'petsa',en:'wound',cat:'health'},
+ {id:'chibuk',he:'חִבּוּק',tr:'chibuk',en:'hug',cat:'romance'},
+ {id:'gaagua',he:'גַּעְגּוּעַ',tr:'gaagua',en:'longing / missing',cat:'romance'},
+ {id:'machmad',he:'מַחְמָד',tr:'machmad',en:'sweetheart / darling',cat:'romance'},
+ {id:'ahuv',he:'אָהוּב',tr:'ahuv',en:'beloved (m)',cat:'romance'},
+ {id:'ahuva',he:'אֲהוּבָה',tr:'ahuva',en:'beloved (f)',cat:'romance'},
+ {id:'arus',he:'אָרוּס',tr:'arus',en:'fiancé',cat:'romance'},
+ {id:'arusa',he:'אֲרוּסָה',tr:'arusa',en:'fiancée',cat:'romance'},
+ {id:'nisuim',he:'נִישּׂוּאִים',tr:'nisuim',en:'marriage',cat:'romance'},
+ {id:'neemanut',he:'נֶאֱמָנוּת',tr:'neemanut',en:'loyalty / faithfulness',cat:'romance'},
+ {id:'flirtut',he:'פְלִירְטוּט',tr:'flirtut',en:'flirting',cat:'romance'},
+ {id:'yaar',he:'יַעַר',tr:'yaar',en:'forest',cat:'nature'},
+ {id:'agam',he:'אֲגַם',tr:'agam',en:'lake',cat:'nature'},
+ {id:'choof',he:'חוֹף',tr:'choof',en:'beach',cat:'nature'},
+ {id:'even',he:'אֶבֶן',tr:'even',en:'stone',cat:'nature'},
+ {id:'chol',he:'חוֹל',tr:'chol',en:'sand',cat:'nature'},
+ {id:'ale',he:'עָלֶה',tr:'ale',en:'leaf',cat:'nature'},
+ {id:'shamayim',he:'שָׁמַיִם',tr:'shamayim',en:'sky',cat:'nature'},
+ {id:'anan',he:'עָנָן',tr:'anan',en:'cloud',cat:'nature'},
+ {id:'barak',he:'בָּרָק',tr:'barak',en:'lightning',cat:'nature'},
+ {id:'raam',he:'רַעַם',tr:'raam',en:'thunder',cat:'nature'},
+ {id:'deshe',he:'דֶּשֶׁא',tr:'deshe',en:'grass',cat:'nature'},
+ {id:'charak',he:'חֶרֶק',tr:'charak',en:'insect',cat:'nature'},
+ {id:'dvora',he:'דְּבוֹרָה',tr:'dvora',en:'bee',cat:'nature'},
+ {id:'parpar',he:'פַּרְפַּר',tr:'parpar',en:'butterfly',cat:'nature'},
+ {id:'nachash',he:'נָחָשׁ',tr:'nachash',en:'snake',cat:'nature'},
+ {id:'rechov',he:'רְחוֹב',tr:'rechov',en:'street',cat:'street'},
+ {id:'midracha',he:'מִדְרָכָה',tr:'midracha',en:'sidewalk',cat:'street'},
+ {id:'ramzor',he:'רַמְזוֹר',tr:'ramzor',en:'traffic light',cat:'street'},
+ {id:'pina',he:'פִּנָּה',tr:'pina',en:'corner',cat:'street'},
+ {id:'tachana',he:'תַּחֲנָה',tr:'tachana',en:'station',cat:'street'},
+ {id:'chanut',he:'חֲנוּת',tr:'chanut',en:'shop / store',cat:'street'},
+ {id:'shuk',he:'שׁוּק',tr:'shuk',en:'market',cat:'street'},
+ {id:'otobus',he:'אוֹטוֹבּוּס',tr:'otobus',en:'bus',cat:'street'},
+ {id:'mechonit',he:'מְכוֹנִית',tr:'mechonit',en:'car',cat:'street'},
+ {id:'pkak',he:'פְּקָק',tr:'pkak',en:'traffic jam',cat:'street'},
+ {id:'misrad',he:'מִשְׂרָד',tr:'misrad',en:'office',cat:'work'},
+ {id:'bos',he:'בּוֹס',tr:'bos',en:'boss',cat:'work'},
+ {id:'oved',he:'עוֹבֵד',tr:'oved',en:'worker / employee',cat:'work'},
+ {id:'maskoret',he:'מַשְׂכּוֹרֶת',tr:'maskoret',en:'salary',cat:'work'},
+ {id:'machshev',he:'מַחְשֵׁב',tr:'machshev',en:'computer',cat:'work'},
+ {id:'telefon',he:'טֶלֶפוֹן',tr:'telefon',en:'phone',cat:'work'},
+ {id:'proyekt',he:'פְּרוֹיֶקְט',tr:'proyekt',en:'project',cat:'work'},
+ {id:'mesima',he:'מְשִׂימָה',tr:'mesima',en:'task',cat:'work'},
+ {id:'hafsaka',he:'הַפְסָקָה',tr:'hafsaka',en:'break',cat:'work'},
+ {id:'amit',he:'עָמִית',tr:'amit',en:'colleague',cat:'work'},
+ {id:'choze',he:'חוֹזֶה',tr:'choze',en:'contract',cat:'work'},
+ {id:'rayon',he:'רָאָיוֹן',tr:'rayon',en:'interview',cat:'work'},
+ {id:'nisayon',he:'נִסָּיוֹן',tr:'nisayon',en:'experience',cat:'work'},
+ {id:'kariera',he:'קַרְיֵרָה',tr:'kariera',en:'career',cat:'work'},
+ {id:'kidum',he:'קִדּוּם',tr:'kidum',en:'promotion',cat:'work'},
+ {id:'prisha',he:'פְּרִישָׁה',tr:'prisha',en:'retirement',cat:'work'},
+ {id:'chevra',he:'חֶבְרָה',tr:'chevra',en:'company',cat:'work'},
+ {id:'lakoach',he:'לָקוֹחַ',tr:'lakoach',en:'client / customer',cat:'work'},
+ {id:'doch',he:'דּוֹחַ',tr:'doch',en:'report',cat:'work'},
+ {id:'matseget',he:'מַצָּגֶת',tr:'matseget',en:'presentation',cat:'work'},
+ {id:'madpeset',he:'מַדְפֶּסֶת',tr:'madpeset',en:'printer',cat:'work'},
+ {id:'tikiya',he:'תִּיקִיָּה',tr:'tikiya',en:'folder',cat:'work'},
+ {id:'sisma',he:'סִיסְמָה',tr:'sisma',en:'password',cat:'work'},
+ {id:'internet',he:'אִינְטֶרְנֶט',tr:'internet',en:'internet',cat:'work'},
+ {id:'menahel',he:'מְנַהֵל',tr:'menahel',en:'manager',cat:'work'},
+ {id:'tsevet',he:'צֶוֶת',tr:'tsevet',en:'team',cat:'work'},
+ {id:'misra',he:'מִשְׂרָה',tr:'misra',en:'position / job',cat:'work'},
+ {id:'chufsha',he:'חֻפְשָׁה',tr:'chufsha',en:'vacation',cat:'work'},
+ {id:'mishmeret',he:'מִשְׁמֶרֶת',tr:'mishmeret',en:'shift',cat:'work'},
+ {id:'michtav',he:'מִכְתָּב',tr:'michtav',en:'letter',cat:'work'},
+ {id:'chatima',he:'חֲתִימָה',tr:'chatima',en:'signature',cat:'work'},
+ {id:'pakid',he:'פָּקִיד',tr:'pakid',en:'clerk',cat:'work'},
+ {id:'matos',he:'מָטוֹס',tr:'matos',en:'airplane',cat:'travel'},
+ {id:'rakevet',he:'רַכֶּבֶת',tr:'rakevet',en:'train',cat:'travel'},
+ {id:'kartis',he:'כַּרְטִיס',tr:'kartis',en:'ticket',cat:'travel'},
+ {id:'darkon',he:'דַּרְכּוֹן',tr:'darkon',en:'passport',cat:'travel'},
+ {id:'mizvada',he:'מִזְוָדָה',tr:'mizvada',en:'suitcase',cat:'travel'},
+ {id:'malon',he:'מָלוֹן',tr:'malon',en:'hotel',cat:'travel'},
+ {id:'tisa',he:'טִיסָה',tr:'tisa',en:'flight',cat:'travel'},
+ {id:'nesia',he:'נְסִיעָה',tr:'nesia',en:'trip / journey',cat:'travel'},
+ {id:'tayar',he:'תַּיָּר',tr:'tayar',en:'tourist',cat:'travel'},
+ {id:'mapa',he:'מַפָּה',tr:'mapa',en:'map',cat:'travel'},
+ {id:'viza',he:'וִיזָה',tr:'viza',en:'visa',cat:'travel'},
+ {id:'mekhes',he:'מֶכֶס',tr:'mekhes',en:'customs',cat:'travel'},
+ {id:'dalpak',he:'דֶּלְפָּק',tr:'dalpak',en:'counter',cat:'travel'},
+ {id:'hamraa',he:'הַמְרָאָה',tr:'hamraa',en:'takeoff',cat:'travel'},
+ {id:'nechita',he:'נְחִיתָה',tr:'nechita',en:'landing',cat:'travel'},
+ {id:'tarmil',he:'תַּרְמִיל',tr:'tarmil',en:'backpack',cat:'travel'},
+ {id:'hazmana',he:'הַזְמָנָה',tr:'hazmana',en:'reservation',cat:'travel'},
+ {id:'gvul',he:'גְּבוּל',tr:'gvul',en:'border',cat:'travel'},
+ {id:'shaar',he:'שַׁעַר',tr:'shaar',en:'gate',cat:'travel'},
+ {id:'terminal',he:'טֶרְמִינָל',tr:'terminal',en:'terminal',cat:'travel'},
+ {id:'oreach',he:'אוֹרֵחַ',tr:'oreach',en:'guest',cat:'travel'},
+ {id:'nofesh',he:'נוֹפֶשׁ',tr:'nofesh',en:'vacation / resort',cat:'travel'},
+ {id:'shizuf',he:'שִׁיזּוּף',tr:'shizuf',en:'suntan',cat:'travel'},
+ {id:'tsilum',he:'צִלּוּם',tr:'tsilum',en:'photo',cat:'travel'},
+ {id:'zar',he:'זָר',tr:'zar',en:'stranger / foreigner',cat:'travel'},
+ {id:'monit',he:'מוֹנִית',tr:'monit',en:'taxi',cat:'travel'},
+ {id:'namal',he:'נָמָל',tr:'namal',en:'port',cat:'travel'},
+ {id:'oniya',he:'אֳנִיָּה',tr:'oniya',en:'ship',cat:'travel'},
+ {id:'delek',he:'דֶּלֶק',tr:'delek',en:'fuel / gas',cat:'travel'},
+ {id:'sdeteufa',he:'שְׂדֵה תְּעוּפָה',tr:'sde teufa',en:'airport',cat:'travel'},
+ {id:'madrich',he:'מַדְרִיךְ',tr:'madrich',en:'guide',cat:'travel'},
+ {id:'atsira',he:'עֲצִירָה',tr:'atsira',en:'stop',cat:'travel'},
+ {id:'maslul',he:'מַסְלוּל',tr:'maslul',en:'route / trail',cat:'travel'},
+ {id:'yaad',he:'יַעַד',tr:'yaad',en:'destination',cat:'travel'},
+ {id:'binyan',he:'בִּנְיָן',tr:'binyan',en:'building',cat:'city'},
+ {id:'shchuna',he:'שְׁכוּנָה',tr:'shchuna',en:'neighborhood',cat:'city'},
+ {id:'park',he:'פַּארְק',tr:'park',en:'park',cat:'city'},
+ {id:'kikar',he:'כִּכָּר',tr:'kikar',en:'square / plaza',cat:'city'},
+ {id:'gesher',he:'גֶּשֶׁר',tr:'gesher',en:'bridge',cat:'city'},
+ {id:'migdal',he:'מִגְדָּל',tr:'migdal',en:'tower',cat:'city'},
+ {id:'muzeon',he:'מוּזֵיאוֹן',tr:'muzeon',en:'museum',cat:'city'},
+ {id:'sifria',he:'סִפְרִיָּה',tr:'sifria',en:'library',cat:'city'},
+ {id:'bank',he:'בַּנְק',tr:'bank',en:'bank',cat:'city'},
+ {id:'doar',he:'דֹּאַר',tr:'doar',en:'post / mail',cat:'city'},
+ {id:'mishtara',he:'מִשְׁטָרָה',tr:'mishtara',en:'police',cat:'city'},
+ {id:'kabaim',he:'כַּבָּאִים',tr:'kabaim',en:'firefighters',cat:'city'},
+ {id:'kanyon',he:'קַנְיוֹן',tr:'kanyon',en:'mall',cat:'city'},
+ {id:'migrash',he:'מִגְרָשׁ',tr:'migrash',en:'lot / court / field',cat:'city'},
+ {id:'itstadion',he:'אִצְטַדְיוֹן',tr:'itstadion',en:'stadium',cat:'city'},
+ {id:'teatron',he:'תֵּיאַטְרוֹן',tr:'teatron',en:'theater',cat:'city'},
+ {id:'kolnoa',he:'קוֹלְנוֹעַ',tr:'kolnoa',en:'cinema',cat:'city'},
+ {id:'misada',he:'מִסְעָדָה',tr:'misada',en:'restaurant',cat:'city'},
+ {id:'beitkafe',he:'בֵּית קָפֶה',tr:'beit kafe',en:'cafe',cat:'city'},
+ {id:'iriya',he:'עִירִיָּה',tr:'iriya',en:'city hall',cat:'city'},
+ {id:'universita',he:'אוּנִיבֶרְסִיטָה',tr:'universita',en:'university',cat:'city'},
+ {id:'beitsefer',he:'בֵּית סֵפֶר',tr:'beit sefer',en:'school',cat:'city'},
+ {id:'ganyeladim',he:'גַּן יְלָדִים',tr:'gan yeladim',en:'kindergarten',cat:'city'},
+ {id:'shagrirut',he:'שַׁגְרִירוּת',tr:'shagrirut',en:'embassy',cat:'city'},
+ {id:'chanaya',he:'חֲנָיָה',tr:'chanaya',en:'parking',cat:'city'},
+ {id:'andarta',he:'אַנְדַּרְטָה',tr:'andarta',en:'monument',cat:'city'},
+ {id:'sdera',he:'שְׂדֵרָה',tr:'sdera',en:'boulevard',cat:'city'},
+ {id:'simta',he:'סִמְטָה',tr:'simta',en:'alley',cat:'city'},
+ {id:'merkaz',he:'מֶרְכָּז',tr:'merkaz',en:'center',cat:'city'},
+ {id:'parvar',he:'פַּרְבָּר',tr:'parvar',en:'suburb',cat:'city'},
+ {id:'sameach',he:'שָׂמֵחַ',tr:'sameach',en:'happy',cat:'feelings'},
+ {id:'atsuv',he:'עָצוּב',tr:'atsuv',en:'sad',cat:'feelings'},
+ {id:'koes',he:'כּוֹעֵס',tr:'koes',en:'angry',cat:'feelings'},
+ {id:'mefached',he:'מְפַחֵד',tr:'mefached',en:'afraid',cat:'feelings'},
+ {id:'nirgash',he:'נִרְגָּשׁ',tr:'nirgash',en:'excited',cat:'feelings'},
+ {id:'mudag',he:'מֻדְאָג',tr:'mudag',en:'worried',cat:'feelings'},
+ {id:'ayef',he:'עָיֵף',tr:'ayef',en:'tired',cat:'feelings'},
+ {id:'meshuamam',he:'מְשֻׁעֲמָם',tr:'meshuamam',en:'bored',cat:'feelings'},
+ {id:'mufta',he:'מֻפְתָּע',tr:'mufta',en:'surprised',cat:'feelings'},
+ {id:'mekane',he:'מְקַנֵּא',tr:'mekane',en:'jealous',cat:'feelings'},
+ {id:'geeh',he:'גֵּאֶה',tr:'ge\'e',en:'proud',cat:'feelings'},
+ {id:'navoch',he:'נָבוֹךְ',tr:'navoch',en:'embarrassed',cat:'feelings'},
+ {id:'lachuts',he:'לָחוּץ',tr:'lachuts',en:'stressed',cat:'feelings'},
+ {id:'ragua',he:'רָגוּעַ',tr:'ragua',en:'calm',cat:'feelings'},
+ {id:'mevulbal',he:'מְבֻלְבָּל',tr:'mevulbal',en:'confused',cat:'feelings'},
+ {id:'meuchzav',he:'מְאֻכְזָב',tr:'meuchzav',en:'disappointed',cat:'feelings'},
+ {id:'adish',he:'אָדִישׁ',tr:'adish',en:'indifferent',cat:'feelings'},
+ {id:'boded',he:'בּוֹדֵד',tr:'boded',en:'lonely',cat:'feelings'},
+ {id:'batuach',he:'בָּטוּחַ',tr:'batuach',en:'confident / sure',cat:'feelings'},
+ {id:'mekave',he:'מְקַוֶּה',tr:'mekave',en:'hopeful',cat:'feelings'},
+ {id:'sakran',he:'סַקְרָן',tr:'sakran',en:'curious',cat:'feelings'},
+ {id:'mukal',he:'מֻקָל',tr:'mukal',en:'relieved',cat:'feelings'},
+ {id:'metuskal',he:'מְתֻסְכָּל',tr:'metuskal',en:'frustrated',cat:'feelings'},
+ {id:'ashem',he:'אָשֵׁם',tr:'ashem',en:'guilty',cat:'feelings'},
+ {id:'mevuyash',he:'מְבֻיָּשׁ',tr:'mevuyash',en:'ashamed',cat:'feelings'},
+ {id:'chared',he:'חָרֵד',tr:'chared',en:'anxious',cat:'feelings'},
+ {id:'amits',he:'אַמִּיץ',tr:'amits',en:'brave',cat:'feelings'},
+ {id:'bayshan',he:'בַּיְישָׁן',tr:'bayshan',en:'shy',cat:'feelings'},
+ {id:'pagua',he:'פָּגוּעַ',tr:'pagua',en:'hurt',cat:'feelings'},
+ {id:'merutse',he:'מְרֻצֶּה',tr:'merutse',en:'satisfied',cat:'feelings'},
+ {id:'nilhav',he:'נִלְהָב',tr:'nilhav',en:'enthusiastic',cat:'feelings'},
+ {id:'meyuash',he:'מְיֹאָשׁ',tr:'meyuash',en:'hopeless',cat:'feelings'},
+ {id:'nisar',he:'נִסְעָר',tr:'nisar',en:'upset',cat:'feelings'},
+ {id:'shalev',he:'שָׁלֵו',tr:'shalev',en:'serene',cat:'feelings'},
+ {id:'rosh',he:'רֹאשׁ',tr:'rosh',en:'head',cat:'body'},
+ {id:'yad',he:'יָד',tr:'yad',en:'hand',cat:'body'},
+ {id:'regel',he:'רֶגֶל',tr:'regel',en:'leg / foot',cat:'body'},
+ {id:'ayin',he:'עַיִן',tr:'ayin',en:'eye',cat:'body'},
+ {id:'ozen',he:'אֹזֶן',tr:'ozen',en:'ear',cat:'body'},
+ {id:'af',he:'אַף',tr:'af',en:'nose',cat:'body'},
+ {id:'pe',he:'פֶּה',tr:'pe',en:'mouth',cat:'body'},
+ {id:'sear',he:'שֵׂעָר',tr:'sear',en:'hair',cat:'body'},
+ {id:'etsba',he:'אֶצְבַּע',tr:'etsba',en:'finger',cat:'body'},
+ {id:'gav',he:'גַּב',tr:'gav',en:'back',cat:'body'},
+ {id:'beten',he:'בֶּטֶן',tr:'beten',en:'stomach',cat:'body'},
+ {id:'katef',he:'כָּתֵף',tr:'katef',en:'shoulder',cat:'body'},
+ {id:'berech',he:'בֶּרֶךְ',tr:'berech',en:'knee',cat:'body'},
+ {id:'chaze',he:'חָזֶה',tr:'chaze',en:'chest',cat:'body'},
+ {id:'tsavar',he:'צַוָּאר',tr:'tsavar',en:'neck',cat:'body'},
+ {id:'or',he:'עוֹר',tr:'or',en:'skin',cat:'body'},
+ {id:'shen',he:'שֵׁן',tr:'shen',en:'tooth',cat:'body'},
+ {id:'lashon',he:'לָשׁוֹן',tr:'lashon',en:'tongue',cat:'body'},
+ {id:'dam',he:'דָּם',tr:'dam',en:'blood',cat:'body'},
+ {id:'etsem',he:'עֶצֶם',tr:'etsem',en:'bone',cat:'body'},
+ {id:'tsiporen',he:'צִפֹּרֶן',tr:'tsiporen',en:'fingernail',cat:'body'},
+ {id:'marpek',he:'מַרְפֵּק',tr:'marpek',en:'elbow',cat:'body'},
+ {id:'karsol',he:'קַרְסֹל',tr:'karsol',en:'ankle',cat:'body'},
+ {id:'yarech',he:'יָרֵךְ',tr:'yarech',en:'thigh',cat:'body'},
+ {id:'gaba',he:'גַּבָּה',tr:'gaba',en:'eyebrow',cat:'body'},
+ {id:'lechi',he:'לֶחִי',tr:'lechi',en:'cheek',cat:'body'},
+ {id:'santer',he:'סַנְטֵר',tr:'santer',en:'chin',cat:'body'},
+ {id:'garon',he:'גָּרוֹן',tr:'garon',en:'throat',cat:'body'},
+ {id:'moach',he:'מוֹחַ',tr:'moach',en:'brain',cat:'body'},
+ {id:'ima',he:'אִמָּא',tr:'ima',en:'mom',cat:'family'},
+ {id:'aba',he:'אַבָּא',tr:'aba',en:'dad',cat:'family'},
+ {id:'ben',he:'בֵּן',tr:'ben',en:'son',cat:'family'},
+ {id:'bat',he:'בַּת',tr:'bat',en:'daughter',cat:'family'},
+ {id:'ach',he:'אָח',tr:'ach',en:'brother',cat:'family'},
+ {id:'achot',he:'אָחוֹת',tr:'achot',en:'sister',cat:'family'},
+ {id:'saba',he:'סַבָּא',tr:'saba',en:'grandfather',cat:'family'},
+ {id:'savta',he:'סַבְתָא',tr:'savta',en:'grandmother',cat:'family'},
+ {id:'dod',he:'דּוֹד',tr:'dod',en:'uncle',cat:'family'},
+ {id:'doda',he:'דּוֹדָה',tr:'doda',en:'aunt',cat:'family'},
+ {id:'bendod',he:'בֶּן דּוֹד',tr:'ben dod',en:'cousin (m)',cat:'family'},
+ {id:'batdoda',he:'בַּת דּוֹדָה',tr:'bat doda',en:'cousin (f)',cat:'family'},
+ {id:'baal',he:'בַּעַל',tr:'baal',en:'husband',cat:'family'},
+ {id:'isha',he:'אִשָּׁה',tr:'isha',en:'wife',cat:'family'},
+ {id:'horim',he:'הוֹרִים',tr:'horim',en:'parents',cat:'family'},
+ {id:'yeled',he:'יֶלֶד',tr:'yeled',en:'boy / child',cat:'family'},
+ {id:'yalda',he:'יַלְדָּה',tr:'yalda',en:'girl',cat:'family'},
+ {id:'tinok',he:'תִּינוֹק',tr:'tinok',en:'baby',cat:'family'},
+ {id:'neched',he:'נֶכֶד',tr:'neched',en:'grandson',cat:'family'},
+ {id:'nechda',he:'נֶכְדָּה',tr:'nechda',en:'granddaughter',cat:'family'},
+ {id:'gis',he:'גִּיס',tr:'gis',en:'brother-in-law',cat:'family'},
+ {id:'gisa',he:'גִּיסָה',tr:'gisa',en:'sister-in-law',cat:'family'},
+ {id:'cham',he:'חָם',tr:'cham',en:'father-in-law',cat:'family'},
+ {id:'chamot',he:'חָמוֹת',tr:'chamot',en:'mother-in-law',cat:'family'},
+ {id:'shaa',he:'שָׁעָה',tr:'shaa',en:'hour',cat:'time'},
+ {id:'daka',he:'דַּקָּה',tr:'daka',en:'minute',cat:'time'},
+ {id:'shniya',he:'שְׁנִיָּה',tr:'shniya',en:'second',cat:'time'},
+ {id:'chodesh',he:'חֹדֶשׁ',tr:'chodesh',en:'month',cat:'time'},
+ {id:'ona',he:'עוֹנָה',tr:'ona',en:'season',cat:'time'},
+ {id:'mukdam',he:'מֻקְדָּם',tr:'mukdam',en:'early',cat:'time'},
+ {id:'meuchar',he:'מְאֻחָר',tr:'meuchar',en:'late',cat:'time'},
+ {id:'miyad',he:'מִיָּד',tr:'miyad',en:'immediately',cat:'time'},
+ {id:'kvar',he:'כְּבָר',tr:'kvar',en:'already',cat:'time'},
+ {id:'adayin',he:'עֲדַיִן',tr:'adayin',en:'still / yet',cat:'time'},
+ {id:'lifamim',he:'לִפְעָמִים',tr:'lif\'amim',en:'sometimes',cat:'time'},
+ {id:'nadir',he:'נָדִיר',tr:'nadir',en:'rare',cat:'time'},
+ {id:'rega',he:'רֶגַע',tr:'rega',en:'moment',cat:'time'},
+ {id:'avar',he:'עָבָר',tr:'avar',en:'past',cat:'time'},
+ {id:'atid',he:'עָתִיד',tr:'atid',en:'future',cat:'time'},
+ {id:'hove',he:'הֹוֶה',tr:'hove',en:'present',cat:'time'},
+ {id:'sofshavua',he:'סוֹף שָׁבוּעַ',tr:'sof shavua',en:'weekend',cat:'time'},
+ {id:'chag',he:'חַג',tr:'chag',en:'holiday',cat:'time'},
+ {id:'yomhuledet',he:'יוֹם הֻלֶּדֶת',tr:'yom huledet',en:'birthday',cat:'time'},
+ {id:'tor',he:'תּוֹר',tr:'tor',en:'turn / queue',cat:'time'},
+ {id:'luachshana',he:'לוּחַ שָׁנָה',tr:'luach shana',en:'calendar',cat:'time'},
+ {id:'shaon',he:'שָׁעוֹן',tr:'shaon',en:'clock / watch',cat:'time'},
+ {id:'taarich',he:'תַּאֲרִיךְ',tr:'taarich',en:'date (calendar)',cat:'time'},
+ {id:'tkufa',he:'תְּקוּפָה',tr:'tkufa',en:'period / era',cat:'time'}
 ];
 
-const CAT_LABELS={basics:'Everyday basics',home:'The home · הַבַּיִת',food:'Food & cooking · אֹכֶל',clothing:'Clothing · בְּגָדִים',health:'Health · בְּרִיאוּת',romance:'Romance & social · אַהֲבָה',nature:'Nature · טֶבַע',street:'Street Hebrew · סְלֶנְג'};
+const CAT_LABELS={basics:'Everyday basics',home:'The home · הַבַּיִת',food:'Food & cooking · אֹכֶל',clothing:'Clothing · בְּגָדִים',health:'Health · בְּרִיאוּת',romance:'Romance & social · אַהֲבָה',nature:'Nature · טֶבַע',street:'Street Hebrew · סְלֶנְג',work:'Work · עֲבוֹדָה',travel:'Travel · נְסִיעוֹת',city:'In the city · בָּעִיר',feelings:'Feelings · רְגָשׁוֹת',body:'The body · גּוּף',family:'Family · מִשְׁפָּחָה',time:'Time · זְמַן'};
 
 const NOUNS=[
  {id:'n_bayit',he:'בַּיִת',pl:'בָּתִּים',g:'m',en:'house'},
@@ -904,7 +1307,10 @@ const LESSONS=[
   verbs:['kns3','pgsh3','zkr3','shbr3','nafal']},
  {id:'L13',title:'Street Hebrew',he:'סְלֶנְג',sub:'How Israelis actually talk',
   intro:"Textbook Hebrew gets you reading; these words get you friends. Half of Israeli small talk runs on a couple dozen expressions.",
-  vocab:['sababa','akhla','yalla','beseder','magniv','walla','kef','bali','einbeaya','manishma','makore','stam','davka','nireli','shtuyot','lonora','khavalzman','mamash','betakh','nu','takhles','metoraf']}
+  vocab:['sababa','akhla','yalla','beseder','magniv','walla','kef','bali','einbeaya','manishma','makore','stam','davka','nireli','shtuyot','lonora','khavalzman','mamash','betakh','nu','takhles','metoraf']},
+ {id:'L14',title:'Want, need, can — infinitives',he:'שֵׁם הַפֹּעַל',sub:'The missing piece of every sentence',
+  intro:"רוֹצֶה, צָרִיךְ, יָכוֹל and אֶפְשָׁר all take an infinitive. Master the לְ־ forms and half of spoken Hebrew unlocks — plus יֵשׁ לִי, because Hebrew has no verb 'to have'.",
+  verbs:['ktv1','dbr2','sbr5','lbsh7','kns3','akhal','halakh','asa'],tenses:['inf'],prep:true}
 ];
 
 /* per-lesson teaching pages, shown before the drills. b is HTML; ex is
@@ -938,6 +1344,9 @@ const LESSON_TEACH={
   {h:'The vanishing middle',b:'<span class="he">קָם, שָׂם, בָּא</span> — the weak middle letter hides in past and present, then returns in the future: <span class="he">קָם → יָקוּם</span>.',ex:['קַמְתִּי מֻקְדָּם וְהָלַכְתִּי לַיָּם','kamti mukdam ve-halakhti la-yam — I got up early and went to the sea']}],
  L12:[
   {h:'The hidden נ',b:'Past wears the <span class="he">נִ־</span> up front: <span class="he">נִשְׁבַּר</span>. The future swallows it into a dagesh: <span class="he">יִשָּׁבֵר</span> — that dot is the נ\'s footprint.',ex:['הַכּוֹס נִשְׁבְּרָה','ha-kos nishbera — the glass broke']}],
+ L14:[
+  {h:'One melody per binyan',b:'Every binyan builds its infinitive the same way: pa\'al <span class="he">לִכְתֹּב</span>, pi\'el <span class="he">לְדַבֵּר</span>, hif\'il <span class="he">לְהַסְבִּיר</span>, hitpa\'el <span class="he">לְהִתְלַבֵּשׁ</span>, nif\'al <span class="he">לְהִכָּנֵס</span>. Learn the melody once, apply it to every root.',ex:['אֲנִי רוֹצֶה לְדַבֵּר עִבְרִית','ani rotse ledaber ivrit — I want to speak Hebrew']},
+  {h:'There is no "to have"',b:'Hebrew says "there-is to-me": <span class="he">יֵשׁ לִי כֶּלֶב</span> — I have a dog. Negative: <span class="he">אֵין לִי זְמַן</span> — I have no time. The preposition carries the person: לִי, לְךָ, לוֹ, לָנוּ…',ex:['יֵשׁ לָנוּ בַּיִת קָטָן','yesh lanu bayit katan — we have a small house']}],
  L13:[
   {h:'The essentials',b:'<span class="he">סַבַּבָּה</span> fine/cool · <span class="he">אַחְלָה</span> great · <span class="he">יָאלְלָה</span> let\'s go · <span class="he">תַּכְלֶס</span> honestly · <span class="he">וָואלָה</span> no way?! — these five carry half of Israeli small talk.',ex:['וָואלָה?… סַבַּבָּה','walla?… sababa — no way?… cool']},
   {h:'Register cheat sheet',b:'Spoken Hebrew says <span class="he">יַגִּיד</span>, not <span class="he">יֹאמַר</span>. Pu\'al and Huf\'al are for reading, not saying. And at the shuk you\'ll hear <span class="he">שָׁלוֹשׁ שֶׁקֶל</span> — wrong, universal, and worth understanding even as you learn the standard <span class="he">שְׁלוֹשָׁה שְׁקָלִים</span>.'}]
@@ -973,7 +1382,64 @@ const SENTENCES=[
  {pre:'וָואלָה, לֹא',post:'אֶת זֶה!',en:"Walla, I didn't know that!",v:'yada',t:'past',p:'p1s'},
  {pre:'מָה קוֹרֶה? מָה אַתָּה',post:'עַכְשָׁו?',en:"What's up? What are you doing now?",v:'asa',t:'present',p:'ms'},
  {pre:'חֲבָל עַל הַזְּמַן — הִיא',post:'מַמָּשׁ יָפֶה.',en:'Amazing — she dances really beautifully.',v:'rkd1',t:'present',p:'fs'},
- {pre:'נוּ, מָתַי הֵם כְּבָר',post:'?',en:'Nu, when are they finally coming?',v:'ba',t:'present',p:'mp'}
+ {pre:'נוּ, מָתַי הֵם כְּבָר',post:'?',en:'Nu, when are they finally coming?',v:'ba',t:'present',p:'mp'},
+ {pre:'אֲנִי ',post:' מִכְתָּב אֶתְמוֹל.',en:'I wrote a letter yesterday.',v:'ktv1',t:'past',p:'p1s'},
+ {pre:'הִיא תָּמִיד ',post:' אֶת הַדֶּלֶת.',en:'She always closes the door.',v:'sgr1',t:'present',p:'fs'},
+ {pre:'אַתָּה ',post:' אֶת הַשֵּׁם שֶׁלִּי?',en:'Will you remember my name?',v:'zkr1',t:'future',p:'p2ms'},
+ {pre:'הֵם ',post:' עַל הַכֶּלֶב כָּל הַלַּיְלָה.',en:'They guarded the dog all night.',v:'shmr1',t:'past',p:'p3mp'},
+ {pre:'',post:' אֶת הָעֲבוֹדָה עַכְשָׁו.',en:'I just finished the work.',v:'gmr1',t:'past',p:'p1s'},
+ {pre:'הַיְלָדִים ',post:' הַיּוֹם בַּמְּסִבָּה.',en:'The kids are dancing today at the party.',v:'rkd1',t:'present',p:'mp'},
+ {pre:'הוּא ',post:' לַמַּיִם בְּלִי לְפַחֵד.',en:'He jumped into the water without fear.',v:'kfz1',t:'past',p:'p3ms'},
+ {pre:'מָתַי ',post:' אֶת הַמְּנַהֵל?',en:'When will we meet the manager?',v:'pgsh1',t:'future',p:'p1p'},
+ {pre:'',post:' אֶת הַמְּכוֹנִית לִפְנֵי הַנְּסִיעָה?',en:'Did you check the car before the trip?',v:'bdk1',t:'past',p:'p2ms'},
+ {pre:'הוּא ',post:' אֶת הַכֶּסֶף כָּל עֶרֶב.',en:'He counts the money every evening.',v:'spr1',t:'present',p:'ms'},
+ {pre:'הִיא ',post:' שֶׁזֶּה רַעְיוֹן טוֹב.',en:'She thinks it\'s a good idea.',v:'khshv1',t:'present',p:'fs'},
+ {pre:'הַיֶּלֶד ',post:' אֶת הַכּוֹס בְּטָעוּת.',en:'The boy broke the glass by accident.',v:'shbr1',t:'past',p:'p3ms'},
+ {pre:'הִיא ',post:' שִׂמְלָה אֲדֻמָּה אֶתְמוֹל.',en:'She wore a red dress yesterday.',v:'lbsh1',t:'past',p:'p3fs'},
+ {pre:'כֻּלָּם ',post:' אוֹתוֹ מֵהַמְּסִבָּה.',en:'Everyone kicked him out of the party.',v:'grs1',t:'past',p:'p3mp'},
+ {pre:'הַבָּנוֹת ',post:' עַכְשָׁו מֵהַבְּדִיחָה.',en:'The girls are laughing now at the joke.',v:'tskhk1',t:'present',p:'fp'},
+ {pre:'הַיְלָדִים ',post:' בַּחוּץ עַכְשָׁו.',en:'The kids are playing outside now.',v:'shkk1',t:'present',p:'mp'},
+ {pre:'הוּא ',post:' עִבְרִית מְצֻיֶּנֶת.',en:'He speaks excellent Hebrew.',v:'dbr2',t:'present',p:'ms'},
+ {pre:'',post:' מִמֶּנּוּ עֶזְרָה אֶתְמוֹל.',en:'I asked him for help yesterday.',v:'bksh2',t:'past',p:'p1s'},
+ {pre:'אַתְּ ',post:' לִי מָה שֶׁקָּרָה?',en:'Will you tell me what happened?',v:'spr2',t:'future',p:'p2fs'},
+ {pre:'',post:' אוֹתוֹ לִשְׂחוֹת בַּקַּיִץ.',en:'We taught him to swim in the summer.',v:'lmd2',t:'past',p:'p1p'},
+ {pre:'הִיא ',post:' מַתָּנָה יָפָה.',en:'She received a nice gift.',v:'kbl2',t:'past',p:'p3fs'},
+ {pre:'אִמָּא ',post:' אֹרֶז לָאֲרוּחָה.',en:'Mom is cooking rice for the meal.',v:'bshl2',t:'present',p:'fs'},
+ {pre:'הַצַּלָּם ',post:' אֶת הַחֲתֻנָּה.',en:'The photographer photographed the wedding.',v:'tslm2',t:'past',p:'p3ms'},
+ {pre:'',post:' עַכְשָׁו בְּכַרְטִיס אַשְׁרַאי.',en:'I\'ll pay now by credit card.',v:'shlm2',t:'future',p:'p1s'},
+ {pre:'הֵם ',post:' בַּגִּיטָרָה בְּיַחַד.',en:'They play guitar together.',v:'nign2',t:'present',p:'mp'},
+ {pre:'',post:' אֶת הָאוֹרְחִים בְּכָבוֹד.',en:'We honored the guests respectfully.',v:'kbd2',t:'past',p:'p1p'},
+ {pre:'',post:' אֶת כָּל הַחֲבֵרִים לְיוֹם הֻלֶּדֶת.',en:'I invited all my friends to the birthday.',v:'zmn5',t:'past',p:'p1s'},
+ {pre:'הוּא ',post:' נֵר בְּכָל עֶרֶב שַׁבָּת.',en:'He lights a candle every Friday evening.',v:'dlk5',t:'present',p:'ms'},
+ {pre:'הַמּוֹרֶה ',post:' אֶת הַשִּׁעוּר בְּפִתְאוֹם.',en:'The teacher suddenly stopped the lesson.',v:'psk5',t:'past',p:'p3ms'},
+ {pre:'אַתָּה ',post:' לִי אֵיךְ זֶה עוֹבֵד?',en:'Will you explain to me how it works?',v:'sbr5',t:'future',p:'p2ms'},
+ {pre:'הִיא ',post:' עֲיֵפָה מְאוֹד הַיּוֹם.',en:'She feels very tired today.',v:'rgsh5',t:'present',p:'fs'},
+ {pre:'אֲנַחְנוּ ',post:' אֶת הָעֲבוֹדָה מָחָר.',en:'We\'ll start the work tomorrow.',v:'tkhl5',t:'future',p:'p1p'},
+ {pre:'הַמּוֹרָה ',post:' לָנוּ אֶת הַמִּשְׁפָּטִים.',en:'The teacher dictated the sentences to us.',v:'ktv5',t:'past',p:'p3fs'},
+ {pre:'הֵם ',post:' אֶת הַתְּמוּנָה בַּמַּחְשֵׁב.',en:'They are enlarging the picture on the computer.',v:'gdl5',t:'present',p:'mp'},
+ {pre:'הוּא ',post:' הַבַּיְתָה בְּשֶׁקֶט.',en:'He entered the house quietly.',v:'kns3',t:'past',p:'p3ms'},
+ {pre:'אֲנַחְנוּ ',post:' מָחָר בַּקָּפֶה.',en:'We\'ll meet each other tomorrow at the cafe.',v:'pgsh3',t:'future',p:'p1p'},
+ {pre:'פִּתְאֹם ',post:' אֵיפֹה שַׂמְתִּי אֶת הַמַּפְתֵּחוֹת.',en:'Suddenly I remembered where I put the keys.',v:'zkr3',t:'past',p:'p1s'},
+ {pre:'הַכּוֹס ',post:' פִּתְאֹם כְּשֶׁנָּפְלָה.',en:'The glass suddenly broke when it fell.',v:'shbr3',t:'past',p:'p3fs'},
+ {pre:'הוּא ',post:' מַהֵר בַּבֹּקֶר.',en:'He gets dressed quickly in the morning.',v:'lbsh7',t:'present',p:'ms'},
+ {pre:'',post:' מְאוֹד לִקְרַאת הַטִּיּוּל.',en:'We got very excited about the trip.',v:'rgsh7',t:'past',p:'p1p'},
+ {pre:'אַתְּ ',post:' אֵלַי מָחָר?',en:'Will you call me tomorrow?',v:'kshr7',t:'future',p:'p2fs'},
+ {pre:'הַשַּׂחְקָנִים ',post:' כָּל בֹּקֶר בַּמִּגְרָשׁ.',en:'The players train every morning on the field.',v:'amn7',t:'present',p:'mp'},
+ {pre:'הֵם ',post:' בַּקַּיִץ הַבָּא.',en:'They will get married next summer.',v:'khtn7',t:'future',p:'p3mp'},
+ {pre:'לָמָּה ',post:' כָּל כָּךְ מוּזָר אֶתְמוֹל?',en:'Why did you behave so strangely yesterday?',v:'htnhg7',t:'past',p:'p2ms'},
+ {pre:'הַבַּת שֶׁלִּי ',post:' מַהֵר.',en:'My daughter is maturing fast.',v:'htbgr7',t:'present',p:'fs'},
+ {pre:'הִיא ',post:' מֵהָעֲבוֹדָה בַּשָּׁבוּעַ שֶׁעָבַר.',en:'She resigned from the job last week.',v:'htptr7',t:'past',p:'p3fs'},
+ {pre:'הַחֲתֻנָּה ',post:' עַל יְדֵי צַלָּם מְעֻלֶּה.',en:'The wedding was photographed by an excellent photographer.',v:'tslm4',t:'past',p:'p3fs'},
+ {pre:'הַחֶשְׁבּוֹן כֻּלּוֹ כְּבָר ',post:'.',en:'The whole bill is already paid.',v:'shlm4',t:'present',p:'ms'},
+ {pre:'הַתַּפּוּחֵי אֲדָמָה ',post:' בְּמֶשֶׁךְ שָׁעָה.',en:'The potatoes were cooked for an hour.',v:'bshl4',t:'past',p:'p3mp'},
+ {pre:'',post:' לַחֲתֻנָּה שֶׁל הַשְּׁכֵנִים.',en:'I was invited to the neighbors\' wedding.',v:'zmn6',t:'past',p:'p1s'},
+ {pre:'הָעֲבוֹדָה ',post:' בִּגְלַל הַגֶּשֶׁם.',en:'The work is stopped because of the rain.',v:'psk6',t:'present',p:'fs'},
+ {pre:'הָאוֹר בַּמִּסְדְּרוֹן ',post:' כָּל הַלַּיְלָה.',en:'The light in the hallway was left on all night.',v:'dlk6',t:'past',p:'p3ms'},
+ {pre:'הִיא לֹא ',post:' לָצֵאת הַיּוֹם.',en:'She doesn\'t want to go out today.',v:'ratsa',t:'present',p:'fs'},
+ {pre:'הוּא ',post:' עָיֵף מְאוֹד אֶתְמוֹל.',en:'He was very tired yesterday.',v:'haya',t:'past',p:'p3ms'},
+ {pre:'',post:' עַל הַמַּדְרֵגוֹת אֶתְמוֹל.',en:'I fell on the stairs yesterday.',v:'nafal',t:'past',p:'p1s'},
+ {pre:'הוּא ',post:' לָנוּ תְּשׁוּבָה מָחָר.',en:'He will give us an answer tomorrow.',v:'natan',t:'future',p:'p3ms'},
+ {pre:'כֻּלָּם ',post:' מֻקְדָּם בַּצָּבָא.',en:'Everyone gets up early in the army.',v:'kam',t:'present',p:'mp'},
 ];
 
 const EXCEPTIONS=[
@@ -1030,7 +1496,55 @@ const EXCEPTIONS=[
  {id:'x_root_labels',q:'What does the label ע״ו on a root mean?',
   a:'Its middle (2nd) letter is a weak ו',
   d:['It starts with ע','It ends with ו','It has only two letters'],
-  why:'Grammar names slots by פ-ע-ל: פ=1st, ע=2nd, ל=3rd. ע״ו = "ayin slot holds ו", like ק-ו-ם.'}
+  why:'Grammar names slots by פ-ע-ל: פ=1st, ע=2nd, ל=3rd. ע״ו = "ayin slot holds ו", like ק-ו-ם.'},
+ {id:'x_infinitive_paal',q:'Which is the correct infinitive (\'to write\') in the Pa\'al binyan, root כ-ת-ב?',
+  a:'לִכְתֹּב',d:['לְכָתוֹב','לְהִכָּתֵב','כּוֹתֵב'],
+  why:'Pa\'al infinitives take the לִ- prefix with the pattern לִקְטֹל, so כ-ת-ב becomes לִכְתֹּב (to write).'},
+ {id:'x_infinitive_piel',q:'What is the infinitive form of the Piel verb \'to speak\', root ד-ב-ר?',
+  a:'לְדַבֵּר',d:['לִדְבֹּר','לְהַדְבִּיר','מְדַבֵּר'],
+  why:'Piel infinitives use the לְ- prefix with the pattern לְפַעֵל, giving לְדַבֵּר (to speak) — not the Pa\'al or Hif\'il patterns, and not the present-tense form.'},
+ {id:'x_infinitive_hifil',q:'Which infinitive form belongs to the Hif\'il binyan for \'to explain\', root ס-ב-ר?',
+  a:'לְהַסְבִּיר',d:['לְסַבֵּר','לִסְבֹּר','מַסְבִּיר'],
+  why:'Hif\'il infinitives are built with the לְהַ- prefix pattern לְהַפְעִיל, producing לְהַסְבִּיר (to explain).'},
+ {id:'x_modal_syntax',q:'Which sentence correctly says \'I want to eat\' using the modal + infinitive pattern?',
+  a:'אֲנִי רוֹצֶה לֶאֱכֹל',d:['אֲנִי רוֹצֶה אוֹכֵל','אֲנִי רוֹצֶה לֶאֱכֹל אֶת','אֲנִי רוֹצֶה אֹכֶל'],
+  why:'Modal verbs like רוצה, צריך, and יכול must be followed by the infinitive of the next verb, not its present-tense form or a related noun.'},
+ {id:'x_modal_gender',q:'How should a female speaker correctly say \'I need to go\' using צריך?',
+  a:'אֲנִי צְרִיכָה לָלֶכֶת',d:['אֲנִי צָרִיךְ לָלֶכֶת','אֲנִי צְרִיכִים לָלֶכֶת','אֲנִי לָלֶכֶת צְרִיכָה'],
+  why:'צריך behaves like an adjective and agrees in gender and number with its subject, so a female speaker must use the feminine צְרִיכָה, in the standard modal-then-infinitive order.'},
+ {id:'x_yesh_li',q:'How do you say \'I have a book\' in Hebrew, which has no verb \'to have\'?',
+  a:'יֵשׁ לִי סֵפֶר',d:['אֲנִי יֵשׁ סֵפֶר','אֲנִי יֵשׁ לִי סֵפֶר','לִי סֵפֶר'],
+  why:'Possession is expressed with יש (there is) plus the possessor marked by the inflected preposition ל-, so \'I have\' is literally \'there is to me\': יֵשׁ לִי.'},
+ {id:'x_ein_li',q:'What is the correct way to say \'I don\'t have money\'?',
+  a:'אֵין לִי כֶּסֶף',d:['לֹא יֵשׁ לִי כֶּסֶף','אֲנִי אֵין כֶּסֶף','אֵין אֲנִי כֶּסֶף'],
+  why:'The negative of יש is the separate word אין, so negative possession uses אֵין לִי rather than negating יש with לא.'},
+ {id:'x_inflected_prep_le',q:'Which inflected form of the preposition לְ- (to/for) means \'to him\'?',
+  a:'לוֹ',d:['לוֹא','לְהוּא','לוֹי'],
+  why:'The preposition לְ- fuses directly with pronoun suffixes: לִי (to me), לְךָ (to you, m.), and לוֹ (to him) — it does not keep a separate pronoun word.'},
+ {id:'x_construct_shnei',q:'Which is correct for \'two books\', with סְפָרִים being masculine plural?',
+  a:'שְׁנֵי סְפָרִים',d:['שְׁתֵּי סְפָרִים','שְׁנַיִם סְפָרִים','שְׁתַּיִם סְפָרִים'],
+  why:'Before a masculine plural noun, \'two\' takes the construct form שְׁנֵי; שְׁתֵּי is reserved for feminine nouns, and the independent form שְׁנַיִם isn\'t placed directly before a noun.'},
+ {id:'x_gender_numbers',q:'Which is correct for \'three girls\', with בָּנוֹת being feminine?',
+  a:'שָׁלֹשׁ בָּנוֹת',d:['שְׁלוֹשָׁה בָּנוֹת','שָׁלֹשׁ בָּנִים','שְׁלוֹשָׁה בָּנִים'],
+  why:'Hebrew cardinal numbers 3–10 reverse gender: the form without a ה-ending (שָׁלֹשׁ) is used with feminine nouns, while the form with ה (שְׁלוֹשָׁה) is used with masculine nouns — opposite to normal adjective agreement.'},
+ {id:'x_lamed_alef_verbs',q:'What is the correct third-person feminine past-tense form of קָרָא (to read/call), a ל"א verb?',
+  a:'קָרְאָה',d:['קָרְתָה','קָרְאִית','קָרַאְתָה'],
+  why:'ל"א verbs keep the root-final א, which becomes silent before the feminine ending -ָה, giving קָרְאָה (she read) rather than dropping or reshaping the א.'},
+ {id:'x_ayin_vav_verbs',q:'Which is the correct third-person plural past-tense form of the hollow (ע"ו) verb קָם (to get up), root ק-ו-ם?',
+  a:'קָמוּ',d:['קוֹמוּ','קָוְמוּ','קָמְווּ'],
+  why:'ע"ו verbs drop the middle root letter ו in most conjugations, so the plural past collapses to קָמוּ (they got up) instead of preserving the ו.'},
+ {id:'x_bet_contraction',q:'What is the correct contracted form when בְּ- (in) meets the definite article in הַבַּיִת (the house)?',
+  a:'בַּבַּיִת',d:['בְּהַבַּיִת','בְּבַּיִת','בֶּהַבַּיִת'],
+  why:'When בְּ, כְּ, or לְ meet the definite article הַ-, the ה is dropped and its patach vowel shifts onto the prefix letter, so בְּ + הַבַּיִת becomes בַּבַּיִת.'},
+ {id:'x_et_definite',q:'Which sentence correctly uses אֶת for the definite direct object in \'I am reading the book\'?',
+  a:'אֲנִי קוֹרֵא אֶת הַסֵּפֶר',d:['אֲנִי קוֹרֵא אֶת סֵפֶר','אֲנִי קוֹרֵא הַסֵּפֶר','אֲנִי אֶת קוֹרֵא הַסֵּפֶר'],
+  why:'אֶת marks a definite direct object — one with הַ-, a name, or a pronoun — so it is required before הַסֵּפֶר but must be omitted before an indefinite noun like סֵפֶר.'},
+ {id:'x_adjective_agreement',q:'Which phrase correctly matches the adjective \'big\' to עִיר (city, feminine)?',
+  a:'עִיר גְּדוֹלָה',d:['עִיר גָּדוֹל','עִיר גְּדוֹלִים','עִיר גְּדוֹלוֹת'],
+  why:'Hebrew adjectives must agree with their noun in gender and number; since עִיר is feminine singular, the adjective needs the feminine singular ending, גְּדוֹלָה.'},
+ {id:'x_plural_irregular',q:'What is the irregular plural of אִשָּׁה (woman)?',
+  a:'נָשִׁים',d:['אִשָּׁהִים','אֲנָשׁוֹת','אִשּׁוֹת'],
+  why:'אִשָּׁה has a suppletive plural, נָשִׁים, that does not follow the regular feminine plural pattern of simply adding -וֹת.'}
 ];
 </script>
 <script>
@@ -1041,11 +1555,14 @@ function buildAuto(v){
   for(const p in t.past) forms.past[p]=conj(v.root,t.past[p]);
   for(const p in t.present) forms.present[p]=conj(v.root,t.present[p]);
   if(t.future) for(const p in t.future) forms.future[p]=conj(v.root,t.future[p]);
-  return {id:v.id,b:v.b,root:v.root.split('').map(c=>c==='ש'?'שׁ':c).join('-'),en:v.en,tr:v.tr,giz:null,note:null,forms,lemma:forms.past.p3ms};
+  return {id:v.id,b:v.b,root:v.root.split('').map(c=>c==='ש'?'שׁ':c).join('-'),raw:v.root,en:v.en,tr:v.tr,giz:null,note:null,forms,
+    inf:INF_TPL[v.b]?conj(v.root,INF_TPL[v.b]):null,lemma:forms.past.p3ms};
 }
+const EXPLICIT_INF={asa:'לַעֲשׂוֹת',ratsa:'לִרְצוֹת',haya:'לִהְיוֹת',nafal:'לִפֹּל',natan:'לָתֵת',lakakh:'לָקַחַת',kam:'לָקוּם',ba:'לָבוֹא',sam:'לָשִׂים',yashav:'לָשֶׁבֶת',yada:'לָדַעַת',halakh:'לָלֶכֶת',akhal:'לֶאֱכֹל',amar:'לוֹמַר',histakel:'לְהִסְתַּכֵּל'};
 const ALL_VERBS=[
   ...AUTO_VERBS.map(buildAuto),
-  ...EXPLICIT_VERBS.map(v=>({id:v.id,b:v.b,root:v.root,en:v.en,tr:v.tr,giz:v.giz,note:v.note,forms:v.f,lemma:v.f.past.p3ms}))
+  ...EXPLICIT_VERBS.map(v=>({id:v.id,b:v.b,root:v.root,en:v.en,tr:v.tr,giz:v.giz,note:v.note,forms:v.f,
+    inf:v.inf||EXPLICIT_INF[v.id]||null,lemma:v.f.past.p3ms}))
 ];
 const VERB_BY_ID=Object.fromEntries(ALL_VERBS.map(v=>[v.id,v]));
 const VOCAB_BY_ID=Object.fromEntries(VOCAB_SEED.map(w=>[w.id,w]));
@@ -1056,8 +1573,10 @@ function allForms(v){
     const tbl=v.forms[t]; if(!tbl) continue;
     for(const p in tbl) out.push({t,p,form:tbl[p]});
   }
+  if(v.inf) out.push({t:'inf',p:'-',form:v.inf});
   return out;
 }
+const formOf=(v,t,p)=>t==='inf'?v.inf:v.forms[t][p];
 
 /* ===== answer normalization ===== */
 const strip=s=>s.normalize('NFC').replace(/[֑-ׇ]/g,'').replace(/[׳״'"\s]/g,'');
@@ -1090,7 +1609,7 @@ function maleHeur(pointed){
   return strip(out);
 }
 function acceptedAnswers(v,t,p){
-  const set=new Set(); const f=v.forms[t][p];
+  const set=new Set(); const f=formOf(v,t,p);
   set.add(strip(f)); set.add(maleHeur(f));
   for(const s of [...set]) if(s.startsWith('י')&&!s.startsWith('יי')) set.add('י'+s);
   return set;
@@ -1135,6 +1654,7 @@ function migrateObj(o){
   o.prefs=o.prefs||{};
   if(!o.chat||typeof o.chat!=='object') o.chat={who:'shira',threads:{}};
   o.chat.threads=o.chat.threads||{};
+  if(!Array.isArray(o.stories)) o.stories=[];
   st.days=st.days||{};
   st.totalReviews=st.totalReviews||0; st.totalCorrect=st.totalCorrect||0;
   st.longestStreak=Math.max(st.longestStreak||0,st.streak||0);
@@ -1190,7 +1710,7 @@ async function initDb(){
   }catch(e){}
 }
 
-const LOG_CAP=2000;
+const LOG_CAP=6000;
 function bumpTotals(ok){
   state.stats.totalReviews=(state.stats.totalReviews||0)+1;
   if(ok) state.stats.totalCorrect=(state.stats.totalCorrect||0)+1;
@@ -1243,7 +1763,7 @@ function lev1(a,b){
 }
 function classifyMiss(v,t,p,u){
   if(!u) return 'other';
-  const cc=strip(v.forms[t][p]);
+  const cc=strip(formOf(v,t,p));
   if(u!==cc&&phon(u)===phon(cc)) return 'spell';
   for(const f of allForms(v)){
     if(f.t===t&&f.p===p) continue;
@@ -1254,7 +1774,7 @@ function classifyMiss(v,t,p,u){
     if(o.id===v.id||o.root!==v.root) continue;
     for(const f of allForms(o)) if(strip(f.form)===u||maleHeur(f.form)===u) return 'binyan';
   }
-  return lev1(u,strip(v.forms[t][p]))?'typo':'other';
+  return lev1(u,strip(formOf(v,t,p)))?'typo':'other';
 }
 const ERR_LABEL={spell:'right sounds, wrong letters (half credit)',typo:'a near-miss typo (half credit)',tense:'right person, wrong tense',person:'right tense, wrong person',form:'a different form of this verb',binyan:'the same root in a different binyan'};
 
@@ -1392,7 +1912,7 @@ const $=s=>document.querySelector(s);
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function personLabel(t,p){ return t==='present'?PRESENT_FORMS[p]:PERSONS[p]; }
+function personLabel(t,p){ if(t==='inf') return {en:'"to …" form',he:''}; return t==='present'?PRESENT_FORMS[p]:PERSONS[p]; }
 
 /* ===== tabs ===== */
 document.querySelectorAll('nav.tabs button').forEach(b=>{
@@ -1627,10 +2147,13 @@ function pickWeighted(n){
       lit=litPref==='full'?1:0.35;
     }
     for(const t of tenses){
+      if(t==='inf') continue;
       if(!v.forms[t]) continue;
       for(const p in v.forms[t])
         cells.push({v,t,p,wgt:cellWgt(skill,v.id+'|'+t+'|'+p)*lit});
     }
+    if(v.inf&&(!sessScope||!sessScope.tenses||sessScope.tenses.includes('inf')))
+      cells.push({v,t:'inf',p:'-',wgt:cellWgt(skill,v.id+'|inf|-')*lit});
   }
   return weightedSample(cells,n);
 }
@@ -1663,6 +2186,8 @@ function openSession(mode){
     sess.items=buildNumItems(sessLen());
   }else if(mode==='spell'){
     sess.items=buildSpellItems(sessLen());
+  }else if(mode==='prep'){
+    sess.items=buildPrepItems(sessLen());
   }else if(mode==='na'){
     sess.items=buildNaItems(sessLen());
   }else if(mode==='cloze'){
@@ -1732,8 +2257,14 @@ function finishSession(){
 }
 
 function distractors(v,t,p,n){
-  const correct=v.forms[t][p];
-  const pool=allForms(v).map(x=>x.form).filter(f=>f!==correct);
+  const correct=formOf(v,t,p);
+  let pool;
+  if(t==='inf'&&v.raw){
+    /* infinitive decoys = same root run through OTHER binyanim's templates */
+    pool=Object.keys(INF_TPL).filter(b=>b!==v.b).map(b=>conj(v.raw,INF_TPL[b]));
+  }else{
+    pool=allForms(v).map(x=>x.form).filter(f=>f!==correct);
+  }
   return shuffle([...new Set(pool)]).slice(0,n);
 }
 
@@ -1750,6 +2281,7 @@ function renderQuestion(){
     if(g==='na') return renderNa(x,body);
     if(g==='num') return renderNum(x,body);
     if(g==='spell') return renderSpell(x,body);
+    if(g==='prep') return renderPrep(x,body);
     if(g==='cloze') return renderCloze(x,body);
     return renderExc(x,body);
   }
@@ -1763,6 +2295,7 @@ function renderQuestion(){
   if(sess.mode==='order') return renderOrder(it,body);
   if(sess.mode==='num') return renderNum(it,body);
   if(sess.mode==='spell') return renderSpell(it,body);
+  if(sess.mode==='prep') return renderPrep(it,body);
   if(sess.mode==='na') return renderNa(it,body);
   if(sess.mode==='cloze') return renderCloze(it,body);
   return renderExc(it,body);
@@ -1774,13 +2307,16 @@ function bindNext(){$('#q-next').addEventListener('click',()=>{sess.i++;renderQu
 /* MCQ */
 function renderMCQ(it,body){
   const t0=performance.now();
-  const {v,t,p}=it; const correct=v.forms[t][p];
+  const {v,t,p}=it; const correct=formOf(v,t,p);
   const opts=shuffle([correct,...distractors(v,t,p,3)]);
   const pl=personLabel(t,p);
+  const modal=t==='inf'&&Math.random()<0.55?pick(MODALS):null;
   body.innerHTML=`<div class="qcard">
       <div class="qkicker">${BINYANIM[v.b].name} · <span class="he">${esc(v.root)}</span></div>
-      <div class="qbig">${esc(v.en)}</div>
-      <div class="qsub">${TENSES[t].en} · ${pl.en} <span class="he">${pl.he}</span></div>
+      ${modal?`<div class="qbig he" style="font-size:clamp(24px,7vw,34px)">${modal.he} <span class="blank">____</span></div>
+      <div class="qsub">"${modal.en} to ${esc(v.en)}" — pick the infinitive</div>`
+      :`<div class="qbig">${esc(v.en)}</div>
+      <div class="qsub">${TENSES[t].en} · ${pl.en} <span class="he">${pl.he}</span></div>`}
     </div>
     <div class="opts">${opts.map((o,i)=>`<button class="opt he" data-i="${i}">${hn(o)}</button>`).join('')}</div>
     <div class="feedback" id="fb"></div>`;
@@ -1807,7 +2343,7 @@ function renderMCQ(it,body){
 /* Type */
 function renderType(it,body){
   const t0=performance.now();
-  const {v,t,p}=it; const correct=v.forms[t][p]; const pl=personLabel(t,p);
+  const {v,t,p}=it; const correct=formOf(v,t,p); const pl=personLabel(t,p);
   body.innerHTML=`<div class="qcard">
       <div class="qkicker">${BINYANIM[v.b].name} · <span class="he">${esc(v.root)}</span></div>
       <div class="qbig">${esc(v.en)}</div>
@@ -1921,7 +2457,7 @@ function renderExc(it,body){
 /* dictation: hear a form, type it */
 function renderListen(it,body){
   const t0=performance.now();
-  const {v,t,p}=it; const correct=v.forms[t][p]; const pl=personLabel(t,p);
+  const {v,t,p}=it; const correct=formOf(v,t,p); const pl=personLabel(t,p);
   body.innerHTML=`<div class="qcard">
       <div class="qkicker">Listen &amp; type</div>
       <div class="qbig" style="font-size:36px">🔊</div>
@@ -2237,7 +2773,7 @@ function renderOrder(it,body){
 /* ===== sharp ear: hear a form, spot it among lookalikes ===== */
 function renderEar(it,body){
   const t0=performance.now();
-  const {v,t,p}=it; const correct=v.forms[t][p];
+  const {v,t,p}=it; const correct=formOf(v,t,p);
   const opts=shuffle([correct,...distractors(v,t,p,3)]);
   body.innerHTML=`<div class="qcard">
       <div class="qkicker">Sharp ear · ${BINYANIM[v.b].name}</div>
@@ -2331,6 +2867,48 @@ function renderNum(it,body){
   }));
 }
 
+/* ===== little words: inflected prepositions + yesh li ===== */
+function buildPrepItems(cnt){
+  const skill=skillCells(), cells=[];
+  for(const s in PREP_SETS)
+    for(const p in PREP_SETS[s].forms)
+      cells.push({s,p,kind:(s==='l'&&Math.random()<0.35)?'yesh':'form',wgt:cellWgt(skill,'prep_'+s+'_'+p+'|prep|-')});
+  return weightedSample(cells,cnt);
+}
+function renderPrep(it,body){
+  const t0=performance.now();
+  const set=PREP_SETS[it.s], correct=set.forms[it.p][0];
+  const pl=PERSONS[it.p];
+  const opts=shuffle([correct,...shuffle(Object.keys(set.forms).filter(k=>k!==it.p)).slice(0,3).map(k=>set.forms[k][0])]);
+  let big,sub;
+  if(it.kind==='yesh'){
+    big=`יֵשׁ <span class="blank">____</span> כֶּלֶב`;
+    sub=`"${pl.en==='I'?'I have':pl.en+' ha'+(pl.en==='we'||pl.en==='they'?'ve':'s')} a dog" — for ${pl.en} <span class="he">${pl.he}</span>`;
+  }else{
+    big=`${set.he} + <span style="color:var(--accent)">${pl.he}</span>`;
+    sub=`"${set.en}" for ${pl.en} — pick the fused form`;
+  }
+  body.innerHTML=`<div class="qcard">
+      <div class="qkicker">Little words · מִלּוֹת יַחַס</div>
+      <div class="qbig he" style="font-size:clamp(24px,7vw,34px)">${big}</div>
+      <div class="qsub">${sub}</div>
+    </div>
+    <div class="opts">${opts.map((o,i)=>`<button class="opt he" data-i="${i}">${hn(o)}</button>`).join('')}</div>
+    <div class="feedback" id="fb"></div>`;
+  let done=false;
+  body.querySelectorAll('.opt').forEach((btn,i)=>btn.addEventListener('click',()=>{
+    if(done)return; done=true;
+    const ok=opts[i]===correct;
+    btn.classList.add(ok?'correct':'wrong');
+    body.querySelectorAll('.opt').forEach((b,j)=>{if(opts[j]===correct)b.classList.add('correct');else if(b!==btn)b.classList.add('dim');});
+    if(ok)sess.right++;
+    logAttempt('prep_'+it.s+'_'+it.p,'prep','-',ok,'prep',{k:'prep',lat:Math.round(performance.now()-t0)});
+    const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
+    fb.innerHTML=(ok?'Right — ':'It\'s ')+`<b class="he">${hn(correct)}</b> <button class="spk" data-speak="${esc(correct)}">🔊</button> · <i>${set.forms[it.p][1]}</i>`+(it.kind==='yesh'?`<br><span class="muted">Hebrew has no verb "to have" — יֵשׁ לִי is literally "there-is to-me".</span>`:'');
+    fb.insertAdjacentHTML('afterend',nextBtnRow()); bindNext();
+  }));
+}
+
 /* ===== daily mix: the weakest cells across every game ===== */
 function buildMixItems(n){
   const skill=skillCells(), items=[];
@@ -2338,6 +2916,7 @@ function buildMixItems(n){
   pickWeighted(4).forEach((it,i)=>items.push({game:vGames[i%vGames.length],it}));
   buildVocabItems(1).forEach(it=>items.push({game:'vocab',it}));
   buildSpellItems(1).forEach(it=>items.push({game:'spell',it}));
+  buildPrepItems(1).forEach(it=>items.push({game:'prep',it}));
   buildNaItems(2).forEach(it=>items.push({game:'na',it}));
   weightedSample(EXCEPTIONS.map(q=>({...q,wgt:cellWgt(skill,q.id+'|rule|-')})),1).forEach(it=>items.push({game:'exc',it}));
   buildNumItems(1).forEach(it=>items.push({game:'num',it}));
@@ -2373,7 +2952,7 @@ function renderSpeedRound(){
     if(left<=0) return;
     if(qi>=sess.items.length) sess.items.push(...pickWeighted(20));
     const it=sess.items[qi++];
-    const {v,t,p}=it; const correct=v.forms[t][p];
+    const {v,t,p}=it; const correct=formOf(v,t,p);
     const opts=shuffle([correct,...distractors(v,t,p,3)]);
     const pl=personLabel(t,p);
     const t0=performance.now();
@@ -2421,10 +3000,12 @@ function renderAi(){
   root.innerHTML=`<div class="ggrid">
     <button class="gtile" id="ai-sent"><span class="glyph">✨</span><b>Fresh sentences</b><span class="d">AI-written, engine-checked</span></button>
     <button class="gtile" id="ai-trans"><span class="glyph">⇆</span><b>Translate</b><span class="d">Free-form, tutor-graded</span></button>
+    <button class="gtile" id="ai-story" style="grid-column:1/-1;flex-direction:row;align-items:center"><span class="glyph">📖</span><span><b>Story time</b><span class="d" style="display:block">Short stories built from words you know — tap to save new ones</span></span></button>
   </div>
   <p class="muted" style="font-size:12px;margin:8px 4px 0">Key saved on this device · <button style="color:var(--accent);font-weight:600" id="ai-remove">remove</button></p>`;
   document.getElementById('ai-sent').addEventListener('click',startAiSentences);
   document.getElementById('ai-trans').addEventListener('click',startAiTranslate);
+  document.getElementById('ai-story').addEventListener('click',startStory);
   document.getElementById('ai-remove').addEventListener('click',()=>setAiKey(''));
 }
 function aiSpinner(msg){
@@ -2448,7 +3029,7 @@ async function startAiSentences(){
     const cells=pickWeighted(5);
     const lines=cells.map((c,i)=>{
       const pl=personLabel(c.t,c.p);
-      return `${i+1}. verb "${c.v.en}" (${BINYANIM[c.v.b].name}), ${TENSES[c.t].en} tense, subject: ${pl.en} (${pl.he}) — the blank will hold the Hebrew form ${c.v.forms[c.t][c.p]}`;
+      return `${i+1}. verb "${c.v.en}" (${BINYANIM[c.v.b].name}), ${TENSES[c.t].en}${c.t==='inf'?'':' tense'}, subject: ${pl.en} (${pl.he}) — the blank will hold the Hebrew form ${formOf(c.v,c.t,c.p)}`;
     }).join('\n');
     const out=await aiChat([
       {role:'system',content:'You write short Hebrew practice sentences for a learner. Everyday spoken register. You never write the verb form itself — you leave a blank.'},
@@ -2468,7 +3049,7 @@ async function startAiTranslate(){
     const cells=pickWeighted(5);
     const lines=cells.map((c,i)=>{
       const pl=personLabel(c.t,c.p);
-      return `${i+1}. verb "${c.v.en}" (${BINYANIM[c.v.b].name}), ${TENSES[c.t].en} tense, subject ${pl.en}; correct Hebrew form: ${c.v.forms[c.t][c.p]}`;
+      return `${i+1}. verb "${c.v.en}" (${BINYANIM[c.v.b].name}), ${TENSES[c.t].en}${c.t==='inf'?'':' tense'}, subject ${pl.en}; correct Hebrew form: ${formOf(c.v,c.t,c.p)}`;
     }).join('\n');
     const out=await aiChat([
       {role:'system',content:'You create English sentences for Hebrew translation practice, everyday spoken register.'},
@@ -2506,7 +3087,7 @@ function renderTrans(it,body){
     try{
       const out=await aiChat([
         {role:'system',content:"You grade a Hebrew learner's translation. Encouraging but honest. Judge meaning and grammar; ignore missing niqqud and reasonable spelling variants."},
-        {role:'user',content:`English: "${it.en}"\nExpected verb form: ${v.forms[it.t][it.p]} ("${v.en}", ${TENSES[it.t].en}, ${pl.en})\nReference translation: ${it.ref}\nLearner wrote: ${u}\nReturn JSON {"score":0|0.5|1,"feedback":"one or two short sentences"}`}
+        {role:'user',content:`English: "${it.en}"\nExpected verb form: ${formOf(v,it.t,it.p)} ("${v.en}", ${TENSES[it.t].en}, ${pl.en})\nReference translation: ${it.ref}\nLearner wrote: ${u}\nReturn JSON {"score":0|0.5|1,"feedback":"one or two short sentences"}`}
       ],300,true);
       g=JSON.parse(out);
     }catch(e){ g={score:null,feedback:'Grading failed — '+String(e&&e.message||e)}; }
@@ -2591,7 +3172,10 @@ function renderChat(){
   }
   bar.hidden=false;
   const who=state.chat&&state.chat.who||'shira';
-  pk.innerHTML=Object.entries(PERSONAS).map(([k,p])=>`<button class="pchip${k===who?' on':''}" data-p="${k}"><span class="em">${p.emoji}</span><span>${p.name} · <span class="he">${p.he}</span><br><span class="muted" style="font-weight:400;font-size:10.5px">${p.bio}</span></span></button>`).join('');
+  pk.innerHTML=Object.entries(PERSONAS).map(([k,p])=>`<button class="pchip${k===who?' on':''}" data-p="${k}"><span class="em">${p.emoji}</span><span>${p.name} · <span class="he">${p.he}</span><br><span class="muted" style="font-weight:400;font-size:10.5px">${p.bio}</span></span></button>`).join('')+`<button class="pchip" id="chat-clear" title="Clear this conversation">🗑</button>`;
+  document.getElementById('chat-clear').addEventListener('click',()=>{
+    state.chat.threads[who]=[{r:'a',t:PERSONAS[who].hi}]; persist(); renderChat();
+  });
   pk.querySelectorAll('.pchip').forEach(b=>b.addEventListener('click',()=>{
     state.chat.who=b.dataset.p; persist(); renderChat();
   }));
@@ -2657,6 +3241,63 @@ document.getElementById('chat-addyes').addEventListener('click',async()=>{
   bar.hidden=true;
 });
 
+/* ===== story time: short AI stories built from words you know ===== */
+let storyIdx=0;
+function startStory(){
+  if(!aiKey()) return;
+  lessonRun=null; sessScope=null;
+  $('#session').classList.add('on'); document.documentElement.style.overflow='hidden';
+  sess.mode='story';
+  if(state.stories.length){ storyIdx=state.stories.length-1; renderStory(); }
+  else newStory();
+}
+async function newStory(){
+  aiSpinner('Writing a story at your level'); sess.mode='story';
+  try{
+    const known=[];
+    for(const id in state.srs){
+      if(id[0]==='v'&&(state.srs[id].ivl||0)>=3){ const w=VOCAB_BY_ID[id.slice(1)]; if(w) known.push(w.he); }
+    }
+    const sample=shuffle(known).slice(0,25).join(', ')||'בית, אוכל, יום, חבר, קפה';
+    const out=await aiChat([
+      {role:'system',content:'You write short Hebrew stories for learners. Simple spoken Hebrew, no niqqud, everyday life, light humor.'},
+      {role:'user',content:`Write a short story: 6-8 short sentences, beginner-intermediate level. Prefer using some of these words the learner already knows: ${sample}. Return JSON {"title":"short Hebrew title","he":"the story with each sentence on its own line","en":"English translation with matching line breaks"}`}
+    ],700,true);
+    const g=JSON.parse(out);
+    state.stories.push({id:Date.now(),title:String(g.title||'סיפור'),he:String(g.he||''),en:String(g.en||'')});
+    if(state.stories.length>10) state.stories.splice(0,state.stories.length-10);
+    persist(); storyIdx=state.stories.length-1; renderStory();
+  }catch(e){ aiFail(e); }
+}
+function renderStory(){
+  const s=state.stories[storyIdx]; if(!s) return;
+  $('#sess-bar').style.width='0%'; $('#sess-count').textContent='';
+  $('#sess-body').innerHTML=`<div class="qcard" style="text-align:start">
+      <div class="row"><div class="qkicker grow">Story time · ${storyIdx+1} of ${state.stories.length}</div>
+        <button class="spk" data-speak="${esc(s.he)}">🔊</button></div>
+      <div class="he" style="font-size:21px;font-weight:700;margin:8px 0">${esc(s.title)}</div>
+      <div class="he" id="story-body" style="font-size:19px;line-height:2;white-space:pre-wrap">${chatBubbleHtml(s.he)}</div>
+      <div id="story-en" class="muted" style="font-size:14px;white-space:pre-wrap;margin-top:12px;line-height:1.6" hidden>${esc(s.en)}</div>
+      <p class="muted" style="font-size:12px;margin:12px 0 0">Tap any word to add it to your vocabulary.</p>
+    </div>
+    <div class="sess-actions">
+      <button class="btn ghost" id="st-prev"${storyIdx?'':' disabled'}>‹</button>
+      <button class="btn ghost grow" id="st-en">Translation</button>
+      <button class="btn grow" id="st-new">New story</button>
+      <button class="btn ghost" id="st-next"${storyIdx<state.stories.length-1?'':' disabled'}>›</button>
+    </div>`;
+  $('#st-en').addEventListener('click',()=>{const e2=$('#story-en');e2.hidden=!e2.hidden;});
+  $('#st-new').addEventListener('click',newStory);
+  if(storyIdx) $('#st-prev').addEventListener('click',()=>{storyIdx--;renderStory();});
+  if(storyIdx<state.stories.length-1) $('#st-next').addEventListener('click',()=>{storyIdx++;renderStory();});
+  $('#story-body').addEventListener('click',e=>{
+    const w=e.target.closest('.cw'); if(!w) return;
+    tappedWord=w.textContent;
+    document.getElementById('chat-addw').textContent=tappedWord;
+    document.getElementById('chat-addbar').hidden=false;
+  });
+}
+
 /* ===== level check: a fixed-composition sample across every skill area;
    answers log as normal events so the whole app adapts from them ===== */
 function buildLevelItems(){
@@ -2721,9 +3362,9 @@ function startSweep(){
   const q=[];
   const hasHist=id=>{const e=state.srs[id];return e&&(e.reps||0)>0;};
   const skill=skillCells();
-  VOCAB_SEED.forEach(w=>{ if(!hasHist('v'+w.id)&&!skill[w.id+'|word|-']) q.push({cid:'v'+w.id,he:w.he,en:w.en,tr:w.tr,lg:w.id}); });
-  NOUNS.forEach(w=>{ if(!hasHist(w.id)) q.push({cid:w.id,he:w.he,en:w.en+' · plural '+w.pl,tr:null}); });
-  ADJS.forEach(a=>{ if(!hasHist(a.id)) q.push({cid:a.id,he:a.ms,en:a.en,tr:null}); });
+  VOCAB_SEED.forEach(w=>{ if(!hasHist('v'+w.id)&&!skill[w.id+'|word|-']) q.push({cid:'v'+w.id,rev:'r'+w.id,he:w.he,en:w.en,tr:w.tr,lg:w.id}); });
+  NOUNS.forEach(w=>{ if(!hasHist(w.id)) q.push({cid:w.id,rev:'r'+w.id,he:w.he,en:w.en+' · plural '+w.pl,tr:null}); });
+  ADJS.forEach(a=>{ if(!hasHist(a.id)) q.push({cid:a.id,rev:'r'+a.id,he:a.ms,en:a.en,tr:null}); });
   sweep={q,i:0,marked:0};
   $('#session').classList.add('on'); document.documentElement.style.overflow='hidden';
   sess.mode='sweep';
@@ -2734,7 +3375,7 @@ function renderSweep(){
   if(sweep.i>=sweep.q.length){
     $('#sess-body').innerHTML=`<div class="sess-done"><div class="big he">מְעֻלֶּה!</div>
       <h3>${sweep.marked} marked known</h3>
-      <p class="muted">${sweep.q.length?'Recognition marked — those skip lesson flashcards. Their reverse cards (English → say the Hebrew) still start fresh, because recognizing and recalling are different skills.':'Everything already has practice history — nothing left to sweep.'}</p>
+      <p class="muted">${sweep.q.length?'"Recognize it" schedules only the Hebrew→English card; "know it cold" schedules both directions; "still learning" comes back tomorrow.':'Everything already has practice history — nothing left to sweep.'}</p>
       <div class="sess-actions" style="max-width:280px;margin:18px auto 0"><button class="btn wide" id="d-close">Done</button></div></div>`;
     $('#sess-bar').style.width='100%'; $('#sess-count').textContent='';
     $('#d-close').addEventListener('click',closeSession);
@@ -2743,31 +3384,49 @@ function renderSweep(){
   const it=sweep.q[sweep.i];
   $('#sess-bar').style.width=(sweep.i/sweep.q.length*100)+'%';
   $('#sess-count').textContent=(sweep.i+1)+' / '+sweep.q.length;
-  $('#sess-body').innerHTML=`<div class="flash" style="min-height:220px">
-      <div class="qkicker">Do you recognize this?</div>
+  $('#sess-body').innerHTML=`<div class="flash" style="min-height:200px">
+      <div class="qkicker">How well do you know this?</div>
       <div class="front he" style="font-size:clamp(30px,9vw,44px)">${hn(esc(it.he))}</div>
       <div class="back"><b>${esc(it.en)}</b>${it.tr?' · <i>'+esc(it.tr)+'</i>':''}</div>
       <button class="spk" data-speak="${esc(it.he)}">🔊</button>
     </div>
-    <div class="grade" style="grid-template-columns:1fr 1fr">
-      <button class="again" id="sw-no">Still learning</button>
-      <button class="easy" id="sw-yes">I recognize it</button>
+    <div class="grade" style="grid-template-columns:1fr 1fr;gap:8px">
+      <button class="again" id="sw-new">Never seen it</button>
+      <button class="good" id="sw-learn">Still learning<small>seen it, shaky</small></button>
+      <button style="background:var(--gold-soft);color:var(--gold);border-radius:13px;padding:12px 6px;font-weight:700;font-size:15px" id="sw-rec">Recognize it<small style="display:block;font-weight:500;font-size:11.5px;opacity:.8">couldn't recall it cold</small></button>
+      <button class="easy" id="sw-know">Know it cold<small>both directions</small></button>
     </div>`;
-  $('#sw-yes').addEventListener('click',()=>{
-    state.srs[it.cid]={ef:2.5,ivl:21,due:addDays(todayStr(),21),lapses:0,reps:1};
+  const adv=()=>{sweep.i++;renderSweep();};
+  const seed=(cid,ivl)=>{state.srs[cid]={ef:2.5,ivl,due:addDays(todayStr(),ivl),lapses:0,reps:1};};
+  $('#sw-new').addEventListener('click',adv);
+  $('#sw-learn').addEventListener('click',()=>{ seed(it.cid,1); sweep.marked++; persist(); adv(); });
+  $('#sw-rec').addEventListener('click',()=>{ seed(it.cid,21); sweep.marked++; persist(); adv(); });
+  $('#sw-know').addEventListener('click',()=>{
+    seed(it.cid,21);
+    if(it.rev) seed(it.rev,10);
     if(it.lg){
       state.log.push({v:it.lg,t:'word',p:'-',ok:1,m:'sweep',ts:Date.now(),k:'vocab'});
       if(state.log.length>LOG_CAP) state.log=state.log.slice(-LOG_CAP);
     }
-    sweep.marked++; persist(); sweep.i++; renderSweep();
+    sweep.marked++; persist(); adv();
   });
-  $('#sw-no').addEventListener('click',()=>{sweep.i++;renderSweep();});
 }
 
 /* ===== onboarding: shown until there's real history or a level check ===== */
 function renderOnboard(){
   const root=document.getElementById('onboard-root'); if(!root) return;
-  if(state.level||state.log.length>=10){ root.innerHTML=''; return; }
+  if(state.level||state.log.length>=10){
+    const tr=state.stats.totalReviews||0;
+    const stale=!state.lastExport||dayDiff(state.lastExport,todayStr())>30;
+    if(tr>50&&stale){
+      root.innerHTML=`<div class="card" style="margin-top:16px"><b style="font-size:14.5px">💾 Back up your progress</b>
+        <p class="muted" style="margin:6px 0 10px;font-size:13px">${state.lastExport?'Your last export was over a month ago':'You have never exported'} — iOS can clear site data from rarely-opened apps. One tap protects everything.</p>
+        <button class="btn wide" id="ob-backup">Export backup</button></div>`;
+      document.getElementById('ob-backup').addEventListener('click',()=>{document.getElementById('backup-btn').click();renderOnboard();});
+      return;
+    }
+    root.innerHTML=''; return;
+  }
   root.innerHTML=`<div class="card" style="margin-top:16px">
     <b style="font-size:15.5px">New here — or not exactly a beginner?</b>
     <p class="muted" style="margin:6px 0 12px;font-size:13.5px">Take the 3-minute level check so the app knows what to skip, or sweep-mark the vocabulary you already know.</p>
@@ -2786,8 +3445,9 @@ function startLesson(L){
   if((L.vocab&&L.vocab.length)||(L.verbs&&L.verbs.length)||(L.nouns&&L.nouns.length)||(L.adjs&&L.adjs.length)) stages.push('flash');
   if(L.vocab&&L.vocab.length) stages.push('vocab');
   if(L.verbs&&L.verbs.length){ stages.push('mcq'); stages.push('type'); }
-  const sents=SENTENCES.filter(s=>(L.verbs||[]).includes(s.v));
+  const sents=SENTENCES.filter(s=>(L.verbs||[]).includes(s.v)&&(!L.tenses||L.tenses.includes(s.t)));
   if(sents.length) stages.push('cloze');
+  if(L.prep) stages.push('prep');
   if((L.nouns&&L.nouns.length)||(L.adjs&&L.adjs.length)) stages.push('na');
   lessonRun={L,stages,i:0,ti:0};
   $('#session').classList.add('on'); document.documentElement.style.overflow='hidden';
@@ -2844,13 +3504,18 @@ function lessonProgress(L,skill){
     const v=VERB_BY_ID[vid]; if(!v) continue;
     let n=0,accSum=0,cells=0;
     for(const t of (L.tenses||['past','present','future'])){
+      if(t==='inf'){
+        const s=skill[vid+'|inf|-'];
+        if(s){ n+=s.n; accSum+=s.acc; cells++; }
+        continue;
+      }
       if(!v.forms[t]) continue;
       for(const p in v.forms[t]){
         const s=skill[vid+'|'+t+'|'+p];
         if(s){ n+=s.n; accSum+=s.acc; cells++; }
       }
     }
-    if(n>=6&&cells&&accSum/cells>=0.75) done++;
+    if(n>=(L.tenses&&L.tenses[0]==='inf'?3:6)&&cells&&accSum/cells>=0.75) done++;
   }
   for(const wid of (L.vocab||[])){ total++;
     /* recognizing a word when shown is not knowing it — completion needs
@@ -3106,7 +3771,7 @@ $('#add-btn').addEventListener('click',()=>{
 });
 
 /* ===== binyan chart ===== */
-const MODE_LABEL={mcq:'Quiz',type:'Type it',cloze:'Sentences',listen:'Dictation',ear:'Sharp ear',order:'Word order',vocab:'Vocab',roots:'Roots',num:'Numbers',speed:'Speed',na:'Nouns & adj',exc:'Rules',trans:'Translate',spell:'Spelling',sweep:'Sweep'};
+const MODE_LABEL={mcq:'Quiz',type:'Type it',cloze:'Sentences',listen:'Dictation',ear:'Sharp ear',order:'Word order',vocab:'Vocab',roots:'Roots',num:'Numbers',speed:'Speed',na:'Nouns & adj',exc:'Rules',trans:'Translate',spell:'Spelling',prep:'Little words',sweep:'Sweep'};
 function statBar(label,r,w){
   const tot=r+w;
   const pct=tot?Math.round(r/tot*100):null;
@@ -3148,8 +3813,9 @@ function renderWeak(){
     .sort((a,b)=>a[1].acc-b[1].acc).slice(0,6)
     .map(([k,s])=>{
       const [vid,t,p]=k.split('|'); const v=VERB_BY_ID[vid];
-      if(!v||!v.forms[t]||!v.forms[t][p]) return '';
-      const form=v.forms[t][p]; const pl=personLabel(t,p); const pct=Math.round(s.acc*100);
+      const form=v?(t==='inf'?v.inf:(v.forms[t]&&v.forms[t][p])):null;
+      if(!form) return '';
+      const pl=personLabel(t,p); const pct=Math.round(s.acc*100);
       return `<div class="vrow"><span class="he">${hn(esc(form))}</span>
         <button class="spk" data-speak="${esc(form)}">🔊</button>
         <span class="m"><b>${esc(v.en)}</b><span>${TENSES[t].en} · ${pl.en} · ${BINYANIM[v.b].name}</span></span>
@@ -3217,6 +3883,7 @@ function renderAll(){ renderStats(); renderVocab(); renderLessons(); renderOnboa
 <script>
 'use strict';
 document.getElementById('backup-btn').addEventListener('click',()=>{
+  state.lastExport=todayStr(); persist();
   const blob=new Blob([JSON.stringify(state,null,1)],{type:'application/json'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download='shoresh-backup-'+todayStr()+'.json';
