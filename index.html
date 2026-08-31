@@ -52,10 +52,11 @@ input,select{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 #app{max-width:640px;margin:0 auto;padding:18px 16px 96px}
-header.top{display:flex;align-items:baseline;justify-content:space-between;margin:2px 2px 16px;flex-wrap:wrap;gap:8px}
-.brand{font-weight:700;font-size:20px;letter-spacing:.01em}
-.brand .he{font-weight:700;color:var(--accent);margin-inline-start:6px;font-size:22px}
-.daymark{font-size:13px;color:var(--muted)}
+header.top{display:flex;align-items:center;justify-content:space-between;margin:0 2px 12px;gap:8px}
+.brand{font-weight:700;font-size:17px;letter-spacing:.01em}
+.brand .he{font-weight:700;color:var(--accent);margin-inline-start:5px;font-size:18px}
+body[data-tab="chat"] header.top{display:none}
+body[data-tab="chat"] #app{padding-top:10px}
 .top-right{display:flex;align-items:center;gap:8px}
 #nikud-btn,#gear-btn{font-size:13px;padding:4px 10px;border-radius:20px;background:var(--surface2);border:1px solid var(--line);font-weight:600;color:var(--ink)}
 .setsel{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;font-size:14px;color:var(--ink)}
@@ -240,9 +241,13 @@ details.ref[open] summary .car{transform:rotate(90deg)}
 .pchip.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
 .pchip .em{font-size:19px}
 .chat-msgs{padding-bottom:76px;min-height:200px}
-.bub{max-width:82%;padding:9px 13px;border-radius:16px;margin:7px 0;font-size:16.5px;line-height:1.5;width:fit-content;white-space:pre-wrap;word-break:break-word}
-.bub.u{margin-inline-start:auto;background:var(--btn);color:var(--btn-ink);border-bottom-right-radius:5px}
+.brow{display:flex;margin:7px 0}
+.brow.u{justify-content:flex-end}
+.bub{max-width:82%;padding:9px 13px;border-radius:16px;font-size:16.5px;line-height:1.5;white-space:pre-wrap;word-break:break-word;text-align:start}
+.bub.u{background:var(--btn);color:var(--btn-ink);border-bottom-right-radius:5px}
 .bub.a{background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);border-bottom-left-radius:5px}
+.fixline{font-size:12.5px;color:var(--gold);background:var(--gold-soft);padding:4px 10px;border-radius:10px;margin-top:-4px;max-width:82%;text-align:start}
+.chat-head{position:sticky;top:0;background:var(--bg);z-index:30;display:flex;align-items:center;gap:8px;padding:8px 0 10px}
 .bub .cw{border-bottom:1.5px dashed currentColor;cursor:pointer}
 .chat-inbar{position:fixed;left:0;right:0;bottom:64px;background:var(--surface);border-top:1px solid var(--line);
   padding:8px max(12px,env(safe-area-inset-left));display:flex;gap:8px;z-index:39}
@@ -258,7 +263,6 @@ details.ref[open] summary .car{transform:rotate(90deg)}
     <div class="top-right">
       <button id="nikud-btn" onclick="toggleNikud()">אָ niqqud</button>
       <button id="gear-btn" aria-label="Settings">⚙️</button>
-      <div class="daymark" id="daymark"></div>
     </div>
   </header>
 
@@ -327,11 +331,20 @@ details.ref[open] summary .car{transform:rotate(90deg)}
   </section>
 
   <section class="screen" id="tab-chat">
-    <div class="pchips" id="chat-pick"></div>
-    <div class="chat-msgs" id="chat-msgs"></div>
-    <div class="chat-inbar" id="chat-inbar">
-      <input id="chat-in" dir="auto" placeholder="Hebrew, English, or both…" autocomplete="off">
-      <button class="btn" id="chat-send" style="border-radius:20px;padding:10px 16px">↑</button>
+    <div id="chat-list" class="stack"></div>
+    <div id="chat-talk" hidden>
+      <div class="chat-head">
+        <button class="x" id="chat-back" style="font-size:22px;padding:2px 10px;color:var(--accent)">‹</button>
+        <span id="chat-avatar" style="font-size:24px"></span>
+        <b class="grow" id="chat-name" style="font-size:15px"></b>
+        <button class="chip" id="chat-fix-toggle">✎ fixes on</button>
+        <button class="chip" id="chat-clear" title="Clear conversation">🗑</button>
+      </div>
+      <div class="chat-msgs" id="chat-msgs"></div>
+      <div class="chat-inbar" id="chat-inbar">
+        <input id="chat-in" dir="auto" placeholder="Hebrew, English, or both…" autocomplete="off">
+        <button class="btn" id="chat-send" style="border-radius:20px;padding:10px 16px">↑</button>
+      </div>
     </div>
   </section>
 
@@ -1421,6 +1434,43 @@ const VOCAB_SEED=[
 
 const CAT_LABELS={basics:'Everyday basics',home:'The home · הַבַּיִת',food:'Food & cooking · אֹכֶל',clothing:'Clothing · בְּגָדִים',health:'Health · בְּרִיאוּת',romance:'Romance & social · אַהֲבָה',nature:'Nature · טֶבַע',street:'Street Hebrew · סְלֶנְג',work:'Work · עֲבוֹדָה',travel:'Travel · נְסִיעוֹת',city:'In the city · בָּעִיר',feelings:'Feelings · רְגָשׁוֹת',body:'The body · גּוּף',family:'Family · מִשְׁפָּחָה',time:'Time · זְמַן',colors:'Colors · צְבָעִים',animals:'Animals · חַיּוֹת',weather:'Weather · מֶזֶג אֲוִיר',shopping:'Shopping · קְנִיּוֹת',school:'School · לִמּוּדִים',tech:'Tech · טֶכְנוֹלוֹגְיָה',sports:'Sports · סְפּוֹרְט',holidays:'Holidays · חַגִּים'};
 
+/* phrases & idioms: meaning first, literal second — because Hebrew doesn't
+   translate word for word */
+const PHRASES=[
+ {id:'ph_mapitom',he:'מָה פִּתְאוֹם',tr:'ma pitom',en:'no way! of course not!',lit:'what suddenly'},
+ {id:'ph_einmatsav',he:'אֵין מַצָּב',tr:'ein matsav',en:"no way / not a chance",lit:'there is no situation'},
+ {id:'ph_alhapanim',he:'עַל הַפָּנִים',tr:'al ha-panim',en:'terrible, awful',lit:'on the face'},
+ {id:'ph_sofhaderekh',he:'סוֹף הַדֶּרֶךְ',tr:'sof ha-derekh',en:'awesome, the best',lit:'end of the road'},
+ {id:'ph_metalze',he:'מֵת עַל זֶה',tr:'met al ze',en:'love it, crazy about it',lit:'dying on it'},
+ {id:'ph_einlimusag',he:'אֵין לִי מוּשָׂג',tr:'ein li musag',en:'I have no idea',lit:'I have no concept'},
+ {id:'ph_kolhakavod',he:'כָּל הַכָּבוֹד',tr:'kol ha-kavod',en:'well done! respect!',lit:'all the honor'},
+ {id:'ph_bekef',he:'בְּכֵיף',tr:'be-kef',en:'gladly, with pleasure',lit:'in fun'},
+ {id:'ph_lomeshane',he:'לֹא מְשַׁנֶּה',tr:'lo meshane',en:"never mind, it doesn't matter",lit:'not changing'},
+ {id:'ph_zehu',he:'זֶהוּ',tr:'zehu',en:"that's it, done",lit:'this is it'},
+ {id:'ph_nubeemet',he:'נוּ בֶּאֱמֶת',tr:'nu be-emet',en:'oh come on!',lit:'well, in truth'},
+ {id:'ph_azovotkha',he:'עֲזֹב אוֹתְךָ',tr:'azov otkha',en:'forget it, drop it',lit:'leave yourself'},
+ {id:'ph_maikhpatli',he:'מָה אִכְפַּת לִי',tr:'ma ikhpat li',en:"what do I care",lit:'what is cared to me'},
+ {id:'ph_sheyihye',he:'שֶׁיִּהְיֶה',tr:'she-yihye',en:'whatever, so be it',lit:'that it will be'},
+ {id:'ph_beteavon',he:'בְּתֵאָבוֹן',tr:'be-teavon',en:'bon appétit',lit:'in appetite'},
+ {id:'ph_labriut',he:'לַבְּרִיאוּת',tr:'la-briut',en:'bless you (after a sneeze)',lit:'to the health'},
+ {id:'ph_behatslakha',he:'בְּהַצְלָחָה',tr:'be-hatslakha',en:'good luck',lit:'in success'},
+ {id:'ph_mazaltov',he:'מַזָּל טוֹב',tr:'mazal tov',en:'congratulations',lit:'good luck/star'},
+ {id:'ph_shabatshalom',he:'שַׁבָּת שָׁלוֹם',tr:'shabat shalom',en:'good Shabbat',lit:'Sabbath of peace'},
+ {id:'ph_khagsameakh',he:'חַג שָׂמֵחַ',tr:'khag sameakh',en:'happy holiday',lit:'joyous festival'},
+ {id:'ph_titkhadesh',he:'תִּתְחַדֵּשׁ',tr:'titkhadesh',en:'enjoy your new thing!',lit:'be renewed'},
+ {id:'ph_kaparaalekha',he:'כַּפָּרָה עָלֶיךָ',tr:'kapara alekha',en:'sweetie, dear (endearment)',lit:'atonement upon you'},
+ {id:'ph_neshamasheli',he:'נְשָׁמָה שֶׁלִּי',tr:'neshama sheli',en:'my dear, darling',lit:'my soul'},
+ {id:'ph_khaimsheli',he:'חַיִּים שֶׁלִּי',tr:'khaim sheli',en:'darling, my love',lit:'my life'},
+ {id:'ph_yallabai',he:'יָאלְלָה בַּיי',tr:'yalla bai',en:'ok, bye!',lit:'come on, bye'},
+ {id:'ph_regaregar',he:'רֶגַע רֶגַע',tr:'rega rega',en:'hold on, wait a second',lit:'moment moment'},
+ {id:'ph_leatleat',he:'לְאַט לְאַט',tr:'le-at le-at',en:'easy does it, step by step',lit:'slowly slowly'},
+ {id:'ph_anialze',he:'אֲנִי עַל זֶה',tr:'ani al ze',en:"I'm on it",lit:'I am on it'},
+ {id:'ph_eizekef',he:'אֵיזֶה כֵּיף',tr:'eize kef',en:'how fun! what a treat!',lit:'what a fun'},
+ {id:'ph_eizebasa',he:'אֵיזֶה בָּאסָה',tr:'eize basa',en:'what a bummer',lit:'what a basa (downer)'},
+ {id:'ph_asitalihayom',he:'עָשִׂיתָ לִי אֶת הַיּוֹם',tr:'asita li et ha-yom',en:'you made my day',lit:'you did the day for me'},
+ {id:'ph_taasekhaim',he:'תַּעֲשֶׂה חַיִּים',tr:'taase khaim',en:'have a blast! enjoy!',lit:'make life'}
+];
+
 const NOUNS=[
  {id:'n_bayit',he:'בַּיִת',pl:'בָּתִּים',g:'m',en:'house'},
  {id:'n_ish',he:'אִישׁ',pl:'אֲנָשִׁים',g:'m',en:'man'},
@@ -2057,6 +2107,7 @@ function cardPool(){
   ALL_VERBS.forEach(v=>pool.push({id:'verb_'+v.id,kind:'verb',v}));
   NOUNS.forEach(w=>pool.push({id:w.id,kind:'noun',w}));
   ADJS.forEach(a=>pool.push({id:a.id,kind:'adj',a}));
+  PHRASES.forEach(w=>pool.push({id:w.id,kind:'phrase',w}));
   /* reverse (recall) cards: English on the front, SAY the Hebrew, self-grade.
      Recognition and recall are separate skills with separate schedules. */
   VOCAB_SEED.forEach(w=>pool.push({id:'r'+w.id,kind:'rvocab',w}));
@@ -2064,6 +2115,7 @@ function cardPool(){
   ALL_VERBS.forEach(v=>pool.push({id:'rverb_'+v.id,kind:'rverb',v}));
   NOUNS.forEach(w=>pool.push({id:'r'+w.id,kind:'rnoun',w}));
   ADJS.forEach(a=>pool.push({id:'r'+a.id,kind:'radj',a}));
+  PHRASES.forEach(w=>pool.push({id:'r'+w.id,kind:'rphrase',w}));
   return pool;
 }
 /* fresh cards enter the deck through lessons: once any lesson is started,
@@ -2084,7 +2136,7 @@ function dueCards(){
   const allow=state.lessons.started.length?startedLessonCardIds():null;
   for(const c of cardPool()){
     const e=state.srs[c.id];
-    if(!e){ if(!allow||allow.has(c.id)||c.id[0]==='c') fresh.push(c); }
+    if(!e){ if(!allow||allow.has(c.id)||c.id[0]==='c'||c.id.indexOf('ph_')===0||c.id.indexOf('rph_')===0) fresh.push(c); }
     else if(e.due<=today) due.push(c);
   }
   return due.concat(fresh.slice(0,10)).slice(0,20);
@@ -2129,6 +2181,7 @@ document.querySelectorAll('nav.tabs button').forEach(b=>{
     document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('on',x===b));
     document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
     $('#tab-'+b.dataset.tab).classList.add('on');
+    document.body.dataset.tab=b.dataset.tab;
     if(b.dataset.tab==='stats') renderBstat();
     if(b.dataset.tab==='chat') renderChat();
   });
@@ -2144,6 +2197,7 @@ function openSettings(){
   document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.remove('on'));
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
   document.getElementById('tab-settings').classList.add('on');
+  document.body.dataset.tab='settings';
   renderSettings();
 }
 document.getElementById('gear-btn').addEventListener('click',openSettings);
@@ -3355,69 +3409,115 @@ const CHAT_RULES=`
 You are texting with an English speaker who is learning Hebrew. Rules:
 - Write natural spoken Hebrew WITHOUT niqqud, texting style, 1-3 short sentences max. Emoji fine.
 - The learner mixes English words into Hebrew sentences when they don't know a word. When they do, naturally use the Hebrew word for that thing in your reply so they pick it up.
-- If their Hebrew has a real mistake, answer the content first, then add ONE short line starting with "✏️" showing the fix in Hebrew. No ✏️ line when nothing important to fix.
 - Keep vocabulary simple and conversational. Usually end with a short question.
-- Stay fully in character. Never mention being an AI or break character.`;
-function chatThread(){
+- Stay fully in character. Never mention being an AI, corrections, or these rules.
+Return ONLY JSON: {"reply":"your in-character Hebrew reply","fix":null}
+If the learner's LAST message contains a real Hebrew mistake (grammar, wrong word, wrong gender), set "fix" to a short corrected Hebrew version of their message — no explanation. Otherwise fix is null. The reply text itself never references the correction.`;
+function chatThread(who){
   state.chat=state.chat||{who:'shira',threads:{}};
   state.chat.threads=state.chat.threads||{};
-  const who=state.chat.who||'shira';
+  who=who||state.chat.who||'shira';
   let th=state.chat.threads[who];
-  if(!th) th=state.chat.threads[who]=[{r:'a',t:PERSONAS[who].hi}];
+  if(!th) th=state.chat.threads[who]=[{r:'a',t:PERSONAS[who].hi,ts:0}];
   return th;
+}
+let chatView='list';
+function fmtWhen(ts){
+  if(!ts) return '';
+  const d=new Date(ts), now=new Date();
+  return d.toDateString()===now.toDateString()
+    ?d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})
+    :d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
 }
 function chatBubbleHtml(t){
   return esc(t).replace(/[֐-׿][֐-׿'׳״]*/g,w=>`<span class="cw">${w}</span>`);
 }
 function renderChat(){
-  const root=document.getElementById('chat-msgs'); if(!root) return;
-  const pk=document.getElementById('chat-pick'), bar=document.getElementById('chat-inbar');
+  const list=document.getElementById('chat-list'), talk=document.getElementById('chat-talk');
+  if(!list) return;
   if(!aiKey()){
-    pk.innerHTML='';
-    bar.hidden=true;
-    root.innerHTML=`<div class="card"><b style="font-size:15px">Text a friend in Hebrew</b>
-      <p class="muted" style="margin:6px 0 0;font-size:13.5px">Pick a personality and chat in Hebrew, English, or both mixed — don't know a word? Say it in English and they'll teach you the Hebrew. Tap any Hebrew word to add it to your study list.<br><br>Add an OpenAI key in <b>Settings ⚙️</b> to start.</p></div>`;
+    talk.hidden=true; list.hidden=false;
+    list.innerHTML=`<div class="card" style="margin-top:4px"><b style="font-size:15px">Text a friend in Hebrew</b>
+      <p class="muted" style="margin:6px 0 0;font-size:13.5px">Chat in Hebrew, English, or both mixed — don't know a word? Say it in English and they'll teach you the Hebrew. Tap any Hebrew word to save it.<br><br>Add an OpenAI key in <b>Settings ⚙️</b> to start.</p></div>`;
     return;
   }
-  bar.hidden=false;
-  const who=state.chat&&state.chat.who||'shira';
-  pk.innerHTML=Object.entries(PERSONAS).map(([k,p])=>`<button class="pchip${k===who?' on':''}" data-p="${k}"><span class="em">${p.emoji}</span><span>${p.name} · <span class="he">${p.he}</span><br><span class="muted" style="font-weight:400;font-size:10.5px">${p.bio}</span></span></button>`).join('')+`<button class="pchip" id="chat-clear" title="Clear this conversation">🗑</button>`;
-  document.getElementById('chat-clear').addEventListener('click',()=>{
-    state.chat.threads[who]=[{r:'a',t:PERSONAS[who].hi}]; persist(); renderChat();
-  });
-  pk.querySelectorAll('.pchip').forEach(b=>b.addEventListener('click',()=>{
-    state.chat.who=b.dataset.p; persist(); renderChat();
+  if(chatView==='talk') renderTalk(); else renderChatList();
+}
+function renderChatList(){
+  const list=document.getElementById('chat-list');
+  document.getElementById('chat-talk').hidden=true;
+  list.hidden=false;
+  list.innerHTML='<h2 class="sec" style="margin:4px 2px 10px">Messages</h2>'+Object.entries(PERSONAS).map(([k,p])=>{
+    const th=(state.chat.threads||{})[k];
+    const last=th&&th[th.length-1];
+    const prev=last?((last.r==='u'?'You: ':'')+last.t.replace(/\s+/g,' ')):p.hi;
+    return `<button class="mode conv" data-p="${k}" style="padding:12px 14px">
+      <span class="glyph" style="font-size:24px">${p.emoji}</span>
+      <span class="grow" style="min-width:0"><b>${p.name} · <span class="he">${p.he}</span></b>
+        <span class="d" dir="auto" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;max-width:100%">${esc(prev.slice(0,70))}</span></span>
+      <span class="muted" style="font-size:11px;flex:none">${last?fmtWhen(last.ts):''}</span></button>`;
+  }).join('');
+  list.querySelectorAll('.conv').forEach(b=>b.addEventListener('click',()=>{
+    state.chat.who=b.dataset.p; persist(); chatView='talk'; renderChat();
   }));
-  const th=chatThread();
-  root.innerHTML=th.map(m=>`<div class="bub ${m.r==='u'?'u':'a'}" dir="auto">${chatBubbleHtml(m.t)}</div>`).join('');
+}
+function renderTalk(){
+  document.getElementById('chat-list').hidden=true;
+  const talk=document.getElementById('chat-talk'); talk.hidden=false;
+  const who=state.chat.who||'shira', p=PERSONAS[who];
+  document.getElementById('chat-avatar').textContent=p.emoji;
+  document.getElementById('chat-name').innerHTML=`${p.name} · <span class="he">${p.he}</span>`;
+  const fixOn=(state.prefs&&state.prefs.chatFix)!==false;
+  const ft=document.getElementById('chat-fix-toggle');
+  ft.textContent='✎ fixes '+(fixOn?'on':'off');
+  ft.classList.toggle('on',fixOn);
+  const root=document.getElementById('chat-msgs');
+  const th=chatThread(who);
+  root.innerHTML=th.map(m=>{
+    let h=`<div class="brow ${m.r==='u'?'u':'a'}"><div class="bub ${m.r==='u'?'u':'a'}" dir="auto">${chatBubbleHtml(m.t)}</div></div>`;
+    if(m.r==='u'&&m.fx&&fixOn) h+=`<div class="brow u"><div class="fixline" dir="auto">✎ ${chatBubbleHtml(m.fx)}</div></div>`;
+    return h;
+  }).join('');
   window.scrollTo(0,document.body.scrollHeight);
 }
+document.getElementById('chat-back').addEventListener('click',()=>{chatView='list';renderChat();});
+document.getElementById('chat-clear').addEventListener('click',()=>{
+  const who=state.chat.who||'shira';
+  state.chat.threads[who]=[{r:'a',t:PERSONAS[who].hi,ts:0}]; persist(); renderTalk();
+});
+document.getElementById('chat-fix-toggle').addEventListener('click',()=>{
+  const P=state.prefs=state.prefs||{};
+  P.chatFix=(P.chatFix!==false)?false:true;
+  persist(); renderTalk();
+});
 let chatBusy=false;
 async function chatSend(){
   if(chatBusy||!aiKey()) return;
   const input=document.getElementById('chat-in');
   const txt=(input.value||'').trim(); if(!txt) return;
-  const th=chatThread(), who=state.chat.who||'shira';
-  th.push({r:'u',t:txt});
+  const who=state.chat.who||'shira', th=chatThread(who);
+  const um={r:'u',t:txt,ts:Date.now()};
+  th.push(um);
   if(th.length>30) th.splice(0,th.length-30);
-  persist(); input.value=''; renderChat();
+  persist(); input.value=''; renderTalk();
   const root=document.getElementById('chat-msgs');
-  root.insertAdjacentHTML('beforeend','<div class="bub a" id="chat-typing">···</div>');
+  root.insertAdjacentHTML('beforeend','<div class="brow a"><div class="bub a" id="chat-typing">···</div></div>');
   window.scrollTo(0,document.body.scrollHeight);
   chatBusy=true;
   try{
     const msgs=[{role:'system',content:PERSONAS[who].sys+CHAT_RULES}];
     th.slice(-14).forEach(m=>msgs.push({role:m.r==='u'?'user':'assistant',content:m.t}));
-    const out=await aiChat(msgs,220);
-    th.push({r:'a',t:String(out||'').trim()});
+    const out=await aiChat(msgs,300,true);
+    let g; try{ g=JSON.parse(out); }catch(_){ g={reply:String(out||'').trim(),fix:null}; }
+    th.push({r:'a',t:String(g.reply||'').trim()||'…',ts:Date.now()});
+    if(g.fix&&typeof g.fix==='string'&&strip(g.fix)!==strip(txt)) um.fx=g.fix.trim();
     if(th.length>30) th.splice(0,th.length-30);
     persist();
   }catch(e){
-    const tEl=document.getElementById('chat-typing'); if(tEl) tEl.remove();
-    th.push({r:'a',t:'⚠️ '+String(e&&e.message||'connection issue')});
+    th.push({r:'a',t:'⚠️ '+String(e&&e.message||'connection issue'),ts:Date.now()});
   }
   chatBusy=false;
-  renderChat();
+  renderTalk();
 }
 document.getElementById('chat-send').addEventListener('click',chatSend);
 document.getElementById('chat-in').addEventListener('keydown',e=>{if(e.key==='Enter')chatSend();});
@@ -3574,6 +3674,7 @@ function startSweep(){
   VOCAB_SEED.forEach(w=>{ if(!hasHist('v'+w.id)&&!skill[w.id+'|word|-']) q.push({cid:'v'+w.id,rev:'r'+w.id,he:w.he,en:w.en,tr:w.tr,lg:w.id}); });
   NOUNS.forEach(w=>{ if(!hasHist(w.id)) q.push({cid:w.id,rev:'r'+w.id,he:w.he,en:w.en+' · plural '+w.pl,tr:null}); });
   ADJS.forEach(a=>{ if(!hasHist(a.id)) q.push({cid:a.id,rev:'r'+a.id,he:a.ms,en:a.en,tr:null}); });
+  PHRASES.forEach(w=>{ if(!hasHist(w.id)) q.push({cid:w.id,rev:'r'+w.id,he:w.he,en:w.en+' — lit. '+w.lit,tr:w.tr}); });
   sweep={q,i:0,marked:0};
   $('#session').classList.add('on'); document.documentElement.style.overflow='hidden';
   sess.mode='sweep';
@@ -3811,10 +3912,10 @@ function renderFlash(){
   const iv=nextIvls(state.srs[c.id]);
   const rev=c.kind.charAt(0)==='r';
   const base=rev?c.kind.slice(1):c.kind;
-  const heWord=base==='vocab'||base==='noun'?c.w.he:base==='adj'?c.a.ms:c.v.lemma;
+  const heWord=base==='vocab'||base==='noun'||base==='phrase'?c.w.he:base==='adj'?c.a.ms:c.v.lemma;
   const enWord=base==='adj'?c.a.en:base==='verb'?c.v.en:c.w.en;
   const front=rev?enWord:heWord;
-  const kick=(rev?'Say it in Hebrew · ':'')+(base==='vocab'?'Vocabulary':base==='noun'?'Noun · שֵׁם עֶצֶם':base==='adj'?'Adjective · שֵׁם תֹּאַר':BINYANIM[c.v.b].name+' · <span class="he">'+esc(c.v.root)+'</span>');
+  const kick=(rev?'Say it in Hebrew · ':'')+(base==='vocab'?'Vocabulary':base==='phrase'?'Phrase · בִּיטוּי':base==='noun'?'Noun · שֵׁם עֶצֶם':base==='adj'?'Adjective · שֵׁם תֹּאַר':BINYANIM[c.v.b].name+' · <span class="he">'+esc(c.v.root)+'</span>');
   $('#sess-body').innerHTML=`<div class="flash">
       <div class="qkicker">${kick}</div>
       <div class="front${rev?'':' he'}"${rev?' style="font-family:Heebo,sans-serif;font-size:clamp(24px,7vw,36px)"':''}>${rev?esc(front):hn(esc(front))}</div>
@@ -3832,6 +3933,8 @@ function renderFlash(){
       const spk=`<button class="spk" data-speak="${esc(heWord)}">🔊</button>`;
       back.innerHTML=base==='vocab'
         ?`<span class="he" style="font-size:28px;color:var(--ink)">${hn(heWord)}</span> ${spk}${c.w.tr?'<br><i>'+esc(c.w.tr)+'</i>':''}`
+        :base==='phrase'
+        ?`<span class="he" style="font-size:24px;color:var(--ink)">${hn(c.w.he)}</span> ${spk}<br><span class="muted" style="font-size:12.5px">lit. ${esc(c.w.lit)} · <i>${esc(c.w.tr)}</i></span>`
         :base==='noun'
         ?`<span class="he" style="font-size:28px;color:var(--ink)">${hn(c.w.he)}</span> ${spk}<br><span class="muted" style="font-size:13.5px">${c.w.g==='m'?'masculine':'feminine'} · plural <span class="he" style="font-size:19px">${hn(c.w.pl)}</span></span>`
         :base==='adj'
@@ -3841,6 +3944,8 @@ function renderFlash(){
     }else{
       back.innerHTML=base==='vocab'
         ?`<b>${esc(c.w.en)}</b>${c.w.tr?' · <i>'+esc(c.w.tr)+'</i>':''}`
+        :base==='phrase'
+        ?`<b>${esc(c.w.en)}</b><br><span class="muted" style="font-size:12.5px">literally: ${esc(c.w.lit)}</span>${c.w.tr?' · <i>'+esc(c.w.tr)+'</i>':''}`
         :base==='noun'
         ?`<b>${esc(c.w.en)}</b> · ${c.w.g==='m'?'masculine':'feminine'}<br><span class="muted" style="font-size:13.5px">plural <span class="he" style="font-size:20px">${hn(c.w.pl)}</span></span>`
         :base==='adj'
@@ -3961,9 +4066,17 @@ function renderVocab(){
       const B=M.by[cat]||{t:0,rc:0};
       if(words.length) html+=`<div class="cat-label" style="display:flex;justify-content:space-between;align-items:center">${CAT_LABELS[cat]}<span class="pill${B.rc===B.t&&B.t?' ':''}" style="${B.rc===B.t&&B.t?'background:var(--good-soft);color:var(--good)':''}">${B.rc}/${B.t}</span></div><div class="card">${words.map(w=>row(w,false)).join('')}</div>`;
     }
+    const phRows=PHRASES.map(w=>`<div class="vrow"><span class="he" style="min-width:118px;font-size:18px">${hn(esc(w.he))}</span>
+      <button class="spk" data-speak="${esc(w.he)}">🔊</button>
+      <span class="m"><b>${esc(w.en)}</b><span>lit. ${esc(w.lit)} · ${esc(w.tr)}</span></span></div>`).join('');
+    html+=`<div class="cat-label">Phrases · בִּיטוּיִים <span class="pill">${PHRASES.length}</span></div><div class="card">${phRows}</div>`;
   } else {
     const gen=VOCAB_SEED.filter(match);
     if(gen.length) html+=`<div class="card">${gen.map(w=>row(w,false)).join('')}</div>`;
+    const ph=PHRASES.filter(w=>strip(w.he).includes(qh)||w.en.toLowerCase().includes(q)||w.lit.toLowerCase().includes(q)||w.tr.toLowerCase().includes(q));
+    if(ph.length) html+=`<div class="card"><b style="font-size:14px">Phrases</b>${ph.map(w=>`<div class="vrow"><span class="he" style="min-width:118px;font-size:18px">${hn(esc(w.he))}</span>
+      <button class="spk" data-speak="${esc(w.he)}">🔊</button>
+      <span class="m"><b>${esc(w.en)}</b><span>lit. ${esc(w.lit)}</span></span></div>`).join('')}</div>`;
   }
   list.innerHTML=html||'<p class="muted" style="text-align:center">No matches.</p>';
   list.querySelectorAll('.del').forEach(b=>b.addEventListener('click',()=>{
@@ -4177,8 +4290,7 @@ function renderStats(){
 }
 function renderAll(){ renderStats(); renderVocab(); renderLessons(); renderOnboard(); renderAi(); }
 (function(){
-  const d=new Date();
-  $('#daymark').textContent=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+  document.body.dataset.tab='practice';
   loadLocal(); applyTheme(); freezeGoals(); renderReference(); renderAll();
   badge('Everything is stored on this device.');
   initDb();
