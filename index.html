@@ -258,6 +258,7 @@ details.ref[open] summary .car{transform:rotate(90deg)}
       <button class="gtile" data-mode="na"><span class="glyph">ה</span><b>Nouns &amp; adj</b><span class="d">Plurals &amp; agreement</span></button>
       <button class="gtile" data-mode="num"><span class="glyph">3</span><b>Numbers</b><span class="d">Gendered numerals</span></button>
       <button class="gtile" data-mode="exc"><span class="glyph">!</span><b>Rules</b><span class="d">Exceptions &amp; patterns</span></button>
+      <button class="gtile" data-mode="spell"><span class="glyph">אב</span><b>Spelling</b><span class="d">ב or ו? ח or כ?</span></button>
       <button class="gtile" data-mode="speed"><span class="glyph">⚡</span><b>Speed round</b><span class="d">60-second sprint</span></button>
       <button class="gtile" data-mode="level" style="grid-column:1/-1;flex-direction:row;align-items:center"><span class="glyph">✓</span><span><b>Level check</b><span class="d" style="display:block">3 minutes — where are you right now?</span></span></button>
     </div>
@@ -1006,6 +1007,22 @@ function allForms(v){
 
 /* ===== answer normalization ===== */
 const strip=s=>s.normalize('NFC').replace(/[֑-ׇ]/g,'').replace(/[׳״'"\s]/g,'');
+const unpoint=s=>s.normalize('NFC').replace(/[֑-ׇ]/g,'');
+/* modern Hebrew merged these letter sounds — map each sound-class to one
+   canonical letter so "phonetically right, orthographically wrong" is
+   detectable (vet/vav, khet/khaf, kaf/kuf, tav/tet, alef/ayin, samekh/sin) */
+const PHON_MAP={'ו':'ב','ק':'ח','כ':'ח','ת':'ת','ט':'ת','ע':'א','ש':'ס','ך':'ח','ם':'מ','ן':'נ','ף':'פ','ץ':'צ'};
+const phon=s=>[...strip(s)].map(c=>PHON_MAP[c]||c).join('');
+function spellDiff(u,c){
+  const a=[...u],b=[...c],out=[];
+  if(a.length!==b.length) return out;
+  for(let i=0;i<a.length;i++) if(a[i]!==b[i]) out.push([a[i],b[i]]);
+  return out;
+}
+function spellNote(u,c){
+  const d=spellDiff(u,c);
+  return d.length?`<br><span class="muted">Letters: ${d.map(x=>`<b class="he">${x[1]}</b> not <span class="he">${x[0]}</span>`).join(' · ')}</span>`:'';
+}
 function maleHeur(pointed){
   let out='';const chars=[...pointed.normalize('NFC')];
   const nextBase=i=>{let j=i+1;while(j<chars.length&&chars[j]>='֑'&&chars[j]<='ׇ')j++;return j;};
@@ -1165,6 +1182,8 @@ function lev1(a,b){
 }
 function classifyMiss(v,t,p,u){
   if(!u) return 'other';
+  const cc=strip(v.forms[t][p]);
+  if(u!==cc&&phon(u)===phon(cc)) return 'spell';
   for(const f of allForms(v)){
     if(f.t===t&&f.p===p) continue;
     if(strip(f.form)===u||maleHeur(f.form)===u)
@@ -1176,7 +1195,7 @@ function classifyMiss(v,t,p,u){
   }
   return lev1(u,strip(v.forms[t][p]))?'typo':'other';
 }
-const ERR_LABEL={typo:'a near-miss typo (half credit)',tense:'right person, wrong tense',person:'right tense, wrong person',form:'a different form of this verb',binyan:'the same root in a different binyan'};
+const ERR_LABEL={spell:'right sounds, wrong letters (half credit)',typo:'a near-miss typo (half credit)',tense:'right person, wrong tense',person:'right tense, wrong person',form:'a different form of this verb',binyan:'the same root in a different binyan'};
 
 function bumpActivity(n){
   const today=todayStr(), st=state.stats;
@@ -1401,6 +1420,8 @@ function openSession(mode){
     sess.items=buildOrderItems(sessLen());
   }else if(mode==='num'){
     sess.items=buildNumItems(sessLen());
+  }else if(mode==='spell'){
+    sess.items=buildSpellItems(sessLen());
   }else if(mode==='na'){
     sess.items=buildNaItems(sessLen());
   }else if(mode==='cloze'){
@@ -1428,7 +1449,7 @@ function finishSession(){
   const word=pct===100?'מְצֻיָּן!':pct>=70?'כָּל הַכָּבוֹד!':'עוֹד פַּעַם?';
   if(sess.mode==='level'){
     const evs=state.log.slice(sess.logStart||0);
-    const areaOf=e=>e.t==='word'?'vocab':e.t==='num'?'numbers':e.t==='rule'?'rules':(e.t==='plural'||e.t==='gender'||e.t==='agree')?'nounadj':'conj';
+    const areaOf=e=>e.t==='word'?'vocab':e.t==='spell'?'spelling':e.t==='num'?'numbers':e.t==='rule'?'rules':(e.t==='plural'||e.t==='gender'||e.t==='agree')?'nounadj':'conj';
     const A={};
     for(const e of evs){ const a=areaOf(e); (A[a]=A[a]||{r:0,w:0})[e.ok?'r':'w']++; }
     state.level={d:todayStr(),areas:A}; persist();
@@ -1487,6 +1508,7 @@ function renderQuestion(){
     if(g==='vocab') return renderVocabQ(x,body);
     if(g==='na') return renderNa(x,body);
     if(g==='num') return renderNum(x,body);
+    if(g==='spell') return renderSpell(x,body);
     if(g==='cloze') return renderCloze(x,body);
     return renderExc(x,body);
   }
@@ -1499,6 +1521,7 @@ function renderQuestion(){
   if(sess.mode==='roots') return renderRoot(it,body);
   if(sess.mode==='order') return renderOrder(it,body);
   if(sess.mode==='num') return renderNum(it,body);
+  if(sess.mode==='spell') return renderSpell(it,body);
   if(sess.mode==='na') return renderNa(it,body);
   if(sess.mode==='cloze') return renderCloze(it,body);
   return renderExc(it,body);
@@ -1565,12 +1588,12 @@ function renderType(it,body){
     const extra={lat:Math.round(performance.now()-t0)};
     if(!ok&&u){
       extra.err=classifyMiss(v,t,p,u);
-      if(extra.err==='typo') extra.sc=0.5;
+      if(extra.err==='typo'||extra.err==='spell') extra.sc=0.5;
     }
     logAttempt(v.id,t,p,ok,'type',extra);
     lastQ={en:v.en,b:BINYANIM[v.b].name,t:TENSES[t].en,pl:pl.en,correct};
     const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
-    fb.innerHTML=(ok?'Right — ':'The answer: ')+`<b class="he">${hn(correct)}</b> <button class="spk" data-speak="${esc(correct)}">🔊</button>`+(!ok&&extra.err?` — that was ${ERR_LABEL[extra.err]}`:'')+(v.note?`<br><span class="muted">${esc(v.note)}</span>`:'')+(!ok?whyBtn():'');
+    fb.innerHTML=(ok?'Right — ':'The answer: ')+`<b class="he">${hn(correct)}</b> <button class="spk" data-speak="${esc(correct)}">🔊</button>`+(!ok&&extra.err?` — that was ${ERR_LABEL[extra.err]}`:'')+(extra.err==='spell'&&u?spellNote(u,strip(correct)):'')+(v.note?`<br><span class="muted">${esc(v.note)}</span>`:'')+(!ok?whyBtn():'');
     if(revealed){
       fb.innerHTML+=`<div class="row" style="margin-top:10px;gap:8px">
         <button class="btn ghost grow" id="sg-no">I didn't have it</button>
@@ -1682,7 +1705,7 @@ function renderListen(it,body){
     if(done)return; done=true;
     if(ok) sess.right++;
     const extra={lat:Math.round(performance.now()-t0)};
-    if(!ok&&u){ extra.err=classifyMiss(v,t,p,u); if(extra.err==='typo') extra.sc=0.5; }
+    if(!ok&&u){ extra.err=classifyMiss(v,t,p,u); if(extra.err==='typo'||extra.err==='spell') extra.sc=0.5; }
     logAttempt(v.id,t,p,ok,'listen',extra);
     const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
     fb.innerHTML=(ok?'Right — ':'It was ')+reveal+(!ok&&extra.err?` — that was ${ERR_LABEL[extra.err]}`:'');
@@ -1799,6 +1822,7 @@ function renderVocabQ(it,body){
     if(!ok&&u){
       const other=vocabPool().find(w=>w.id!==it.id&&strip(w.he)===u);
       if(other){ extra.err='form'; note=` — you wrote "${esc(other.en)}"`; }
+      else if(phon(u)===phon(strip(correct))){ extra.err='spell'; extra.sc=0.5; note=' — right sounds, wrong letters (half credit)'+spellNote(u,strip(correct)); }
       else if(lev1(u,strip(correct))){ extra.err='typo'; extra.sc=0.5; note=' — a near-miss typo (half credit)'; }
     }
     logAttempt(it.id,'word','-',ok,'vocab',extra);
@@ -1820,6 +1844,49 @@ function renderVocabQ(it,body){
     $('#sg-yes').addEventListener('click',()=>{logAttempt(it.id,'word','-',true,'vocab',{k:'vocab'});sess.right++;sess.i++;renderQuestion();});
     $('#sg-no').addEventListener('click',()=>{logAttempt(it.id,'word','-',false,'vocab',{k:'vocab'});sess.i++;renderQuestion();});
   });
+}
+
+/* ===== spelling: hear + know the word, pick the right letters ===== */
+const SWAPS={'ב':['ו'],'ו':['ב'],'כ':['ח','ק'],'ח':['כ'],'ק':['כ'],'ת':['ט'],'ט':['ת'],'א':['ע'],'ע':['א'],'ס':['ש'],'ש':['ס']};
+function spellDecoys(he){
+  const base=unpoint(he), chars=[...base], out=new Set();
+  for(let i=0;i<chars.length;i++){
+    const subs=SWAPS[chars[i]]; if(!subs) continue;
+    for(const s of subs){ const d=[...chars]; d[i]=s; out.add(d.join('')); }
+  }
+  out.delete(base);
+  return shuffle([...out]).slice(0,3);
+}
+function buildSpellItems(n){
+  const skill=skillCells();
+  const pool=vocabPool().filter(w=>spellDecoys(w.he).length>=1);
+  return weightedSample(pool.map(w=>({...w,wgt:cellWgt(skill,w.id+'|spell|-')})),n);
+}
+function renderSpell(it,body){
+  const t0=performance.now();
+  const correct=unpoint(it.he);
+  const opts=shuffle([correct,...spellDecoys(it.he)]);
+  body.innerHTML=`<div class="qcard">
+      <div class="qkicker">Spelling · כְּתִיב</div>
+      <div class="qbig" style="font-size:clamp(22px,6vw,30px);font-family:'Heebo',sans-serif;font-weight:600">${esc(it.en)}</div>
+      <div class="qsub">Which spelling is right? <button class="spk" data-speak="${esc(it.he)}">🔊</button></div>
+    </div>
+    <div class="opts">${opts.map((o,i)=>`<button class="opt he" data-i="${i}">${esc(o)}</button>`).join('')}</div>
+    <div class="feedback" id="fb"></div>`;
+  speak(it.he);
+  let done=false;
+  body.querySelectorAll('.opt').forEach((btn,i)=>btn.addEventListener('click',()=>{
+    if(done)return; done=true;
+    const ok=opts[i]===correct;
+    btn.classList.add(ok?'correct':'wrong');
+    body.querySelectorAll('.opt').forEach((b,j)=>{if(opts[j]===correct)b.classList.add('correct');else if(b!==btn)b.classList.add('dim');});
+    if(ok)sess.right++;
+    logAttempt(it.id,'spell','-',ok,'spell',{k:'spell',lat:Math.round(performance.now()-t0)});
+    const d=ok?[]:spellDiff(strip(opts[i]),strip(correct));
+    const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
+    fb.innerHTML=(ok?'Right — ':'It\'s ')+`<b class="he">${hn(it.he)}</b> <button class="spk" data-speak="${esc(it.he)}">🔊</button>${it.tr?' · <i>'+esc(it.tr)+'</i>':''}`+(d.length?`<br><span class="muted">The giveaway: <b class="he">${d.map(x=>x[1]).join('</b>, <b class="he">')}</b>, not <span class="he">${d.map(x=>x[0]).join(', ')}</span></span>`:'');
+    fb.insertAdjacentHTML('afterend',nextBtnRow()); bindNext();
+  }));
 }
 
 /* ===== root families: one root, seven binyanim ===== */
@@ -2028,7 +2095,8 @@ function buildMixItems(n){
   const skill=skillCells(), items=[];
   const vGames=['mcq','type','ear'];
   pickWeighted(4).forEach((it,i)=>items.push({game:vGames[i%vGames.length],it}));
-  buildVocabItems(2).forEach(it=>items.push({game:'vocab',it}));
+  buildVocabItems(1).forEach(it=>items.push({game:'vocab',it}));
+  buildSpellItems(1).forEach(it=>items.push({game:'spell',it}));
   buildNaItems(2).forEach(it=>items.push({game:'na',it}));
   weightedSample(EXCEPTIONS.map(q=>({...q,wgt:cellWgt(skill,q.id+'|rule|-')})),1).forEach(it=>items.push({game:'exc',it}));
   buildNumItems(1).forEach(it=>items.push({game:'num',it}));
@@ -2260,9 +2328,10 @@ function buildLevelItems(){
   items.push({game:'num',it:{kind:'prod',n:pick([3,5,7]),g:'f'}});
   items.push({game:'num',it:{kind:'agree',n:pick([2,3,4])}});
   shuffle(EXCEPTIONS).slice(0,2).forEach(q=>items.push({game:'exc',it:q}));
+  buildSpellItems(2).forEach(it=>items.push({game:'spell',it}));
   return shuffle(items);
 }
-const LEVEL_AREAS={vocab:'Vocabulary',conj:'Verb conjugation',nounadj:'Nouns & adjectives',numbers:'Numbers',rules:'Grammar rules'};
+const LEVEL_AREAS={vocab:'Vocabulary',spelling:'Spelling',conj:'Verb conjugation',nounadj:'Nouns & adjectives',numbers:'Numbers',rules:'Grammar rules'};
 function levelLabel(d){const n=d.r+d.w;if(!n)return['—','var(--muted)'];const p=d.r/n;return p>=0.8?['Advanced','var(--good)']:p>=0.5?['Intermediate','var(--gold)']:['Beginner','var(--bad)'];}
 function levelRows(A){
   const rows=Object.keys(LEVEL_AREAS).map(k=>{
@@ -2276,6 +2345,7 @@ function levelRows(A){
   for(const k in LEVEL_AREAS){const d=A[k];if(!d||!(d.r+d.w))continue;const p=d.r/(d.r+d.w);if(p<wp){wp=p;worst=k;}}
   const REC={conj:"Verb conjugation is your gap — start with the Pa'al lessons (1–3). The drills already target the exact forms you missed here.",
     vocab:'Vocabulary is the gap — run "Mark what you know" in the Vocab tab, then let the flashcards handle the rest.',
+    spelling:'Play the Spelling game — the ב/ו and ח/כ swaps just need targeted reps.',
     nounadj:'Nouns & agreement (lesson 10) is where to focus.',
     numbers:'Hit the Numbers game — gendered numerals just need reps.',
     rules:'Play Exceptions & rules — those patterns unlock everything else.'};
@@ -2695,7 +2765,7 @@ function renderBstat(){
   if(troot) troot.innerHTML=any?['past','present','future'].map(t=>statBar(TENSES[t].en,byT[t].r,byT[t].w)).join('')
     :'<p class="muted" style="font-size:14px">No data yet.</p>';
   const mroot=document.getElementById('mstat-root');
-  const MODE_LABEL={mcq:'Quiz',type:'Type it',cloze:'Sentences',listen:'Dictation',ear:'Sharp ear',order:'Word order',vocab:'Vocab',roots:'Roots',num:'Numbers',speed:'Speed',na:'Nouns & adj',exc:'Rules',trans:'Translate'};
+  const MODE_LABEL={mcq:'Quiz',type:'Type it',cloze:'Sentences',listen:'Dictation',ear:'Sharp ear',order:'Word order',vocab:'Vocab',roots:'Roots',num:'Numbers',speed:'Speed',na:'Nouns & adj',exc:'Rules',trans:'Translate',spell:'Spelling'};
   if(mroot) mroot.innerHTML=(any&&Object.keys(byM).length)?Object.keys(MODE_LABEL).filter(m=>byM[m]).map(m=>statBar(MODE_LABEL[m],byM[m].r,byM[m].w)).join('')
     :'<p class="muted" style="font-size:14px">No data yet.</p>';
   renderWeak();
