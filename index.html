@@ -205,6 +205,22 @@ details.ref[open] summary .car{transform:rotate(90deg)}
 .tile{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;font-size:20px;font-family:'David Libre',serif;box-shadow:var(--shadow)}
 .tile:active{transform:scale(.95)}
 .answer-row{min-height:48px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;direction:rtl;background:var(--surface2);border-radius:12px;padding:8px;margin-top:14px}
+.ggrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.gtile{display:flex;flex-direction:column;align-items:flex-start;gap:5px;background:var(--surface);
+  border:1px solid var(--line);border-radius:14px;padding:12px;box-shadow:var(--shadow);
+  text-align:start;transition:transform .08s ease}
+.gtile:active{transform:scale(.97)}
+.gtile .glyph{font-family:'David Libre',serif;font-size:19px;line-height:1;color:var(--accent);
+  background:var(--accent-soft);width:34px;height:34px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center}
+.gtile b{font-size:13.5px;line-height:1.2}
+.gtile span.d{font-size:11px;color:var(--muted);line-height:1.3}
+.lrow{display:flex;align-items:center;gap:10px;width:100%;text-align:start;padding:10px 2px;border-bottom:1px solid var(--line)}
+.lrow:last-child{border-bottom:none}
+.lrow .ln{width:26px;height:26px;border-radius:8px;background:var(--accent-soft);color:var(--accent);
+  font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}
+.lrow b{font-size:14px;display:block}
+.lrow span.d{font-size:12px;color:var(--muted);display:block}
 </style>
 </head>
 <body>
@@ -230,40 +246,26 @@ details.ref[open] summary .car{transform:rotate(90deg)}
     </div>
     <h2 class="sec">Lessons</h2>
     <div class="stack" id="lessons-root"></div>
-    <h2 class="sec">Free play — focus</h2>
-    <div class="chips" id="binyan-chips"></div>
-    <h2 class="sec">Practice</h2>
-    <div class="stack">
-      <button class="mode" data-mode="mcq"><span class="glyph">אָ</span>
-        <span class="grow"><b>Conjugation quiz</b><span class="d">Pick the right form — multiple choice</span></span></button>
-      <button class="mode" data-mode="type"><span class="glyph">⌨</span>
-        <span class="grow"><b>Type it</b><span class="d">Produce the form yourself (nikud optional)</span></span></button>
-      <button class="mode" data-mode="cloze"><span class="glyph">…</span>
-        <span class="grow"><b>Sentences</b><span class="d">Fill the blank with the right verb form</span></span></button>
-      <button class="mode" data-mode="exc"><span class="glyph">!</span>
-        <span class="grow"><b>Exceptions &amp; rules</b><span class="d">Weak roots, missing tenses, sneaky letters</span></span></button>
-      <button class="mode" data-mode="listen"><span class="glyph">🔊</span>
-        <span class="grow"><b>Listen &amp; type</b><span class="d">Dictation — type the form you hear</span></span></button>
-      <button class="mode" data-mode="na"><span class="glyph">ה</span>
-        <span class="grow"><b>Nouns &amp; adjectives</b><span class="d">Plurals, gender, and agreement</span></span></button>
+    <h2 class="sec">Games</h2>
+    <div class="ggrid">
+      <button class="gtile" data-mode="mcq"><span class="glyph">אָ</span><b>Quiz</b><span class="d">Pick the right form</span></button>
+      <button class="gtile" data-mode="type"><span class="glyph">⌨</span><b>Type it</b><span class="d">Produce the form</span></button>
+      <button class="gtile" data-mode="cloze"><span class="glyph">…</span><b>Sentences</b><span class="d">Fill the blank</span></button>
+      <button class="gtile" data-mode="order"><span class="glyph">⇄</span><b>Word order</b><span class="d">Rebuild from tiles</span></button>
+      <button class="gtile" data-mode="listen"><span class="glyph">🔊</span><b>Dictation</b><span class="d">Type what you hear</span></button>
+      <button class="gtile" data-mode="ear"><span class="glyph">👂</span><b>Sharp ear</b><span class="d">Spot the heard form</span></button>
+      <button class="gtile" data-mode="vocab"><span class="glyph">✎</span><b>Vocab recall</b><span class="d">English → Hebrew</span></button>
+      <button class="gtile" data-mode="roots"><span class="glyph">שׁ</span><b>Root families</b><span class="d">One root, 7 binyanim</span></button>
+      <button class="gtile" data-mode="na"><span class="glyph">ה</span><b>Nouns &amp; adj</b><span class="d">Plurals &amp; agreement</span></button>
+      <button class="gtile" data-mode="num"><span class="glyph">3</span><b>Numbers</b><span class="d">Gendered numerals</span></button>
+      <button class="gtile" data-mode="exc"><span class="glyph">!</span><b>Rules</b><span class="d">Exceptions &amp; patterns</span></button>
+      <button class="gtile" data-mode="speed"><span class="glyph">⚡</span><b>Speed round</b><span class="d">60-second sprint</span></button>
+      <button class="gtile" data-mode="level" style="grid-column:1/-1;flex-direction:row;align-items:center"><span class="glyph">✓</span><span><b>Level check</b><span class="d" style="display:block">3 minutes — where are you right now?</span></span></button>
     </div>
-    <h2 class="sec">More games</h2>
-    <div class="stack">
-      <button class="mode" data-mode="vocab"><span class="glyph">✎</span>
-        <span class="grow"><b>Vocab recall</b><span class="d">See the English, type the Hebrew</span></span></button>
-      <button class="mode" data-mode="roots"><span class="glyph">שׁ</span>
-        <span class="grow"><b>Root families</b><span class="d">One root, seven binyanim — match form to meaning</span></span></button>
-      <button class="mode" data-mode="order"><span class="glyph">⇄</span>
-        <span class="grow"><b>Word order</b><span class="d">Rebuild the sentence from scrambled tiles</span></span></button>
-      <button class="mode" data-mode="ear"><span class="glyph">👂</span>
-        <span class="grow"><b>Sharp ear</b><span class="d">Hear a form, spot it in writing</span></span></button>
-      <button class="mode" data-mode="num"><span class="glyph">3</span>
-        <span class="grow"><b>Numbers</b><span class="d">Counting, and which gender the numeral takes</span></span></button>
-      <button class="mode" data-mode="speed"><span class="glyph">⚡</span>
-        <span class="grow"><b>Speed round</b><span class="d">60 seconds — answer as many as you can</span></span></button>
-      <button class="mode" data-mode="level"><span class="glyph">✓</span>
-        <span class="grow"><b>Level check</b><span class="d">3 minutes — where are you right now?</span></span></button>
-    </div>
+    <details class="ref" style="margin-top:12px">
+      <summary><b style="font-size:14px">Focus on one binyan</b><span class="car">›</span></summary>
+      <div class="refbody" style="padding-top:4px"><div class="chips" id="binyan-chips"></div></div>
+    </details>
     <h2 class="sec">AI tutor</h2>
     <div id="ai-root"></div>
   </section>
@@ -2033,13 +2035,11 @@ function renderAi(){
     });
     return;
   }
-  root.innerHTML=`<div class="stack">
-    <button class="mode" id="ai-sent"><span class="glyph">✨</span>
-      <span class="grow"><b>Fresh sentences</b><span class="d">New AI-written sentences around your weakest forms</span></span></button>
-    <button class="mode" id="ai-trans"><span class="glyph">⇆</span>
-      <span class="grow"><b>Translate</b><span class="d">Type free-form Hebrew — the tutor grades it</span></span></button>
-    <p class="muted" style="font-size:12px;margin:2px 4px">Key saved on this device · <button style="color:var(--accent);font-weight:600" id="ai-remove">remove</button></p>
-  </div>`;
+  root.innerHTML=`<div class="ggrid">
+    <button class="gtile" id="ai-sent"><span class="glyph">✨</span><b>Fresh sentences</b><span class="d">AI-written, engine-checked</span></button>
+    <button class="gtile" id="ai-trans"><span class="glyph">⇆</span><b>Translate</b><span class="d">Free-form, tutor-graded</span></button>
+  </div>
+  <p class="muted" style="font-size:12px;margin:8px 4px 0">Key saved on this device · <button style="color:var(--accent);font-weight:600" id="ai-remove">remove</button></p>`;
   document.getElementById('ai-sent').addEventListener('click',startAiSentences);
   document.getElementById('ai-trans').addEventListener('click',startAiTranslate);
   document.getElementById('ai-remove').addEventListener('click',()=>setAiKey(''));
@@ -2377,25 +2377,34 @@ function renderLessons(){
   const root=document.getElementById('lessons-root'); if(!root) return;
   const skill=skillCells();
   const prs=LESSONS.map(L=>lessonProgress(L,skill));
-  const recIdx=prs.findIndex(pr=>!pr.total||pr.done<pr.total);
-  root.innerHTML=LESSONS.map((L,i)=>{
-    const pr=prs[i];
+  const recIdx=Math.max(0,prs.findIndex(pr=>!pr.total||pr.done<pr.total));
+  const wasOpen=root.querySelector('details')?.open;
+  const pillOf=(pr,started,rec)=>{
     const full=pr.total&&pr.done===pr.total;
-    const started=state.lessons.started.includes(L.id);
-    const pill=full?'<span class="pill" style="background:var(--good-soft);color:var(--good)">✓</span>'
-      :i===recIdx?`<span class="pill gold">${started||pr.pct?pr.pct+'% · ':''}start here</span>`
+    return full?'<span class="pill" style="background:var(--good-soft);color:var(--good)">✓</span>'
+      :rec?`<span class="pill gold">${started||pr.pct?pr.pct+'% · ':''}start here</span>`
       :started?`<span class="pill acc">${pr.pct}%</span>`
       :'<span class="pill">new</span>';
-    return `<button class="mode lesson-btn" data-lesson="${L.id}">
-      <span class="glyph" style="font-size:16px;font-family:'Heebo',sans-serif">${i+1}</span>
-      <span class="grow"><b>${L.title}</b><span class="d">${L.sub||''}</span></span>${pill}</button>`;
-  }).join('');
+  };
+  const R=LESSONS[recIdx];
+  const rows=LESSONS.map((L,i)=>`<button class="lrow lesson-btn" data-lesson="${L.id}">
+      <span class="ln">${i+1}</span>
+      <span class="grow"><b>${L.title}</b><span class="d">${L.sub||''}</span></span>
+      ${pillOf(prs[i],state.lessons.started.includes(L.id),i===recIdx)}</button>`).join('');
+  root.innerHTML=`
+    <button class="mode lesson-btn" data-lesson="${R.id}">
+      <span class="glyph" style="font-size:16px;font-family:'Heebo',sans-serif">${recIdx+1}</span>
+      <span class="grow"><b>${R.title}</b><span class="d">${R.sub||''}</span></span>
+      ${pillOf(prs[recIdx],state.lessons.started.includes(R.id),true)}</button>
+    <details class="ref"${wasOpen?' open':''}>
+      <summary><b style="font-size:14px">All ${LESSONS.length} lessons</b><span class="car">›</span></summary>
+      <div class="refbody" style="padding-top:0">${rows}</div></details>`;
   root.querySelectorAll('.lesson-btn').forEach(b=>b.addEventListener('click',()=>{
     const L=LESSONS.find(x=>x.id===b.dataset.lesson); if(L) startLesson(L);
   }));
 }
 
-document.querySelectorAll('.mode').forEach(b=>b.addEventListener('click',()=>{if(!b.dataset.lesson)openSession(b.dataset.mode);}));
+document.querySelectorAll('.mode,.gtile').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.mode)openSession(b.dataset.mode);}));
 /* ===== flashcards ===== */
 let deck=[],deckI=0,deckRedo=[];
 $('#cards-start').addEventListener('click',()=>{
