@@ -223,6 +223,7 @@ details.ref[open] summary .car{transform:rotate(90deg)}
       <div class="stat"><div class="n tnum" id="st-streak">–</div><div class="l">day streak</div></div>
       <div class="stat"><div class="n tnum" id="st-today">–</div><div class="l">today</div></div>
     </div>
+    <div id="onboard-root"></div>
     <div style="margin-top:16px">
       <button class="mode" data-mode="mix" style="border-color:var(--accent)"><span class="glyph">✦</span>
         <span class="grow"><b>Daily Mix</b><span class="d">Ten questions aimed at your weak spots — every game</span></span></button>
@@ -260,6 +261,8 @@ details.ref[open] summary .car{transform:rotate(90deg)}
         <span class="grow"><b>Numbers</b><span class="d">Counting, and which gender the numeral takes</span></span></button>
       <button class="mode" data-mode="speed"><span class="glyph">⚡</span>
         <span class="grow"><b>Speed round</b><span class="d">60 seconds — answer as many as you can</span></span></button>
+      <button class="mode" data-mode="level"><span class="glyph">✓</span>
+        <span class="grow"><b>Level check</b><span class="d">3 minutes — where are you right now?</span></span></button>
     </div>
   </section>
 
@@ -286,6 +289,11 @@ details.ref[open] summary .car{transform:rotate(90deg)}
         <button class="btn" id="add-btn">Add to my vocab</button>
       </div>
     </div>
+    <div class="card" style="margin-top:12px">
+      <b style="font-size:15px">Already know some of these?</b>
+      <p class="muted" style="margin:6px 0 10px;font-size:13px">Sweep through the built-in words and mark what you know — known words skip lesson flashcards and start with long review intervals.</p>
+      <button class="btn ghost wide" id="sweep-btn">Mark what you know</button>
+    </div>
     <h2 class="sec">Browse</h2>
     <input class="search" id="vsearch" placeholder="Search Hebrew or English…">
     <div class="stack" id="vocab-list"></div>
@@ -304,6 +312,8 @@ details.ref[open] summary .car{transform:rotate(90deg)}
   </section>
 
   <section class="screen" id="tab-stats">
+    <h2 class="sec">Your level</h2>
+    <div class="card" id="level-root"></div>
     <h2 class="sec">Forms to drill</h2>
     <div class="card" id="weak-root"><p class="muted" style="font-size:14px">Answer a few quiz questions and your shakiest forms will surface here.</p></div>
     <h2 class="sec">Accuracy by binyan</h2>
@@ -1279,7 +1289,7 @@ function pickWeighted(n){
 
 /* ===== session runner ===== */
 const sess={items:[],i:0,right:0,mode:null};
-let lessonRun=null, sessScope=null, speedTimer=null;
+let lessonRun=null, sessScope=null, speedTimer=null, sweep=null;
 function openSession(mode){
   sess.mode=mode; sess.i=0; sess.right=0;
   sessScope=lessonRun?lessonRun.L:null;
@@ -1292,6 +1302,9 @@ function openSession(mode){
     sess.items=pickWeighted(10);
   }else if(mode==='mix'){
     sess.items=buildMixItems(10);
+  }else if(mode==='level'){
+    sess.items=buildLevelItems();
+    sess.logStart=state.log.length;
   }else if(mode==='vocab'){
     sess.items=buildVocabItems(10);
   }else if(mode==='roots'){
@@ -1314,7 +1327,7 @@ function openSession(mode){
   $('#session').classList.add('on'); document.documentElement.style.overflow='hidden';
   renderQuestion();
 }
-function closeSession(){ lessonRun=null; sessScope=null; if(speedTimer){clearInterval(speedTimer);speedTimer=null;} $('#session').classList.remove('on'); document.documentElement.style.overflow=''; renderStats(); renderLessons(); }
+function closeSession(){ lessonRun=null; sessScope=null; sweep=null; if(speedTimer){clearInterval(speedTimer);speedTimer=null;} $('#session').classList.remove('on'); document.documentElement.style.overflow=''; renderStats(); renderLessons(); renderOnboard(); }
 $('#sess-quit').addEventListener('click',closeSession);
 
 function sessHead(){
@@ -1325,6 +1338,22 @@ function finishSession(){
   $('#sess-bar').style.width='100%'; $('#sess-count').textContent='';
   const pct=Math.round(sess.right/sess.items.length*100);
   const word=pct===100?'מְצֻיָּן!':pct>=70?'כָּל הַכָּבוֹד!':'עוֹד פַּעַם?';
+  if(sess.mode==='level'){
+    const evs=state.log.slice(sess.logStart||0);
+    const areaOf=e=>e.t==='word'?'vocab':e.t==='num'?'numbers':e.t==='rule'?'rules':(e.t==='plural'||e.t==='gender'||e.t==='agree')?'nounadj':'conj';
+    const A={};
+    for(const e of evs){ const a=areaOf(e); (A[a]=A[a]||{r:0,w:0})[e.ok?'r':'w']++; }
+    state.level={d:todayStr(),areas:A}; persist();
+    $('#sess-body').innerHTML=`<div class="sess-done" style="padding:24px 4px">
+      <h3 style="margin:0 0 4px">Your level right now</h3>
+      <p class="muted" style="margin:0 0 14px;font-size:13px">These answers joined your practice history — every game adapts immediately.</p>
+      <div class="card" style="text-align:start">${levelRows(A)}</div>
+      <div class="sess-actions" style="max-width:280px;margin:18px auto 0"><button class="btn wide" id="lv-close">Done</button></div></div>`;
+    $('#sess-bar').style.width='100%'; $('#sess-count').textContent='';
+    $('#lv-close').addEventListener('click',closeSession);
+    bumpActivity(sess.items.length);
+    return;
+  }
   if(lessonRun){
     const more=lessonRun.i<lessonRun.stages.length;
     $('#sess-body').innerHTML=`<div class="sess-done">
@@ -1362,7 +1391,7 @@ function renderQuestion(){
   if(sess.i>=sess.items.length) return finishSession();
   sessHead();
   const it=sess.items[sess.i], body=$('#sess-body');
-  if(sess.mode==='mix'){
+  if(sess.mode==='mix'||sess.mode==='level'){
     const g=it.game, x=it.it;
     if(g==='mcq') return renderMCQ(x,body);
     if(g==='type') return renderType(x,body);
@@ -1968,6 +1997,126 @@ function renderSpeedRound(){
   next();
 }
 
+/* ===== level check: a fixed-composition sample across every skill area;
+   answers log as normal events so the whole app adapts from them ===== */
+function buildLevelItems(){
+  const items=[];
+  ['basics','home','food','clothing','health','romance'].forEach(c=>{
+    const ws=VOCAB_SEED.filter(w=>(w.cat||'basics')===c);
+    if(ws.length) items.push({game:'vocab',it:pick(ws)});
+  });
+  [['paal','past'],['paal','present'],['paal','future'],['piel','present'],['hifil','past'],['hitpael','future']].forEach(([b,t])=>{
+    const vs=ALL_VERBS.filter(v=>v.b===b&&v.forms[t]);
+    if(vs.length){ const v=pick(vs); items.push({game:'mcq',it:{v,t,p:pick(Object.keys(v.forms[t]))}}); }
+  });
+  [['paal','past'],['piel','present'],['paal','future']].forEach(([b,t])=>{
+    const vs=ALL_VERBS.filter(v=>v.b===b&&v.forms[t]);
+    if(vs.length){ const v=pick(vs); items.push({game:'type',it:{v,t,p:pick(Object.keys(v.forms[t]))}}); }
+  });
+  items.push({game:'na',it:{kind:'plural',w:pick(NOUNS)}});
+  items.push({game:'na',it:{kind:'plural',w:pick(NOUNS)}});
+  items.push({game:'na',it:{kind:'gender',w:pick(NOUNS)}});
+  items.push({game:'na',it:{kind:'agree',a:pick(ADJS),f:pick(['ms','fs','mp','fp'])}});
+  items.push({game:'num',it:{kind:'prod',n:pick([3,5,7]),g:'f'}});
+  items.push({game:'num',it:{kind:'agree',n:pick([2,3,4])}});
+  shuffle(EXCEPTIONS).slice(0,2).forEach(q=>items.push({game:'exc',it:q}));
+  return shuffle(items);
+}
+const LEVEL_AREAS={vocab:'Vocabulary',conj:'Verb conjugation',nounadj:'Nouns & adjectives',numbers:'Numbers',rules:'Grammar rules'};
+function levelLabel(d){const n=d.r+d.w;if(!n)return['—','var(--muted)'];const p=d.r/n;return p>=0.8?['Advanced','var(--good)']:p>=0.5?['Intermediate','var(--gold)']:['Beginner','var(--bad)'];}
+function levelRows(A){
+  const rows=Object.keys(LEVEL_AREAS).map(k=>{
+    const d=A[k]||{r:0,w:0}; const n=d.r+d.w; const lc=levelLabel(d);
+    return `<div class="bstat-row" style="grid-template-columns:1fr auto auto">
+      <div style="font-size:13.5px;font-weight:600">${LEVEL_AREAS[k]}</div>
+      <div class="muted" style="font-size:12px">${n?d.r+' / '+n:'—'}</div>
+      <div style="font-size:12.5px;font-weight:700;color:${lc[1]}">${lc[0]}</div></div>`;
+  }).join('');
+  let worst=null,wp=2;
+  for(const k in LEVEL_AREAS){const d=A[k];if(!d||!(d.r+d.w))continue;const p=d.r/(d.r+d.w);if(p<wp){wp=p;worst=k;}}
+  const REC={conj:"Verb conjugation is your gap — start with the Pa'al lessons (1–3). The drills already target the exact forms you missed here.",
+    vocab:'Vocabulary is the gap — run "Mark what you know" in the Vocab tab, then let the flashcards handle the rest.',
+    nounadj:'Nouns & agreement (lesson 10) is where to focus.',
+    numbers:'Hit the Numbers game — gendered numerals just need reps.',
+    rules:'Play Exceptions & rules — those patterns unlock everything else.'};
+  return rows+(worst&&wp<0.8?`<div class="note" style="margin-top:12px">${REC[worst]}</div>`:'');
+}
+function renderLevelCard(){
+  const root=document.getElementById('level-root'); if(!root) return;
+  if(state.level){
+    root.innerHTML=`<p class="muted" style="margin:0 0 8px;font-size:12.5px">Last checked ${state.level.d}</p>`+levelRows(state.level.areas)+
+      `<button class="btn ghost wide" id="lv-again" style="margin-top:12px">Check again</button>`;
+  }else{
+    root.innerHTML=`<p class="muted" style="font-size:14px;margin:0 0 12px">A 3-minute check across vocabulary, conjugation, nouns, numbers and rules — the app adapts from your answers.</p>
+      <button class="btn wide" id="lv-again">Check my level</button>`;
+  }
+  document.getElementById('lv-again').addEventListener('click',()=>openSession('level'));
+}
+
+/* ===== vocab sweep: rapid "know it / learning" triage that seeds the SRS
+   with long intervals, so lessons skip what you already have ===== */
+function startSweep(){
+  const q=[];
+  const hasHist=id=>{const e=state.srs[id];return e&&(e.reps||0)>0;};
+  const skill=skillCells();
+  VOCAB_SEED.forEach(w=>{ if(!hasHist('v'+w.id)&&!skill[w.id+'|word|-']) q.push({cid:'v'+w.id,he:w.he,en:w.en,tr:w.tr,lg:w.id}); });
+  NOUNS.forEach(w=>{ if(!hasHist(w.id)) q.push({cid:w.id,he:w.he,en:w.en+' · plural '+w.pl,tr:null}); });
+  ADJS.forEach(a=>{ if(!hasHist(a.id)) q.push({cid:a.id,he:a.ms,en:a.en,tr:null}); });
+  sweep={q,i:0,marked:0};
+  $('#session').classList.add('on'); document.documentElement.style.overflow='hidden';
+  sess.mode='sweep';
+  renderSweep();
+}
+function renderSweep(){
+  if(!sweep) return;
+  if(sweep.i>=sweep.q.length){
+    $('#sess-body').innerHTML=`<div class="sess-done"><div class="big he">מְעֻלֶּה!</div>
+      <h3>${sweep.marked} marked known</h3>
+      <p class="muted">${sweep.q.length?'Known words skip lesson flashcards and come back for review in three weeks.':'Everything already has practice history — nothing left to sweep.'}</p>
+      <div class="sess-actions" style="max-width:280px;margin:18px auto 0"><button class="btn wide" id="d-close">Done</button></div></div>`;
+    $('#sess-bar').style.width='100%'; $('#sess-count').textContent='';
+    $('#d-close').addEventListener('click',closeSession);
+    return;
+  }
+  const it=sweep.q[sweep.i];
+  $('#sess-bar').style.width=(sweep.i/sweep.q.length*100)+'%';
+  $('#sess-count').textContent=(sweep.i+1)+' / '+sweep.q.length;
+  $('#sess-body').innerHTML=`<div class="flash" style="min-height:220px">
+      <div class="qkicker">Do you know this?</div>
+      <div class="front he" style="font-size:clamp(30px,9vw,44px)">${hn(esc(it.he))}</div>
+      <div class="back"><b>${esc(it.en)}</b>${it.tr?' · <i>'+esc(it.tr)+'</i>':''}</div>
+      <button class="spk" data-speak="${esc(it.he)}">🔊</button>
+    </div>
+    <div class="grade" style="grid-template-columns:1fr 1fr">
+      <button class="again" id="sw-no">Still learning</button>
+      <button class="easy" id="sw-yes">Know it</button>
+    </div>`;
+  $('#sw-yes').addEventListener('click',()=>{
+    state.srs[it.cid]={ef:2.5,ivl:21,due:addDays(todayStr(),21),lapses:0,reps:1};
+    if(it.lg){
+      state.log.push({v:it.lg,t:'word',p:'-',ok:1,m:'sweep',ts:Date.now(),k:'vocab'});
+      if(state.log.length>LOG_CAP) state.log=state.log.slice(-LOG_CAP);
+    }
+    sweep.marked++; persist(); sweep.i++; renderSweep();
+  });
+  $('#sw-no').addEventListener('click',()=>{sweep.i++;renderSweep();});
+}
+
+/* ===== onboarding: shown until there's real history or a level check ===== */
+function renderOnboard(){
+  const root=document.getElementById('onboard-root'); if(!root) return;
+  if(state.level||state.log.length>=10){ root.innerHTML=''; return; }
+  root.innerHTML=`<div class="card" style="margin-top:16px">
+    <b style="font-size:15.5px">New here — or not exactly a beginner?</b>
+    <p class="muted" style="margin:6px 0 12px;font-size:13.5px">Take the 3-minute level check so the app knows what to skip, or sweep-mark the vocabulary you already know.</p>
+    <div class="row">
+      <button class="btn grow" id="ob-level">Check my level</button>
+      <button class="btn ghost grow" id="ob-sweep">I know words</button>
+    </div></div>`;
+  document.getElementById('ob-level').addEventListener('click',()=>openSession('level'));
+  document.getElementById('ob-sweep').addEventListener('click',startSweep);
+}
+
 /* ===== lesson driver: intro -> flashcards -> scoped drills ===== */
 function startLesson(L){
   if(!state.lessons.started.includes(L.id)){ state.lessons.started.push(L.id); persist(); }
@@ -2017,8 +2166,10 @@ function startLessonFlash(){
   (L.verbs||[]).forEach(id=>{const v=VERB_BY_ID[id]; if(v) cards.push({id:'verb_'+id,kind:'verb',v});});
   (L.nouns||[]).forEach(id=>{const w=NOUNS.find(x=>x.id===id); if(w) cards.push({id,kind:'noun',w});});
   (L.adjs||[]).forEach(id=>{const a=ADJS.find(x=>x.id===id); if(a) cards.push({id,kind:'adj',a});});
-  if(!cards.length) return nextLessonStage();
-  deck=shuffle(cards); deckRedo=[]; deckI=0;
+  const known=id=>{const e=state.srs[id];return e&&((e.ivl||0)>=3||(e.reps||0)>0);};
+  const fresh=cards.filter(c=>!known(c.id));
+  if(!fresh.length) return nextLessonStage();
+  deck=shuffle(fresh); deckRedo=[]; deckI=0;
   sess.mode='flash';
   renderFlash();
 }
@@ -2059,11 +2210,14 @@ function lessonProgress(L,skill){
 function renderLessons(){
   const root=document.getElementById('lessons-root'); if(!root) return;
   const skill=skillCells();
+  const prs=LESSONS.map(L=>lessonProgress(L,skill));
+  const recIdx=prs.findIndex(pr=>!pr.total||pr.done<pr.total);
   root.innerHTML=LESSONS.map((L,i)=>{
-    const pr=lessonProgress(L,skill);
+    const pr=prs[i];
     const full=pr.total&&pr.done===pr.total;
     const started=state.lessons.started.includes(L.id);
     const pill=full?'<span class="pill" style="background:var(--good-soft);color:var(--good)">✓</span>'
+      :i===recIdx?`<span class="pill gold">${started||pr.pct?pr.pct+'% · ':''}start here</span>`
       :started?`<span class="pill acc">${pr.pct}%</span>`
       :'<span class="pill">new</span>';
     return `<button class="mode lesson-btn" data-lesson="${L.id}">
@@ -2253,6 +2407,7 @@ function renderVocab(){
   }));
 }
 $('#vsearch').addEventListener('input',renderVocab);
+$('#sweep-btn').addEventListener('click',startSweep);
 $('#add-btn').addEventListener('click',()=>{
   const he=$('#add-he').value.trim(), en=$('#add-en').value.trim(), tr=$('#add-tr').value.trim();
   if(!he||!en)return;
@@ -2285,6 +2440,7 @@ function renderBstat(){
     if(byT[e.t]) e.ok?byT[e.t].r++:byT[e.t].w++;
   }
   const any=state.log.length>0;
+  renderLevelCard();
   broot.innerHTML=any?Object.keys(BINYANIM).map(k=>{const d=byB[k]||{r:0,w:0};return statBar(BINYANIM[k].name,d.r,d.w);}).join('')
     :'<p class="muted" style="font-size:14px">Complete a quiz to see your per-binyan breakdown.</p>';
   if(troot) troot.innerHTML=any?['past','present','future'].map(t=>statBar(TENSES[t].en,byT[t].r,byT[t].w)).join('')
@@ -2331,7 +2487,7 @@ function renderStats(){
     lifeEl.textContent=tr?`${tr} answers all time · ${Math.round(tc/tr*100)}% correct · longest streak ${ls} day${ls===1?'':'s'}`+(latn?` · avg answer ${(lats/latn/1000).toFixed(1)}s`:''):'No answers yet.';
   }
 }
-function renderAll(){ renderStats(); renderVocab(); renderLessons(); }
+function renderAll(){ renderStats(); renderVocab(); renderLessons(); renderOnboard(); }
 (function(){
   const d=new Date();
   $('#daymark').textContent=d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
