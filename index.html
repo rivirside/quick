@@ -449,6 +449,14 @@ details.ref[open] summary .car{transform:rotate(90deg)}
       <button class="mode" id="set-level"><span class="glyph">📈</span>
         <span class="grow"><b>Level check</b><span class="d">Re-evaluate anytime — 3 minutes</span></span></button>
     </div>
+    <h2 class="sec">App</h2>
+    <div class="card">
+      <p class="muted" style="margin:0 0 12px;font-size:13.5px">The app caches itself so it works offline. After an update is published, tap below to fetch the newest version right away — your progress is untouched.</p>
+      <div class="row" style="align-items:center">
+        <button class="btn ghost grow" id="update-btn">Get latest version</button>
+        <span class="muted" style="font-size:12.5px;flex:none" id="app-ver"></span>
+      </div>
+    </div>
     <p class="savebadge" id="savebadge"></p>
   </section>
 </div>
@@ -4448,6 +4456,17 @@ document.getElementById('merge-file').addEventListener('change',e=>{
   r.readAsText(f);
 });
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
+
+const APP_VER='v22';
+document.getElementById('app-ver').textContent=APP_VER;
+document.getElementById('update-btn').addEventListener('click',async()=>{
+  const b=document.getElementById('update-btn'); b.disabled=true; b.textContent='Updating…';
+  try{
+    if(window.caches){ const ks=await caches.keys(); await Promise.all(ks.map(k=>caches.delete(k))); }
+    if('serviceWorker' in navigator){ const rs=await navigator.serviceWorker.getRegistrations(); await Promise.all(rs.map(r=>r.update().catch(()=>{}))); }
+  }catch(e){}
+  location.reload();
+});
 </script>
 </body>
 </html>
