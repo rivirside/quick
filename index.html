@@ -233,6 +233,21 @@ details.ref[open] summary .car{transform:rotate(90deg)}
 .cal-day.rest{background:transparent;border:1px dashed var(--line)}
 .cal-day.today{outline:2px solid var(--accent);outline-offset:1px}
 .cal-day.future{opacity:.35}
+.pchips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:6px}
+.pchip{flex:none;display:flex;align-items:center;gap:7px;padding:8px 13px;border-radius:14px;
+  background:var(--surface);border:1px solid var(--line);font-size:12.5px;font-weight:600;box-shadow:var(--shadow)}
+.pchip.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.pchip .em{font-size:19px}
+.chat-msgs{padding-bottom:76px;min-height:200px}
+.bub{max-width:82%;padding:9px 13px;border-radius:16px;margin:7px 0;font-size:16.5px;line-height:1.5;width:fit-content;white-space:pre-wrap;word-break:break-word}
+.bub.u{margin-inline-start:auto;background:var(--btn);color:var(--btn-ink);border-bottom-right-radius:5px}
+.bub.a{background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);border-bottom-left-radius:5px}
+.bub .cw{border-bottom:1.5px dashed currentColor;cursor:pointer}
+.chat-inbar{position:fixed;left:0;right:0;bottom:64px;background:var(--surface);border-top:1px solid var(--line);
+  padding:8px max(12px,env(safe-area-inset-left));display:flex;gap:8px;z-index:39}
+.chat-inbar input{flex:1;background:var(--surface2);border:none;border-radius:20px;padding:10px 14px;font-size:16px;min-width:0}
+.chat-addbar{position:fixed;left:12px;right:12px;bottom:122px;background:var(--ink);color:var(--bg);
+  border-radius:14px;padding:10px 14px;display:flex;align-items:center;gap:10px;z-index:45;box-shadow:var(--shadow)}
 </style>
 </head>
 <body>
@@ -307,6 +322,20 @@ details.ref[open] summary .car{transform:rotate(90deg)}
     <h2 class="sec">Browse</h2>
     <input class="search" id="vsearch" placeholder="Search Hebrew or English…">
     <div class="stack" id="vocab-list"></div>
+  </section>
+
+  <section class="screen" id="tab-chat">
+    <div class="pchips" id="chat-pick"></div>
+    <div class="chat-msgs" id="chat-msgs"></div>
+    <div class="chat-inbar" id="chat-inbar">
+      <input id="chat-in" dir="auto" placeholder="Hebrew, English, or both…" autocomplete="off">
+      <button class="btn" id="chat-send" style="border-radius:20px;padding:10px 16px">↑</button>
+    </div>
+    <div class="chat-addbar" id="chat-addbar" hidden>
+      <span class="grow" style="font-size:14px">Add <b class="he" id="chat-addw" style="font-size:18px"></b> to my words?</span>
+      <button class="btn" id="chat-addyes" style="padding:7px 14px">Add</button>
+      <button style="color:var(--bg);opacity:.75;font-weight:700;font-size:16px" id="chat-addno">✕</button>
+    </div>
   </section>
 
   <section class="screen" id="tab-stats">
@@ -384,6 +413,7 @@ details.ref[open] summary .car{transform:rotate(90deg)}
   <button data-tab="cards"><svg viewBox="0 0 24 24"><rect x="4" y="7" width="14" height="12" rx="2"/><path d="M8 4h12v12"/></svg>Cards</button>
   <button data-tab="reference"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h6v18H6a2 2 0 0 0-2 2z"/><path d="M20 5a2 2 0 0 0-2-2h-6v18h6a2 2 0 0 1 2 2z"/></svg>Reference</button>
   <button data-tab="vocab"><svg viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h8"/><path d="M18 15v6M15 18h6"/></svg>Vocab</button>
+  <button data-tab="chat"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-8 8H5l-2 2V12a8 8 0 0 1 8-8h2a8 8 0 0 1 8 8z"/></svg>Chat</button>
   <button data-tab="stats"><svg viewBox="0 0 24 24"><path d="M3 18h3v-6H3zm4 0h3v-9H7zm4 0h3V6h-3zm4 0h3v-3h-3z"/></svg>Stats</button>
 </nav>
 
@@ -1097,6 +1127,8 @@ function migrateObj(o){
   if(!Array.isArray(o.log)) o.log=[];
   if(!o.lessons||!Array.isArray(o.lessons.started)) o.lessons={started:[]};
   o.prefs=o.prefs||{};
+  if(!o.chat||typeof o.chat!=='object') o.chat={who:'shira',threads:{}};
+  o.chat.threads=o.chat.threads||{};
   st.days=st.days||{};
   st.totalReviews=st.totalReviews||0; st.totalCorrect=st.totalCorrect||0;
   st.longestStreak=Math.max(st.longestStreak||0,st.streak||0);
@@ -1128,6 +1160,10 @@ function mergeStates(a,b){
   out.stats.days={...sb.days,...sa.days};
   for(const d in sb.days) out.stats.days[d]=Math.max(sa.days[d]||0,sb.days[d]);
   out.lessons={started:[...new Set([...a.lessons.started,...b.lessons.started])]};
+  const ta=a.chat.threads, tb=b.chat.threads;
+  const threads={...tb,...ta};
+  for(const k in tb) if(ta[k]&&tb[k].length>ta[k].length) threads[k]=tb[k];
+  out.chat={who:a.chat.who||b.chat.who||'shira',threads};
   out.ver=3;
   return out;
 }
@@ -1326,6 +1362,7 @@ document.querySelectorAll('nav.tabs button').forEach(b=>{
     document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
     $('#tab-'+b.dataset.tab).classList.add('on');
     if(b.dataset.tab==='stats') renderBstat();
+    if(b.dataset.tab==='chat') renderChat();
   });
 });
 
@@ -2407,6 +2444,117 @@ document.addEventListener('click',async e=>{
     b.insertAdjacentHTML('afterend',`<div class="note" style="margin-top:8px">${esc(out)}</div>`);
     b.remove();
   }catch(err){ b.textContent='Unavailable'; b.disabled=true; }
+});
+
+/* ===== chat: text an AI friend in mixed Hebrew/English ===== */
+const PERSONAS={
+ shira:{name:'Shira',he:'שירה',emoji:'☕️',bio:'Tel Aviv barista, all the slang',
+  sys:'You are Shira, a 26-year-old barista from Tel Aviv — warm, upbeat, full of Israeli slang (סבבה, אחלה, וואלה, יאללה).',
+  hi:'היי! אני שירה ☕️ מה קורה?'},
+ dani:{name:'Dani',he:'דני',emoji:'🚕',bio:'Taxi driver, zero filter, big heart',
+  sys:'You are Dani, a 55-year-old Jerusalem taxi driver — blunt, funny, opinionated about everything, secretly kind.',
+  hi:'נו, שלום! לאן נוסעים היום? 🚕'},
+ noa:{name:'Noa',he:'נועה',emoji:'📚',bio:'Patient teacher, gentle fixes',
+  sys:'You are Noa, a 34-year-old Hebrew teacher — patient, encouraging, corrects gently and briefly.',
+  hi:'שלום! אני נועה. על מה בא לך לדבר היום? 😊'},
+ avi:{name:'Avi',he:'אבי',emoji:'🍅',bio:'Shuk vendor, food is life',
+  sys:'You are Avi, a 60-year-old vegetable vendor at Machane Yehuda market — loud, generous, everything reminds him of food.',
+  hi:'בוא בוא! הכל טרי היום! מה נשמע חביבי? 🍅'}
+};
+const CHAT_RULES=`
+You are texting with an English speaker who is learning Hebrew. Rules:
+- Write natural spoken Hebrew WITHOUT niqqud, texting style, 1-3 short sentences max. Emoji fine.
+- The learner mixes English words into Hebrew sentences when they don't know a word. When they do, naturally use the Hebrew word for that thing in your reply so they pick it up.
+- If their Hebrew has a real mistake, answer the content first, then add ONE short line starting with "✏️" showing the fix in Hebrew. No ✏️ line when nothing important to fix.
+- Keep vocabulary simple and conversational. Usually end with a short question.
+- Stay fully in character. Never mention being an AI or break character.`;
+function chatThread(){
+  state.chat=state.chat||{who:'shira',threads:{}};
+  state.chat.threads=state.chat.threads||{};
+  const who=state.chat.who||'shira';
+  let th=state.chat.threads[who];
+  if(!th) th=state.chat.threads[who]=[{r:'a',t:PERSONAS[who].hi}];
+  return th;
+}
+function chatBubbleHtml(t){
+  return esc(t).replace(/[֐-׿][֐-׿'׳״]*/g,w=>`<span class="cw">${w}</span>`);
+}
+function renderChat(){
+  const root=document.getElementById('chat-msgs'); if(!root) return;
+  const pk=document.getElementById('chat-pick'), bar=document.getElementById('chat-inbar');
+  if(!aiKey()){
+    pk.innerHTML='';
+    bar.hidden=true;
+    root.innerHTML=`<div class="card"><b style="font-size:15px">Text a friend in Hebrew</b>
+      <p class="muted" style="margin:6px 0 0;font-size:13.5px">Pick a personality and chat in Hebrew, English, or both mixed — don't know a word? Say it in English and they'll teach you the Hebrew. Tap any Hebrew word to add it to your study list.<br><br>Add an OpenAI key in <b>Settings ⚙️</b> to start.</p></div>`;
+    return;
+  }
+  bar.hidden=false;
+  const who=state.chat&&state.chat.who||'shira';
+  pk.innerHTML=Object.entries(PERSONAS).map(([k,p])=>`<button class="pchip${k===who?' on':''}" data-p="${k}"><span class="em">${p.emoji}</span><span>${p.name} · <span class="he">${p.he}</span><br><span class="muted" style="font-weight:400;font-size:10.5px">${p.bio}</span></span></button>`).join('');
+  pk.querySelectorAll('.pchip').forEach(b=>b.addEventListener('click',()=>{
+    state.chat.who=b.dataset.p; persist(); renderChat();
+  }));
+  const th=chatThread();
+  root.innerHTML=th.map(m=>`<div class="bub ${m.r==='u'?'u':'a'}" dir="auto">${chatBubbleHtml(m.t)}</div>`).join('');
+  window.scrollTo(0,document.body.scrollHeight);
+}
+let chatBusy=false;
+async function chatSend(){
+  if(chatBusy||!aiKey()) return;
+  const input=document.getElementById('chat-in');
+  const txt=(input.value||'').trim(); if(!txt) return;
+  const th=chatThread(), who=state.chat.who||'shira';
+  th.push({r:'u',t:txt});
+  if(th.length>30) th.splice(0,th.length-30);
+  persist(); input.value=''; renderChat();
+  const root=document.getElementById('chat-msgs');
+  root.insertAdjacentHTML('beforeend','<div class="bub a" id="chat-typing">···</div>');
+  window.scrollTo(0,document.body.scrollHeight);
+  chatBusy=true;
+  try{
+    const msgs=[{role:'system',content:PERSONAS[who].sys+CHAT_RULES}];
+    th.slice(-14).forEach(m=>msgs.push({role:m.r==='u'?'user':'assistant',content:m.t}));
+    const out=await aiChat(msgs,220);
+    th.push({r:'a',t:String(out||'').trim()});
+    if(th.length>30) th.splice(0,th.length-30);
+    persist();
+  }catch(e){
+    const tEl=document.getElementById('chat-typing'); if(tEl) tEl.remove();
+    th.push({r:'a',t:'⚠️ '+String(e&&e.message||'connection issue')});
+  }
+  chatBusy=false;
+  renderChat();
+}
+document.getElementById('chat-send').addEventListener('click',chatSend);
+document.getElementById('chat-in').addEventListener('keydown',e=>{if(e.key==='Enter')chatSend();});
+/* tap a Hebrew word in any bubble -> offer to save it */
+let tappedWord=null;
+document.getElementById('chat-msgs').addEventListener('click',e=>{
+  const w=e.target.closest('.cw'); if(!w) return;
+  tappedWord=w.textContent;
+  document.getElementById('chat-addw').textContent=tappedWord;
+  document.getElementById('chat-addbar').hidden=false;
+});
+document.getElementById('chat-addno').addEventListener('click',()=>{document.getElementById('chat-addbar').hidden=true;});
+document.getElementById('chat-addyes').addEventListener('click',async()=>{
+  const w=tappedWord; if(!w) return;
+  const bar=document.getElementById('chat-addbar');
+  const known=state.custom.some(c=>strip(c.he)===strip(w))||VOCAB_SEED.some(c=>strip(c.he)===strip(w));
+  if(known){ bar.hidden=true; badge('Already in your vocabulary.'); return; }
+  const yes=document.getElementById('chat-addyes'); yes.disabled=true; yes.textContent='…';
+  try{
+    const out=await aiChat([
+      {role:'system',content:'Reply with JSON only.'},
+      {role:'user',content:`Hebrew word from a chat: "${w}". Return JSON {"en":"short English meaning","tr":"simple transliteration"}`}
+    ],90,true);
+    const g=JSON.parse(out);
+    state.custom.push({cid:Date.now(),he:w,en:String(g.en||'?'),tr:String(g.tr||'')||null});
+    persist(); renderVocab(); renderStats();
+    badge('Added '+w+' — it joins your flashcards and recall quizzes.');
+  }catch(err){ badge('Could not translate right now.'); }
+  yes.disabled=false; yes.textContent='Add';
+  bar.hidden=true;
 });
 
 /* ===== level check: a fixed-composition sample across every skill area;
