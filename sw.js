@@ -1,5 +1,5 @@
 /* Shoresh service worker — offline-first app shell */
-const CACHE = 'shoresh-v25';
+const CACHE = 'shoresh-v26';
 const SHELL = ['./', './index.html', './manifest.webmanifest'];
 
 self.addEventListener('install', e => {

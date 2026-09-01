@@ -1875,7 +1875,9 @@ function allForms(v){
 const formOf=(v,t,p)=>t==='inf'?v.inf:v.forms[t][p];
 
 /* ===== answer normalization ===== */
-const strip=s=>s.normalize('NFC').replace(/[֑-ׇ]/g,'').replace(/[׳״'"\s]/g,'');
+/* also remove invisible bidi/format marks — iOS keyboards and dictation
+   sprinkle RLM/ZWJ into Hebrew input, which must never fail a comparison */
+const strip=s=>s.normalize('NFC').replace(/[֑-ׇ]/g,'').replace(/[׳״'"\s\u200B-\u200F\u202A-\u202E\u2060-\u2069\uFEFF]/g,'');
 const unpoint=s=>s.normalize('NFC').replace(/[֑-ׇ]/g,'');
 /* modern Hebrew merged these letter sounds — map each sound-class to one
    canonical letter so "phonetically right, orthographically wrong" is
@@ -4540,7 +4542,7 @@ document.getElementById('merge-file').addEventListener('change',e=>{
 });
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
-const APP_VER='v25';
+const APP_VER='v26';
 document.getElementById('app-ver').textContent=APP_VER;
 document.getElementById('update-btn').addEventListener('click',async()=>{
   const b=document.getElementById('update-btn'); b.disabled=true; b.textContent='Updating…';
