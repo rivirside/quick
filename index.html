@@ -421,6 +421,8 @@ details.ref[open] summary .car{transform:rotate(90deg)}
         <select class="setsel" id="set-len"><option value="5">5</option><option value="10">10</option><option value="15">15</option></select></div>
       <div class="row" style="margin-bottom:12px"><span class="grow" style="font-size:14.5px">New cards per day<br><span class="muted" style="font-size:12px">Reviews are always all due cards</span></span>
         <select class="setsel" id="set-newday"><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option></select></div>
+      <div class="row" style="margin-bottom:12px"><span class="grow" style="font-size:14.5px">Auto-open keyboard<br><span class="muted" style="font-size:12px">In typing questions — leave off to tap Show answer &amp; self-grade</span></span>
+        <button class="chip" id="set-kb">off</button></div>
       <div class="row"><span class="grow" style="font-size:14.5px">Pu'al &amp; Huf'al<br><span class="muted" style="font-size:12px">Literary binyanim — rare in speech</span></span>
         <select class="setsel" id="set-lit"><option value="light">Rare (default)</option><option value="off">Skip them</option><option value="full">Full weight</option></select></div>
     </div>
@@ -2354,6 +2356,7 @@ function renderSettings(){
   $('#set-goal').value=String(P.goal||20);
   $('#set-len').value=String(P.len||10);
   $('#set-newday').value=String(P.newDay||10);
+  $('#set-kb').textContent=P.kb?'on':'off'; $('#set-kb').classList.toggle('on',!!P.kb);
   $('#set-lit').value=P.lit||'light';
   const rmp=P.ramp;
   $('#set-rampto').value=rmp?String(rmp.to):'';
@@ -2500,6 +2503,7 @@ $('#rate-test').addEventListener('click',()=>speak('שָׁלוֹם, מָה נִ�
 $('#set-goal').addEventListener('change',e=>{(state.prefs=state.prefs||{}).goal=+e.target.value;persist();renderStats();});
 $('#set-len').addEventListener('change',e=>{(state.prefs=state.prefs||{}).len=+e.target.value;persist();});
 $('#set-newday').addEventListener('change',e=>{(state.prefs=state.prefs||{}).newDay=+e.target.value;persist();renderCardsHome();renderStats();});
+$('#set-kb').addEventListener('click',()=>{const P=state.prefs=state.prefs||{};P.kb=!P.kb;persist();$('#set-kb').textContent=P.kb?'on':'off';$('#set-kb').classList.toggle('on',!!P.kb);});
 $('#set-lit').addEventListener('change',e=>{(state.prefs=state.prefs||{}).lit=e.target.value;persist();});
 $('#set-rampto').addEventListener('change',setRamp);
 $('#set-rampby').addEventListener('change',setRamp);
@@ -2560,6 +2564,8 @@ function weightedSample(cells,n){
 }
 const cellWgt=(skill,key)=>{const s=skill[key];return s?0.4+3*(1-s.acc):1.4;};
 const sessLen=()=>(state.prefs&&+state.prefs.len)||10;
+/* opening the keyboard automatically is opt-in — most self-grading happens by tapping */
+const maybeFocus=el=>{ if(state.prefs&&state.prefs.kb) el.focus(); };
 function pickWeighted(n){
   const skill=skillCells(), cells=[];
   let verbs=quizVerbs(), tenses=['past','present','future'];
@@ -2830,7 +2836,7 @@ function renderType(it,body){
       <button class="btn" id="q-check">Check</button>
     </div>
     <div class="feedback" id="fb"></div>`;
-  const input=$('#ans'); input.focus();
+  const input=$('#ans'); maybeFocus(input);
   const acc=acceptedAnswers(v,t,p);
   let done=false;
   const finish=(ok,revealed,u)=>{
@@ -3062,7 +3068,7 @@ function renderVocabQ(it,body){
       <button class="btn" id="q-check">Check</button>
     </div>
     <div class="feedback" id="fb"></div>`;
-  const input=$('#ans'); input.focus();
+  const input=$('#ans'); maybeFocus(input);
   let done=false;
   const reveal=`<b class="he">${hn(correct)}</b> <button class="spk" data-speak="${esc(correct)}">🔊</button>${it.tr?' · <i>'+esc(it.tr)+'</i>':''}`;
   const finish=(ok,u)=>{
@@ -3550,7 +3556,7 @@ function renderTrans(it,body){
       <button class="btn" id="q-check">Check</button>
     </div>
     <div class="feedback" id="fb"></div>`;
-  const input=$('#ans'); input.focus();
+  const input=$('#ans'); maybeFocus(input);
   let done=false;
   $('#q-check').addEventListener('click',async()=>{
     if(done)return;
@@ -4751,7 +4757,7 @@ document.getElementById('merge-file').addEventListener('change',e=>{
 });
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
-const APP_VER='v34';
+const APP_VER='v35';
 document.getElementById('app-ver').textContent=APP_VER;
 document.getElementById('update-btn').addEventListener('click',async()=>{
   const b=document.getElementById('update-btn'); b.disabled=true; b.textContent='Updating…';
