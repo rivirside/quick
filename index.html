@@ -2037,7 +2037,7 @@ function logAttempt(vid,t,p,ok,mode,extra){
   if(!ok){
     for(const cid of ['verb_'+vid,'rverb_'+vid,vid,'r'+vid,'v'+vid]){
       const card=state.srs[cid];
-      if(card&&card.due>todayStr()) card.due=todayStr();
+      if(card&&card.due>todayStr()&&card.last!==todayStr()) card.due=todayStr();
     }
   }
   persist();
@@ -2238,6 +2238,7 @@ function gradeCard(id,g){
   }
   e.reps=(e.reps||0)+1;
   e.due=addDays(todayStr(),e.ivl);
+  e.last=todayStr();
   state.srs[id]=e; bumpTotals(g>0); persist();
 }
 function nextIvls(e){
@@ -4568,7 +4569,7 @@ document.getElementById('merge-file').addEventListener('change',e=>{
 });
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
-const APP_VER='v28';
+const APP_VER='v29';
 document.getElementById('app-ver').textContent=APP_VER;
 document.getElementById('update-btn').addEventListener('click',async()=>{
   const b=document.getElementById('update-btn'); b.disabled=true; b.textContent='Updating…';
