@@ -1,9 +1,15 @@
 /* Shoresh service worker — offline-first app shell */
-const CACHE = 'shoresh-v35';
+const CACHE = 'shoresh-v36';
 const SHELL = ['./', './index.html', './manifest.webmanifest'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  // cache:'reload' skips the browser HTTP cache (GitHub Pages pins files for
+  // 10 minutes) so a new SW never installs a stale shell
+  e.waitUntil(
+    caches.open(CACHE)
+      .then(c => Promise.all(SHELL.map(u => fetch(u, { cache: 'reload' }).then(r => { if (r.ok) return c.put(u, r); }))))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener('activate', e => {
@@ -19,7 +25,7 @@ self.addEventListener('fetch', e => {
   e.respondWith((async () => {
     const cached = await caches.match(e.request, { ignoreSearch: e.request.mode === 'navigate' });
     // Serve from cache, refresh in the background (stale-while-revalidate).
-    const network = fetch(e.request).then(res => {
+    const network = fetch(e.request, { cache: 'no-cache' }).then(res => {
       if (res && (res.ok || res.type === 'opaque')) {
         const copy = res.clone();
         caches.open(CACHE).then(c => c.put(e.request, copy));
