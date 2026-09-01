@@ -1904,6 +1904,20 @@ function maleHeur(pointed){
   }
   return strip(out);
 }
+/* ktiv male: unpointed everyday Hebrew ADDS reading letters the pointed
+   dictionary form lacks (עַכְשָׁו → עכשיו, מִצְוָה → מצווה, דִּבֵּר → דיבר).
+   Accept any answer that matches once those extra י/ו insertions are
+   allowed — extra matres are correct spelling, never an error. The user
+   may add letters; dropping letters the pointed form has stays wrong. */
+function ktivEq(u,c){
+  let i=0,j=0;
+  while(i<u.length){
+    if(j<c.length&&u[i]===c[j]){i++;j++;}
+    else if(u[i]==='י'||u[i]==='ו'){i++;}
+    else return false;
+  }
+  return j===c.length;
+}
 function acceptedAnswers(v,t,p){
   const set=new Set(); const f=formOf(v,t,p);
   set.add(strip(f)); set.add(maleHeur(f));
@@ -2063,12 +2077,12 @@ function classifyMiss(v,t,p,u){
   if(u!==cc&&phon(u)===phon(cc)) return 'spell';
   for(const f of allForms(v)){
     if(f.t===t&&f.p===p) continue;
-    if(strip(f.form)===u||maleHeur(f.form)===u)
+    if(ktivEq(u,strip(f.form)))
       return f.t===t?'person':(f.p===p?'tense':'form');
   }
   for(const o of ALL_VERBS){
     if(o.id===v.id||o.root!==v.root) continue;
-    for(const f of allForms(o)) if(strip(f.form)===u||maleHeur(f.form)===u) return 'binyan';
+    for(const f of allForms(o)) if(ktivEq(u,strip(f.form))) return 'binyan';
   }
   return lev1(u,strip(formOf(v,t,p)))?'typo':'other';
 }
@@ -2772,7 +2786,7 @@ function renderType(it,body){
   };
   $('#q-check').addEventListener('click',()=>{
     const u=strip(input.value||''); if(!u){input.focus();return;}
-    finish(acc.has(u),false,u);
+    finish(acc.has(u)||ktivEq(u,strip(correct)),false,u);
   });
   input.addEventListener('keydown',e=>{if(e.key==='Enter')$('#q-check').click();});
   $('#q-show').addEventListener('click',()=>{
@@ -2879,7 +2893,7 @@ function renderListen(it,body){
   };
   $('#q-check').addEventListener('click',()=>{
     const u=strip(input.value||''); if(!u){input.focus();return;}
-    finish(acc.has(u),u);
+    finish(acc.has(u)||ktivEq(u,strip(correct)),u);
   });
   input.addEventListener('keydown',e=>{if(e.key==='Enter')$('#q-check').click();});
   $('#q-show').addEventListener('click',()=>{
@@ -2986,7 +3000,7 @@ function renderVocabQ(it,body){
     const extra={k:'vocab',lat:Math.round(performance.now()-t0)};
     let note='';
     if(!ok&&u){
-      const other=vocabPool().find(w=>w.id!==it.id&&strip(w.he)===u);
+      const other=vocabPool().find(w=>w.id!==it.id&&ktivEq(u,strip(w.he)));
       if(other){ extra.err='form'; note=` — you wrote "${esc(other.en)}"`; }
       else if(phon(u)===phon(strip(correct))){ extra.err='spell'; extra.sc=0.5; note=' — right sounds, wrong letters (half credit)'+spellNote(u,strip(correct)); }
       else if(lev1(u,strip(correct))){ extra.err='typo'; extra.sc=0.5; note=' — a near-miss typo (half credit)'; }
@@ -2998,7 +3012,7 @@ function renderVocabQ(it,body){
   };
   $('#q-check').addEventListener('click',()=>{
     const u=strip(input.value||''); if(!u){input.focus();return;}
-    finish(acc.has(u),u);
+    finish(acc.has(u)||ktivEq(u,strip(correct)),u);
   });
   input.addEventListener('keydown',e=>{if(e.key==='Enter')$('#q-check').click();});
   $('#q-show').addEventListener('click',()=>{
@@ -4526,7 +4540,7 @@ document.getElementById('merge-file').addEventListener('change',e=>{
 });
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
-const APP_VER='v24';
+const APP_VER='v25';
 document.getElementById('app-ver').textContent=APP_VER;
 document.getElementById('update-btn').addEventListener('click',async()=>{
   const b=document.getElementById('update-btn'); b.disabled=true; b.textContent='Updating…';
