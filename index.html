@@ -2577,7 +2577,7 @@ function openSession(mode){
   $('#session').classList.add('on'); document.documentElement.style.overflow='hidden';
   renderQuestion();
 }
-function closeSession(){ lessonRun=null; sessScope=null; sweep=null; if(speedTimer){clearInterval(speedTimer);speedTimer=null;} $('#session').classList.remove('on'); document.documentElement.style.overflow=''; renderStats(); renderLessons(); renderOnboard(); }
+function closeSession(){ lessonRun=null; sessScope=null; sweep=null; fdeck=null; if(speedTimer){clearInterval(speedTimer);speedTimer=null;} $('#session').classList.remove('on'); document.documentElement.style.overflow=''; renderStats(); renderLessons(); renderOnboard(); }
 $('#sess-quit').addEventListener('click',closeSession);
 /* niqqud-off catches ALL session text, incl. bits templates didn't wrap in hn() */
 const NIKUD_RE=/[\u0591-\u05C7]/;
@@ -2593,7 +2593,7 @@ $('#sess-nikud').addEventListener('click',()=>{
   toggleNikud();
   $('#sess-nikud').style.opacity=nikudOn?'1':'.45';
   if(sweep){ renderSweep(); }
-  else if(sess.mode==='flash'){ if(deckI<deck.length) renderFlash(); }
+  else if(sess.mode==='flash'){ if(fdeck&&fdeck.q.length) renderFlash(); }
   else if(sess.mode!=='speed'&&sess.i<sess.items.length) renderQuestion();
 });
 
@@ -3997,9 +3997,7 @@ function startLessonFlash(){
   const known=id=>{const e=state.srs[id];return e&&((e.ivl||0)>=3||(e.reps||0)>0);};
   const fresh=cards.filter(c=>!known(c.id));
   if(!fresh.length) return nextLessonStage();
-  deck=shuffle(fresh); deckRedo=[]; deckI=0;
-  sess.mode='flash';
-  renderFlash();
+  startFlash(fresh);
 }
 /* lesson completion is derived: verbs need >=6 attempts at >=75% weighted
    accuracy in the lesson's tenses; vocab graduates at interval >=3 days;
@@ -4074,37 +4072,52 @@ function renderLessons(){
 }
 
 document.querySelectorAll('.mode,.gtile').forEach(b=>b.addEventListener('click',()=>{if(b.dataset.mode)openSession(b.dataset.mode);}));
-/* ===== flashcards ===== */
-let deck=[],deckI=0,deckRedo=[];
-$('#cards-start').addEventListener('click',()=>{
-  deck=shuffle(dueCards()); deckRedo=[]; deckI=0;
-  if(!deck.length)return;
-  $('#session').classList.add('on'); document.documentElement.style.overflow='hidden';
+/* ===== flashcards — Anki-style piles =====
+   NEW (blue): first time ever · LEARNING (amber): answered Again, comes
+   back a few cards later · REVIEW (green): scheduled repeats. A card
+   leaves the session only on Good/Easy; the three counters show cards
+   left in each pile, and a card counts ONCE toward the daily total no
+   matter how many tries it takes. */
+let fdeck=null;
+function startFlash(cards){
+  fdeck={q:shuffle(cards),isNew:{},lrn:new Set(),done:new Set(),counted:new Set(),missed:new Set(),total:cards.length};
+  for(const c of cards) fdeck.isNew[c.id]=!state.srs[c.id];
   sess.mode='flash'; renderFlash();
+}
+$('#cards-start').addEventListener('click',()=>{
+  const cs=dueCards(); if(!cs.length)return;
+  $('#session').classList.add('on'); document.documentElement.style.overflow='hidden';
+  startFlash(cs);
 });
+function flashHead(){
+  const F=fdeck; let nw=0,rv=0;
+  for(const c of F.q){ if(F.lrn.has(c.id)) continue; if(F.isNew[c.id]) nw++; else rv++; }
+  $('#sess-bar').style.width=(F.done.size/F.total*100)+'%';
+  const cur=F.q[0], pile=F.lrn.has(cur.id)?1:F.isNew[cur.id]?0:2;
+  const cell=(n,col,on)=>`<span style="color:${col};font-weight:700;${on?'text-decoration:underline;text-underline-offset:3px':''}">${n}</span>`;
+  $('#sess-count').innerHTML=cell(nw,'var(--acc)',pile===0)+' '+cell(F.lrn.size,'var(--gold)',pile===1)+' '+cell(rv,'var(--good)',pile===2);
+}
 function renderFlash(){
-  if(deckI>=deck.length){
-    if(deckRedo.length){deck=shuffle(deckRedo);deckRedo=[];deckI=0;}
-    else{
-      if(lessonRun){
-        $('#sess-body').innerHTML=`<div class="sess-done"><div class="big he">סִיַּמְתָּ!</div>
-          <h3>Cards done</h3><p class="muted">Now drill those forms.</p>
-          <div class="sess-actions" style="max-width:280px;margin:18px auto 0">
-          <button class="btn wide" id="d-next">Continue</button></div></div>`;
-        $('#sess-bar').style.width='100%'; $('#sess-count').textContent='';
-        $('#d-next').addEventListener('click',nextLessonStage); return;
-      }
+  const F=fdeck;
+  if(!F.q.length){
+    $('#sess-bar').style.width='100%'; $('#sess-count').textContent='';
+    if(lessonRun){
       $('#sess-body').innerHTML=`<div class="sess-done"><div class="big he">סִיַּמְתָּ!</div>
-        <h3>Deck clear</h3><p class="muted">Come back tomorrow — spaced repetition does the rest.</p>
+        <h3>Cards done</h3><p class="muted">Now drill those forms.</p>
         <div class="sess-actions" style="max-width:280px;margin:18px auto 0">
-        <button class="btn wide" id="d-close">Done</button></div></div>`;
-      $('#sess-bar').style.width='100%'; $('#sess-count').textContent='';
-      $('#d-close').addEventListener('click',()=>{closeSession();renderCardsHome();}); return;
+        <button class="btn wide" id="d-next">Continue</button></div></div>`;
+      $('#d-next').addEventListener('click',nextLessonStage); return;
     }
+    const tough=F.missed.size;
+    $('#sess-body').innerHTML=`<div class="sess-done"><div class="big he">סִיַּמְתָּ!</div>
+      <h3>${F.total} card${F.total===1?'':'s'} done</h3>
+      <p class="muted">${tough?tough+(tough===1?' card':' cards')+' needed extra rounds — they\'ll be back sooner.':'First try on every card — come back tomorrow.'}</p>
+      <div class="sess-actions" style="max-width:280px;margin:18px auto 0">
+      <button class="btn wide" id="d-close">Done</button></div></div>`;
+    $('#d-close').addEventListener('click',()=>{closeSession();renderCardsHome();}); return;
   }
-  $('#sess-bar').style.width=(deckI/deck.length*100)+'%';
-  $('#sess-count').textContent=(deckI+1)+' / '+deck.length;
-  const c=deck[deckI];
+  flashHead();
+  const c=F.q[0];
   const iv=nextIvls(state.srs[c.id]);
   const rev=c.kind.charAt(0)==='r';
   const base=rev?c.kind.slice(1):c.kind;
@@ -4119,7 +4132,7 @@ function renderFlash(){
       <div class="back" id="f-back" hidden></div>
       <button class="btn ghost" id="f-flip" style="margin-top:8px">${rev?'Show the Hebrew':'Show answer'}</button>
     </div><div class="grade" id="f-grade" hidden>
-      <button class="again">Again<small>today</small></button>
+      <button class="again">Again<small>soon</small></button>
       <button class="good">Good<small>${iv.good}</small></button>
       <button class="easy">Easy<small>${iv.easy}</small></button>
     </div>`;
@@ -4150,7 +4163,14 @@ function renderFlash(){
     }
     $('#f-flip').hidden=true; $('#f-grade').hidden=false;
   });
-  const grade=g=>{gradeCard(c.id,g); bumpActivity(1); if(g===0)deckRedo.push(c); deckI++; renderFlash();};
+  const grade=g=>{
+    gradeCard(c.id,g);
+    if(!F.counted.has(c.id)){ F.counted.add(c.id); bumpActivity(1); }
+    F.q.shift();
+    if(g===0){ F.lrn.add(c.id); F.missed.add(c.id); F.q.splice(Math.min(3,F.q.length),0,c); }
+    else{ F.lrn.delete(c.id); F.done.add(c.id); }
+    renderFlash();
+  };
   $('#f-grade .again').addEventListener('click',()=>grade(0));
   $('#f-grade .good').addEventListener('click',()=>grade(1));
   $('#f-grade .easy').addEventListener('click',()=>grade(2));
@@ -4542,7 +4562,7 @@ document.getElementById('merge-file').addEventListener('change',e=>{
 });
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
-const APP_VER='v26';
+const APP_VER='v27';
 document.getElementById('app-ver').textContent=APP_VER;
 document.getElementById('update-btn').addEventListener('click',async()=>{
   const b=document.getElementById('update-btn'); b.disabled=true; b.textContent='Updating…';
