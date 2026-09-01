@@ -2148,8 +2148,8 @@ function lev1(a,b){
 }
 function classifyMiss(v,t,p,u){
   if(!u) return 'other';
-  const cc=strip(formOf(v,t,p));
-  if(u!==cc&&phon(u)===phon(cc)) return 'spell';
+  const cc=strip(formOf(v,t,p)), cm=maleHeur(formOf(v,t,p));
+  if(u!==cc&&u!==cm&&(phon(u)===phon(cc)||phon(u)===phon(cm))) return 'spell';
   for(const f of allForms(v)){
     if(f.t===t&&f.p===p) continue;
     if(ktivEq(u,strip(f.form)))
@@ -3090,8 +3090,10 @@ function renderVocabQ(it,body){
     if(!ok&&u){
       const other=vocabPool().find(w=>w.id!==it.id&&ktivEq(u,strip(w.he)));
       if(other){ extra.err='form'; note=` — you wrote "${esc(other.en)}"`; }
-      else if(phon(u)===phon(strip(correct))){ extra.err='spell'; extra.sc=0.5; note=' — right sounds, wrong letters (half credit)'+spellNote(u,strip(correct)); }
-      else if(lev1(u,strip(correct))){ extra.err='typo'; extra.sc=0.5; note=' — a near-miss typo (half credit)'; }
+      else if(phon(u)===phon(strip(correct))||phon(u)===phon(maleHeur(correct))){ extra.err='spell'; extra.sc=0.5;
+        const tgt=u.length===maleHeur(correct).length?maleHeur(correct):strip(correct);
+        note=' — right sounds, wrong letters (half credit)'+spellNote(u,tgt); }
+      else if(lev1(u,strip(correct))||lev1(u,maleHeur(correct))){ extra.err='typo'; extra.sc=0.5; note=' — a near-miss typo (half credit)'; }
     }
     logAttempt(it.id,'word','-',ok,'vocab',extra);
     const fb=$('#fb'); fb.className='feedback on '+(ok?'good':'bad');
@@ -3117,7 +3119,7 @@ function renderVocabQ(it,body){
 /* ===== spelling: hear + know the word, pick the right letters ===== */
 const SWAPS={'ב':['ו'],'ו':['ב'],'כ':['ח','ק'],'ח':['כ'],'ק':['כ'],'ת':['ט'],'ט':['ת'],'א':['ע'],'ע':['א'],'ס':['ש'],'ש':['ס']};
 function spellDecoys(he){
-  const base=unpoint(he), chars=[...base], out=new Set();
+  const base=maleHeur(he), chars=[...base], out=new Set();
   for(let i=0;i<chars.length;i++){
     const subs=SWAPS[chars[i]]; if(!subs) continue;
     for(const s of subs){ const d=[...chars]; d[i]=s; out.add(d.join('')); }
@@ -3132,7 +3134,7 @@ function buildSpellItems(n){
 }
 function renderSpell(it,body){
   const t0=performance.now();
-  const correct=unpoint(it.he);
+  const correct=maleHeur(it.he);
   const opts=shuffle([correct,...spellDecoys(it.he)]);
   body.innerHTML=`<div class="qcard">
       <div class="qkicker">Spelling · כְּתִיב</div>
@@ -4774,7 +4776,7 @@ document.getElementById('merge-file').addEventListener('change',e=>{
 });
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
-const APP_VER='v38';
+const APP_VER='v39';
 document.getElementById('app-ver').textContent=APP_VER;
 document.getElementById('update-btn').addEventListener('click',async()=>{
   const b=document.getElementById('update-btn'); b.disabled=true; b.textContent='Updating…';
