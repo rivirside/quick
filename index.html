@@ -2093,6 +2093,9 @@ function bumpTotals(ok){
 function logAttempt(vid,t,p,ok,mode,extra){
   const e={v:vid,t,p,ok:ok?1:0,m:mode,ts:Date.now()};
   if(extra) for(const x of ['err','sc','lat','k']) if(extra[x]!=null) e[x]=extra[x];
+  /* answered with the study guide open on this question: real engagement,
+     not proven recall — half mastery credit */
+  if(ok&&e.sc==null&&sess&&sess.peekI===sess.i&&sess.peekMode===sess.mode) e.sc=0.5;
   state.log.push(e);
   if(state.log.length>LOG_CAP) state.log=state.log.slice(-LOG_CAP);
   bumpTotals(ok);
@@ -2601,7 +2604,7 @@ function pickWeighted(n){
 const sess={items:[],i:0,right:0,mode:null};
 let lessonRun=null, sessScope=null, speedTimer=null, sweep=null;
 function openSession(mode){
-  sess.mode=mode; sess.i=0; sess.right=0; sess.off=0; sess.right0=0; sess.bumped=0;
+  sess.mode=mode; sess.i=0; sess.right=0; sess.off=0; sess.right0=0; sess.bumped=0; sess.peekI=-1;
   sessScope=lessonRun?lessonRun.L:null;
   if(mode==='speed'){
     sess.items=pickWeighted(40);
@@ -4046,7 +4049,7 @@ function renderStudy(){
       <div style="font-size:14.5px;margin:8px 0;line-height:1.55">${c.b}</div>`;
   if(c.tblv){ const v=VERB_BY_ID[c.tblv]; if(v) html+=refTable6(v); }
   if(c.ex) html+=`<div class="note"><span class="he" style="font-size:18px">${c.ex[0]}</span> <button class="spk" data-speak="${esc(c.ex[0])}">🔊</button><br><span class="muted" style="font-size:12.5px">${c.ex[1]}</span></div>`;
-  html+=`</div><div class="sess-actions">${R.ti>0?'<button class="btn ghost" id="st-back">Back</button>':''}<button class="btn grow" id="st-go">${last?(R.resume?'Back to practice':'Done'):'Next'}</button></div>`;
+  html+=`</div>${R.resume&&R.ti===0?'<p class="muted" style="font-size:12px;text-align:center;margin:10px 0 0">Answering after studying counts as half credit — learn now, prove it next time.</p>':''}<div class="sess-actions">${R.ti>0?'<button class="btn ghost" id="st-back">Back</button>':''}<button class="btn grow" id="st-go">${last?(R.resume?'Back to practice':'Done'):'Next'}</button></div>`;
   $('#sess-body').innerHTML=html;
   const bk=$('#st-back'); if(bk) bk.addEventListener('click',()=>{R.ti--;renderStudy();});
   $('#st-go').addEventListener('click',()=>{
@@ -4087,6 +4090,7 @@ function studyPagesForNow(){
 $('#sess-study').addEventListener('click',()=>{
   if(studyRun||sweep||sess.mode==='speed'||sess.mode==='study'||sess.mode==='teach') return;
   const pg=studyPagesForNow(); if(!pg||!pg.length) return;
+  if(sess.mode!=='flash'){ sess.peekI=sess.i; sess.peekMode=sess.mode; }
   openStudy(pg,()=>{ if(sess.mode==='flash') renderFlash(); else renderQuestion(); });
 });
 
@@ -4371,7 +4375,12 @@ function refTable6(v){
       <td class="he">${past||'—'}</td><td class="he">${f||'—'}</td></tr>`;
   }).join('');
   const pres=(v.f?v.f.present:v.forms.present);
-  const presRow=pres?`<div class="note" style="margin-top:8px">present · הֹוֶה:&nbsp; <span class="he" style="font-size:18px">${['ms','fs','mp','fp'].map(k=>pres[k]).join(' · ')}</span></div>`
+  const presRow=pres?`<div class="note" style="margin-top:8px">present · הֹוֶה — no person forms, just gender &amp; number:<br>
+      <span class="he" style="font-size:18px">${pres.ms}</span> <small class="muted">he/I/you (m)</small> ·
+      <span class="he" style="font-size:18px">${pres.fs}</span> <small class="muted">she/I/you (f)</small> ·
+      <span class="he" style="font-size:18px">${pres.mp}</span> <small class="muted">we/they (m)</small> ·
+      <span class="he" style="font-size:18px">${pres.fp}</span> <small class="muted">we/they (f)</small>
+      <br><span class="muted" style="font-size:12px">The pronoun carries the person — "we" is just אֲנַחְנוּ + the plural form: <span class="he">אֲנַחְנוּ ${pres.mp}</span>.</span></div>`
     :`<div class="note" style="margin-top:8px">No present tense — that's the point of this one.</div>`;
   return `<div class="tablewrap"><table class="conjtable">
     <tr><th>person</th><th>past · עָבָר</th><th>future · עָתִיד</th></tr>${rows}</table></div>${presRow}`;
@@ -4757,7 +4766,7 @@ document.getElementById('merge-file').addEventListener('change',e=>{
 });
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
-const APP_VER='v36';
+const APP_VER='v37';
 document.getElementById('app-ver').textContent=APP_VER;
 document.getElementById('update-btn').addEventListener('click',async()=>{
   const b=document.getElementById('update-btn'); b.disabled=true; b.textContent='Updating…';
