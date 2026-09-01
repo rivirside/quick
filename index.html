@@ -3670,19 +3670,24 @@ document.getElementById('chat-in').addEventListener('keydown',e=>{if(e.key==='En
 let tappedWord=null, tappedMeta=null;
 function lookupWord(w){
   const b=strip(w);
-  let hit=state.custom.find(x=>strip(x.he)===b)||VOCAB_SEED.find(x=>strip(x.he)===b);
-  if(hit) return {en:hit.en,tr:hit.tr||''};
-  const ph=PHRASES.find(x=>strip(x.he)===b);
-  if(ph) return {en:ph.en+' (lit. '+ph.lit+')',tr:ph.tr};
-  const nn=NOUNS.find(x=>strip(x.he)===b||strip(x.pl)===b);
-  if(nn) return {en:nn.en+(strip(nn.pl)===b?' (plural)':''),tr:''};
-  const ad=ADJS.find(x=>[x.ms,x.fs,x.mp,x.fp].some(f=>strip(f)===b));
-  if(ad) return {en:ad.en,tr:''};
-  for(const v of ALL_VERBS){
-    for(const f of allForms(v)){
-      if(strip(f.form)===b){
-        const pl=personLabel(f.t,f.p);
-        return {en:v.en+' — '+TENSES[f.t].en+(f.t==='inf'?'':', '+pl.en),tr:v.tr||''};
+  /* exact spelling first for precision, then ktiv male equivalence so the
+     everyday full spellings chat is written in (עכשיו) still hit the
+     pointed dictionary (עַכְשָׁו) without an API round-trip */
+  for(const eq of [x=>x===b, x=>ktivEq(b,x)]){
+    const hit=state.custom.find(x=>eq(strip(x.he)))||VOCAB_SEED.find(x=>eq(strip(x.he)));
+    if(hit) return {en:hit.en,tr:hit.tr||''};
+    const ph=PHRASES.find(x=>eq(strip(x.he)));
+    if(ph) return {en:ph.en+' (lit. '+ph.lit+')',tr:ph.tr};
+    const nn=NOUNS.find(x=>eq(strip(x.he))||eq(strip(x.pl)));
+    if(nn) return {en:nn.en+(eq(strip(nn.pl))?' (plural)':''),tr:''};
+    const ad=ADJS.find(x=>[x.ms,x.fs,x.mp,x.fp].some(f=>eq(strip(f))));
+    if(ad) return {en:ad.en,tr:''};
+    for(const v of ALL_VERBS){
+      for(const f of allForms(v)){
+        if(eq(strip(f.form))){
+          const pl=personLabel(f.t,f.p);
+          return {en:v.en+' — '+TENSES[f.t].en+(f.t==='inf'?'':', '+pl.en),tr:v.tr||''};
+        }
       }
     }
   }
@@ -3690,7 +3695,8 @@ function lookupWord(w){
 }
 function isSavedWord(w){
   const b=strip(w);
-  return state.custom.some(c=>strip(c.he)===b)||VOCAB_SEED.some(c=>strip(c.he)===b)||PHRASES.some(c=>strip(c.he)===b);
+  const eq=x=>ktivEq(b,x);
+  return state.custom.some(c=>eq(strip(c.he)))||VOCAB_SEED.some(c=>eq(strip(c.he)))||PHRASES.some(c=>eq(strip(c.he)));
 }
 async function showWordBar(w){
   tappedWord=w; tappedMeta=null;
@@ -4562,7 +4568,7 @@ document.getElementById('merge-file').addEventListener('change',e=>{
 });
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
-const APP_VER='v27';
+const APP_VER='v28';
 document.getElementById('app-ver').textContent=APP_VER;
 document.getElementById('update-btn').addEventListener('click',async()=>{
   const b=document.getElementById('update-btn'); b.disabled=true; b.textContent='Updating…';
