@@ -504,7 +504,7 @@ document.addEventListener('click',e=>{ const b=e.target.closest('.spk'); if(b&&b
 
 /* ===== niqqud toggle ===== */
 let nikudOn=true;
-function hn(s){ return nikudOn?s:s.normalize('NFC').replace(/[֑-ׇ]/g,''); }
+function hn(s){ return nikudOn?s:maleHeur(s); }
 function toggleNikud(){
   nikudOn=!nikudOn;
   const btn=document.getElementById('nikud-btn');
@@ -1949,16 +1949,24 @@ function spellNote(u,c){
   return d.length?`<br><span class="muted">Letters: ${d.map(x=>`<b class="he">${x[1]}</b> not <span class="he">${x[0]}</span>`).join(' · ')}</span>`:'';
 }
 function maleHeur(pointed){
-  let out='';const chars=[...pointed.normalize('NFC')];
+  let p=pointed.normalize('NFC')
+    /* word-final ־ָו is written ־יו unpointed: עַכְשָׁו → עכשיו */
+    .replace(/\u05B8([\u0591-\u05C7]*)\u05D5(?![\u0591-\u05C7\u05D0-\u05EA])/g,'\u05B8$1\u05D9\u05D5')
+    /* a mid-word consonantal ו doubles: תִּקְוָה → תקווה */
+    .replace(/(?<=[\u05D0-\u05EA][\u0591-\u05C7]*)\u05D5(?=[\u05B0-\u05B8])/g,'וו');
+  let out='';const chars=[...p];
   const nextBase=i=>{let j=i+1;while(j<chars.length&&chars[j]>='֑'&&chars[j]<='ׇ')j++;return j;};
+  let lastBase='';
   for(let i=0;i<chars.length;i++){
     const c=chars[i]; out+=c;
-    if(c==='ֹ'||c==='ֻ'){ const nb=chars[nextBase(i)]; if(nb!=='ו'&&nb!=='א') out+='ו'; }
+    if(c>='א'&&c<='ת') lastBase=c;
+    if(c==='ֹ'||c==='ֻ'){ const nb=chars[nextBase(i)]; if(lastBase!=='ו'&&nb!=='ו'&&nb!=='א') out+='ו'; }
     else if(c==='ִ'){ const j=nextBase(i),nb=chars[j]; let hasDagesh=false;
       for(let k=j+1;k<chars.length&&chars[k]>='֑'&&chars[k]<='ׇ';k++) if(chars[k]==='ּ')hasDagesh=true;
       if(nb&&nb!=='י'&&hasDagesh) out+='י'; }
   }
-  return strip(out);
+  /* remove only the pointing — keep spaces and punctuation (display uses this) */
+  return out.replace(/[\u0591-\u05C7]/g,'');
 }
 /* ktiv male: unpointed everyday Hebrew ADDS reading letters the pointed
    dictionary form lacks (עַכְשָׁו → עכשיו, מִצְוָה → מצווה, דִּבֵּר → דיבר).
@@ -2655,10 +2663,10 @@ $('#sess-quit').addEventListener('click',closeSession);
 /* niqqud-off catches ALL session text, incl. bits templates didn't wrap in hn() */
 const NIKUD_RE=/[\u0591-\u05C7]/;
 function stripWalk(node){
-  if(node.nodeType===3){ if(NIKUD_RE.test(node.nodeValue)) node.nodeValue=node.nodeValue.normalize('NFC').replace(/[\u0591-\u05C7]/g,''); return; }
+  if(node.nodeType===3){ if(NIKUD_RE.test(node.nodeValue)) node.nodeValue=maleHeur(node.nodeValue); return; }
   if(node.nodeType!==1) return;
   const w=document.createTreeWalker(node,NodeFilter.SHOW_TEXT); let n;
-  while(n=w.nextNode()){ if(NIKUD_RE.test(n.nodeValue)) n.nodeValue=n.nodeValue.normalize('NFC').replace(/[\u0591-\u05C7]/g,''); }
+  while(n=w.nextNode()){ if(NIKUD_RE.test(n.nodeValue)) n.nodeValue=maleHeur(n.nodeValue); }
 }
 new MutationObserver(ms=>{ if(nikudOn) return; for(const m of ms) for(const n of m.addedNodes) stripWalk(n); })
   .observe(document.getElementById('sess-body'),{childList:true,subtree:true});
@@ -4766,7 +4774,7 @@ document.getElementById('merge-file').addEventListener('change',e=>{
 });
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
-const APP_VER='v37';
+const APP_VER='v38';
 document.getElementById('app-ver').textContent=APP_VER;
 document.getElementById('update-btn').addEventListener('click',async()=>{
   const b=document.getElementById('update-btn'); b.disabled=true; b.textContent='Updating…';
