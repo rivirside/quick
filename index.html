@@ -61,6 +61,7 @@ body[data-tab="chat"] #app{padding-top:10px}
 #nikud-btn,#gear-btn{font-size:13px;padding:4px 10px;border-radius:20px;background:var(--surface2);border:1px solid var(--line);font-weight:600;color:var(--ink)}
 .setsel{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;font-size:14px;color:var(--ink)}
 #nikud-btn.off{color:var(--muted)}
+.lrow.locked{opacity:.55}
 nav.tabs{position:fixed;bottom:0;left:0;right:0;background:var(--surface);
   border-top:1px solid var(--line);display:flex;justify-content:center;gap:2px;
   padding:6px max(8px,env(safe-area-inset-left)) max(10px,env(safe-area-inset-bottom));z-index:40}
@@ -322,7 +323,8 @@ details.ref[open] summary .car{transform:rotate(90deg)}
       </div>
       <details class="ref" style="margin-top:14px">
         <summary><b style="font-size:14px">Focus on one binyan</b><span class="car">›</span></summary>
-        <div class="refbody" style="padding-top:4px"><div class="chips" id="binyan-chips"></div></div>
+        <div class="refbody" style="padding-top:4px"><div class="chips" id="binyan-chips"></div>
+        <p class="muted" style="font-size:12px;margin:8px 0 0">New to a binyan? Its study guide is under Grammar — or tap 📖 during any drill.</p></div>
       </details>
       <h2 class="sec">AI tutor</h2>
       <div id="ai-root"></div>
@@ -486,6 +488,7 @@ details.ref[open] summary .car{transform:rotate(90deg)}
       <button class="x" id="sess-quit">Quit</button>
       <div class="progress"><i id="sess-bar" style="width:0%"></i></div>
       <div class="sess-count tnum" id="sess-count"></div>
+      <button class="x" id="sess-study" title="Study this first">📖</button>
       <button class="x" id="sess-nikud" title="Toggle niqqud"><span class="he" style="font-size:16px">אָ</span></button>
     </div>
     <div id="sess-body" class="grow"></div>
@@ -1552,6 +1555,55 @@ const NUM_TENS={20:['עֶשְׂרִים','esrim'],30:['שְׁלוֹשִׁים','
 
 /* ===== curriculum: a lesson is a set of stable ids + an optional tense scope.
    Completion is DERIVED from the event log & SRS — no lesson progress state. */
+/* ===== study guides: learn it BEFORE you drill it ===== */
+const BINYAN_MODEL={paal:'ktv1',piel:'dbr2',hifil:'sbr5',hitpael:'lbsh7',nifal:'pgsh3'};
+const BINYAN_NOTES={
+ paal:[
+  {h:"What Pa'al is for",b:"The plain, basic action — write, close, finish, think. It's by far the most common binyan, so most verbs you meet early live here. <b>How to spot it:</b> the past tense is the bare root with a-a vowels — <span class='he'>כָּתַב</span> (katav, he wrote) — nothing added in front.",ex:['אֲנִי כּוֹתֵב הוֹדָעָה','ani kotev hodaa — I am writing a message']},
+  {h:"How Pa'al conjugates",b:"Present has only FOUR forms — masculine/feminine × singular/plural — and the person comes from context: <span class='he'>אֲנִי כּוֹתֵב, הִיא כּוֹתֶבֶת</span>. Past marks the person with suffixes: <span class='he'>־תִּי</span> I, <span class='he'>־תָּ</span> you, <span class='he'>־נוּ</span> we. Future flips to prefixes: <span class='he'>אֶ־ / תִּ־ / יִ־ / נִ־</span>. Infinitive: <span class='he'>לִכְתֹּב</span>. A model verb in full:",tbl:true}],
+ piel:[
+  {h:"What Pi'el is for",b:"Deliberate, often intensive action done TO someone or something — and almost all the talking verbs: <span class='he'>דִּבֵּר</span> spoke, <span class='he'>סִפֵּר</span> told, <span class='he'>לִמֵּד</span> taught, <span class='he'>בִּקֵּשׁ</span> asked for. <b>How to spot it:</b> the strengthened middle root letter (the dagesh in דִּבֵּר), and the present tense opens with <span class='he'>מְ</span>: <span class='he'>מְדַבֵּר</span>.",ex:['הִיא מְדַבֶּרֶת עִבְרִית','hi medaberet ivrit — she speaks Hebrew']},
+  {h:"How Pi'el conjugates",b:"Past: <span class='he'>דִּבֵּר, דִּבַּרְתִּי</span> (i-e vowels). Present: <span class='he'>מְ</span> + root: <span class='he'>מְדַבֵּר / מְדַבֶּרֶת</span>. Future: <span class='he'>אֲדַבֵּר, יְדַבֵּר</span>. Infinitive: <span class='he'>לְדַבֵּר</span> — the לְ pattern with no extra letters. A model verb in full:",tbl:true}],
+ hifil:[
+  {h:"What Hif'il is for",b:"The causative — MAKING something happen or making someone do/feel: <span class='he'>הִדְלִיק</span> turned on (made it burn), <span class='he'>הִסְבִּיר</span> explained (made it clear), <span class='he'>הִתְחִיל</span> began, <span class='he'>הִזְמִין</span> invited/ordered. <b>How to spot it:</b> past starts with <span class='he'>הִ</span> and squeezes an <span class='he'>י</span> before the last root letter; present starts with <span class='he'>מַ</span>: <span class='he'>מַדְלִיק</span>.",ex:['הוּא הִסְבִּיר אֶת הַכֹּל','hu hisbir et hakol — he explained everything']},
+  {h:"How Hif'il conjugates",b:"Past: <span class='he'>הִדְלִיק, הִדְלַקְתִּי</span>. Present: <span class='he'>מַדְלִיק / מַדְלִיקָה</span>. Future drops the ה: <span class='he'>אַדְלִיק, יַדְלִיק</span>. Infinitive keeps it: <span class='he'>לְהַדְלִיק</span>. A model verb in full:",tbl:true}],
+ hitpael:[
+  {h:"What Hitpa'el is for",b:"Reflexive (to yourself), mutual (to each other), or a gradual process: <span class='he'>הִתְלַבֵּשׁ</span> got dressed, <span class='he'>הִתְקַשֵּׁר</span> called, <span class='he'>הִתְחַתֵּן</span> got married, <span class='he'>הִתְרַגֵּשׁ</span> got excited. <b>How to spot it:</b> the <span class='he'>הִתְ</span> prefix survives every tense — you can't miss it. (One quirk: if the root starts with ס or שׂ, the ת swaps inward: <span class='he'>הִסְתַּכֵּל</span> looked.)",ex:['אֲנִי מִתְלַבֵּשׁ וְיוֹצֵא','ani mitlabesh veyotse — I get dressed and head out']},
+  {h:"How Hitpa'el conjugates",b:"Past: <span class='he'>הִתְלַבֵּשׁ, הִתְלַבַּשְׁתִּי</span>. Present swaps ה for מ: <span class='he'>מִתְלַבֵּשׁ / מִתְלַבֶּשֶׁת</span>. Future: <span class='he'>אֶתְלַבֵּשׁ, יִתְלַבֵּשׁ</span>. Infinitive: <span class='he'>לְהִתְלַבֵּשׁ</span>. A model verb in full:",tbl:true}],
+ nifal:[
+  {h:"What Nif'al is for",b:"Things that happen TO you, passives of Pa'al, and some reciprocals: <span class='he'>נִכְנַס</span> entered, <span class='he'>נִפְגַּשׁ</span> met (with), <span class='he'>נִשְׁבַּר</span> broke, <span class='he'>נִשְׁאַר</span> stayed. <b>How to spot it:</b> past and present start with <span class='he'>נִ</span>. In the future the נ hides — it assimilates into a dagesh: <span class='he'>יִכָּנֵס</span>.",ex:['נִפְגַּשְׁנוּ בְּתֵל אָבִיב','nifgashnu betel aviv — we met in Tel Aviv']},
+  {h:"How Nif'al conjugates",b:"Past: <span class='he'>נִכְנַס, נִכְנַסְתִּי</span>. Present: <span class='he'>נִכְנָס / נִכְנֶסֶת</span> — looks like the past, context decides. Future: <span class='he'>אֶכָּנֵס, יִכָּנֵס</span>. Infinitive: <span class='he'>לְהִכָּנֵס</span> — with a ה that the past never had. A model verb in full:",tbl:true}],
+ pual:[
+  {h:"What Pu'al is (recognize it, don't chase it)",b:"The passive of Pi'el: <span class='he'>סֻפַּר</span> was told, <span class='he'>בֻּקַּשׁ / מְבֻקָּשׁ</span> wanted. <b>How to spot it:</b> u-a vowels through the root, present opens with <span class='he'>מְ</span>: <span class='he'>מְבֻקָּשׁ</span>. It has NO infinitive and no imperative. <b>Register:</b> you'll read it in news and official language far more than you'll ever say it — that's why this app keeps it rare in drills. Learn to recognize it and move on.",tbl:true}],
+ hufal:[
+  {h:"What Huf'al is (recognize it, don't chase it)",b:"The passive of Hif'il: <span class='he'>הֻזְמַן</span> was invited, <span class='he'>מֻזְמָן</span> (is) invited, <span class='he'>הֻחְלַט</span> it was decided. <b>How to spot it:</b> the hu/mu openers — past starts <span class='he'>הֻ/הוּ</span>, present starts <span class='he'>מֻ/מוּ</span>. No infinitive, no imperative. <b>Register:</b> formal and written; in speech Israelis usually rephrase actively. Recognition is the goal.",tbl:true}]
+};
+const TOPIC_NOTES={
+ num:[
+  {h:'Numbers flip their gender',heh:'מִסְפָּרִים',b:"Hebrew numbers 3–10 do the OPPOSITE of what adjectives do: the form ending in <span class='he'>ָה-</span> goes with MASCULINE nouns, the bare form with feminine. <span class='he'>שְׁלוֹשָׁה בָּנִים</span> (three boys) but <span class='he'>שָׁלוֹשׁ בָּנוֹת</span> (three girls). Everyone gets this wrong at first — even Israelis slip in fast speech.",ex:['שְׁלוֹשָׁה יְלָדִים וְשָׁלוֹשׁ יְלָדוֹת','shlosha yeladim veshalosh yeladot — three boys and three girls']},
+  {h:'Two is special',b:"Alone, two is <span class='he'>שְׁנַיִם</span> (m) / <span class='he'>שְׁתַּיִם</span> (f). But directly BEFORE a noun it shortens to the construct form: <span class='he'>שְׁנֵי סְפָרִים</span> two books, <span class='he'>שְׁתֵּי בָּנוֹת</span> two girls. Never שניים ספרים.",ex:['שְׁנֵי בָּתִּים וּשְׁתֵּי דִּירוֹת','shnei batim ushtei dirot — two houses and two apartments']}],
+ prep:[
+  {h:'Prepositions conjugate',heh:'מִלּוֹת יַחַס',b:"Hebrew doesn't say 'to me' with two words — the preposition absorbs the pronoun: <span class='he'>לְ</span> becomes <span class='he'>לִי, לְךָ, לָךְ, לוֹ, לָהּ...</span>; <span class='he'>שֶׁל</span> becomes <span class='he'>שֶׁלִּי, שֶׁלְּךָ...</span>; <span class='he'>עִם</span> becomes <span class='he'>אִתִּי, אִתְּךָ...</span>. And the big one: Hebrew has no verb 'to have' — you say <span class='he'>יֵשׁ לִי</span>, 'there is to me'.",ex:['יֵשׁ לִי שְׁאֵלָה','yesh li sheela — I have a question']}],
+ na:[
+  {h:'Nouns lead, adjectives follow',heh:'הַתְאָמָה',b:"Every noun has a gender. The adjective comes AFTER the noun and must match gender and number: <span class='he'>בַּיִת גָּדוֹל, דִּירָה גְּדוֹלָה, בָּתִּים גְּדוֹלִים</span>. Feminine nouns usually end in <span class='he'>ָה-</span> or <span class='he'>ת-</span>; plurals take <span class='he'>ִים-</span> (m) / <span class='he'>וֹת-</span> (f) — but the famous exceptions just have to be learned: <span class='he'>לַיְלָה</span> is masculine, <span class='he'>אִשָּׁה → נָשִׁים</span>, <span class='he'>עִיר → עָרִים</span>. Definite ה goes on BOTH: <span class='he'>הַבַּיִת הַגָּדוֹל</span>.",ex:['הַדִּירָה הַחֲדָשָׁה גְּדוֹלָה','hadira hakhadasha gdola — the new apartment is big']}],
+ spell:[
+  {h:'Why spelling is hard (and fair game for half credit)',heh:'כְּתִיב',b:"Modern Hebrew merged several letter sounds, so your ear can't tell you which letter to write: <span class='he'>ב=ו</span> (v) · <span class='he'>כ=ח</span> (kh) · <span class='he'>כּ=ק</span> (k) · <span class='he'>ת=ט</span> (t) · <span class='he'>א=ע</span> (silent) · <span class='he'>שׂ=ס</span> (s). When you type the right sounds with the wrong letter, the app gives half credit and shows you the swap. Extra reading letters (עכשיו for עַכְשָׁו) are always accepted — that's correct everyday spelling, not an error.",ex:['עַכְשָׁו אֲנִי מֵבִין','akhshav ani mevin — now I understand']}],
+ vocab:[
+  {h:'How recall practice works',b:"You get the English and produce the Hebrew — the hard direction, and the one that makes words usable in conversation. Type without vowel points; everyday full spellings are accepted. Same sounds with a mixed-up letter earns half credit. A miss drags that word's weight up, so the games will bring it back more often."}],
+ roots:[
+  {h:'Everything grows from a root',heh:'שֹׁרֶשׁ',b:"Almost every Hebrew word is built from a root of (usually) three consonants poured into a template. <span class='he'>כ־ת־ב</span> gives כָּתַב wrote, מִכְתָּב letter, כְּתוֹבֶת address, כַּתָּבָה news article. Spotting roots is a superpower: meet one new root and you can often guess five words. Final letters normalize — ם is just מ at the end of a word."}],
+ order:[
+  {h:'Word order basics',b:"Default Hebrew is Subject–Verb–Object like English: <span class='he'>אֲנִי אוֹהֵב קָפֶה</span>. Adjectives come AFTER their noun. Questions keep the same order — only intonation (or מָה/מִי/אֵיפֹה words) changes. Time expressions float freely, usually first or last.",ex:['מָחָר אֲנִי נוֹסֵעַ לְתֵל אָבִיב','makhar ani nosea letel aviv — tomorrow I am going to Tel Aviv']}]
+};
+/* skill tree: parallel tracks, soft prerequisites (60% of the prereq unlocks) */
+const TRACKS=[
+ {t:'Foundations',d:"Pa'al, one tense at a time — the trunk everything hangs off",ls:['L1','L2','L3']},
+ {t:'The binyanim',d:'The verb families — each unlocks a new kind of meaning',ls:['L4','L6','L7','L12']},
+ {t:'Real life',d:'Topic vocabulary — start anywhere, no prerequisites',ls:['L5','L8','L11','L13']},
+ {t:'Building blocks',d:'The grammar that glues sentences together',ls:['L14','L10','L9']}
+];
+const PREREQ={L2:'L1',L3:'L2',L4:'L1',L6:'L4',L7:'L6',L12:'L7',L14:'L1',L9:'L3'};
+
 const LESSONS=[
  {id:'L1',title:"First steps — Pa'al present",he:'הֹוֶה',sub:'The everyday tense of everyday verbs',
   intro:"Pa'al is the plainest binyan, and the present tense has only four forms — masculine/feminine, singular/plural. Person comes from context: אֲנִי כּוֹתֵב, הִיא כּוֹתֶבֶת.",
@@ -2457,11 +2509,11 @@ function renderHomeLesson(){
   const root=document.getElementById('home-lesson'); if(!root) return;
   const skill=skillCells();
   const prs=LESSONS.map(L=>lessonProgress(L,skill));
-  const i=Math.max(0,prs.findIndex(pr=>!pr.total||pr.done<pr.total));
-  const L=LESSONS[i], pr=prs[i];
+  const rec=recommendedLesson(prs);
+  const L=rec.L, pr=rec.pr;
   const started=state.lessons.started.includes(L.id);
   root.innerHTML=`<button class="mode" id="home-lesson-btn" style="padding:13px 16px">
-    <span class="glyph" style="font-size:16px;font-family:'Heebo',sans-serif">${i+1}</span>
+    <span class="glyph">🎯</span>
     <span class="grow"><b>${L.title}</b><span class="d">${started?pr.pct+'% — keep going':'Up next in your path'}</span></span>
     <span class="pill gold">lesson</span></button>`;
   document.getElementById('home-lesson-btn').addEventListener('click',()=>startLesson(L));
@@ -2578,7 +2630,7 @@ function openSession(mode){
   $('#session').classList.add('on'); document.documentElement.style.overflow='hidden';
   renderQuestion();
 }
-function closeSession(){ lessonRun=null; sessScope=null; sweep=null; fdeck=null; if(speedTimer){clearInterval(speedTimer);speedTimer=null;} $('#session').classList.remove('on'); document.documentElement.style.overflow=''; renderStats(); renderLessons(); renderOnboard(); }
+function closeSession(){ lessonRun=null; sessScope=null; sweep=null; fdeck=null; studyRun=null; if(speedTimer){clearInterval(speedTimer);speedTimer=null;} $('#session').classList.remove('on'); document.documentElement.style.overflow=''; renderStats(); renderLessons(); renderOnboard(); }
 $('#sess-quit').addEventListener('click',closeSession);
 /* niqqud-off catches ALL session text, incl. bits templates didn't wrap in hn() */
 const NIKUD_RE=/[\u0591-\u05C7]/;
@@ -2593,9 +2645,11 @@ new MutationObserver(ms=>{ if(nikudOn) return; for(const m of ms) for(const n of
 $('#sess-nikud').addEventListener('click',()=>{
   toggleNikud();
   $('#sess-nikud').style.opacity=nikudOn?'1':'.45';
-  if(sweep){ renderSweep(); }
+  if(studyRun){ renderStudy(); }
+  else if(sweep){ renderSweep(); }
+  else if(sess.mode==='teach'){ showTeachCard(); }
   else if(sess.mode==='flash'){ if(fdeck&&fdeck.q.length) renderFlash(); }
-  else if(sess.mode!=='speed'&&sess.i<sess.items.length) renderQuestion();
+  else if(sess.mode!=='speed'&&sess.mode!=='study'&&sess.i<sess.items.length) renderQuestion();
 });
 
 function sessHead(){
@@ -3952,6 +4006,70 @@ function renderOnboard(){
 }
 
 /* ===== lesson driver: intro -> flashcards -> scoped drills ===== */
+/* ===== study viewer: standalone (from Grammar/skill tree) or mid-session
+   (📖 pauses the question, Back to practice re-renders it) ===== */
+let studyRun=null;
+function openStudy(pages,resume){
+  if(!pages||!pages.length) return;
+  studyRun={pages,ti:0,resume:resume||null};
+  if(!resume){ $('#session').classList.add('on'); document.documentElement.style.overflow='hidden'; sess.mode='study'; }
+  renderStudy();
+}
+function renderStudy(){
+  const R=studyRun; if(!R) return;
+  const c=R.pages[R.ti], last=R.ti>=R.pages.length-1;
+  $('#sess-bar').style.width=((R.ti+1)/R.pages.length*100)+'%';
+  $('#sess-count').textContent=R.pages.length>1?(R.ti+1)+' / '+R.pages.length:'';
+  let html=`<div class="qcard" style="text-align:start">
+      <div class="qkicker">Study</div>
+      <div style="font-size:20px;font-weight:700;margin:6px 0">${c.h}${c.heh?' <span class="he" style="color:var(--accent)">'+c.heh+'</span>':''}</div>
+      <div style="font-size:14.5px;margin:8px 0;line-height:1.55">${c.b}</div>`;
+  if(c.tblv){ const v=VERB_BY_ID[c.tblv]; if(v) html+=refTable6(v); }
+  if(c.ex) html+=`<div class="note"><span class="he" style="font-size:18px">${c.ex[0]}</span> <button class="spk" data-speak="${esc(c.ex[0])}">🔊</button><br><span class="muted" style="font-size:12.5px">${c.ex[1]}</span></div>`;
+  html+=`</div><div class="sess-actions">${R.ti>0?'<button class="btn ghost" id="st-back">Back</button>':''}<button class="btn grow" id="st-go">${last?(R.resume?'Back to practice':'Done'):'Next'}</button></div>`;
+  $('#sess-body').innerHTML=html;
+  const bk=$('#st-back'); if(bk) bk.addEventListener('click',()=>{R.ti--;renderStudy();});
+  $('#st-go').addEventListener('click',()=>{
+    if(!last){ R.ti++; renderStudy(); return; }
+    const f=R.resume; studyRun=null;
+    if(f) f(); else closeSession();
+  });
+}
+function binyanGuidePages(b,vCtx){
+  const B=BINYANIM[b];
+  const model=VERB_BY_ID[BINYAN_MODEL[b]]||ALL_VERBS.find(v=>v.b===b);
+  const pages=(BINYAN_NOTES[b]||[]).map(pg=>({h:pg.h,b:pg.b,ex:pg.ex,tblv:pg.tbl&&model?model.id:null}));
+  if(pages[0]) pages[0].heh=B.he;
+  const vs=ALL_VERBS.filter(v=>v.b===b).slice(0,10);
+  if(vs.length) pages.push({h:B.name+" verbs you'll meet",heh:B.he,
+    b:vs.map(v=>`<div style="margin:7px 0"><span class="he" style="font-size:19px">${v.lemma}</span> <button class="spk" data-speak="${esc(v.lemma)}">🔊</button> — ${esc(v.en)}</div>`).join('')});
+  if(vCtx) pages.unshift({h:esc(vCtx.en),heh:vCtx.lemma,b:`The verb on your screen. It's <b>${B.name}</b> — ${B.fn}. Full conjugation:`,tblv:vCtx.id});
+  return pages;
+}
+function topicPages(k){ return (TOPIC_NOTES[k]||[]).map(x=>({...x})); }
+function studyPagesForNow(){
+  if(sess.mode==='flash'&&fdeck&&fdeck.q.length){
+    const c=fdeck.q[0];
+    if(c.v) return binyanGuidePages(c.v.b,c.v);
+    if(c.kind==='noun'||c.kind==='rnoun'||c.kind==='adj'||c.kind==='radj') return topicPages('na');
+    return topicPages('vocab');
+  }
+  const raw=sess.items&&sess.items[sess.i]; if(!raw) return null;
+  const isMix=sess.mode==='mix'||sess.mode==='level';
+  const m=isMix?(raw.game||''):sess.mode, x=isMix?raw.it:raw;
+  if(x&&x.v!=null&&['mcq','type','listen','ear','cloze','trans'].includes(m)){
+    const v=typeof x.v==='string'?VERB_BY_ID[x.v]:x.v;
+    if(v) return binyanGuidePages(v.b,v);
+  }
+  if(TOPIC_NOTES[m]) return topicPages(m);
+  return null;
+}
+$('#sess-study').addEventListener('click',()=>{
+  if(studyRun||sweep||sess.mode==='speed'||sess.mode==='study'||sess.mode==='teach') return;
+  const pg=studyPagesForNow(); if(!pg||!pg.length) return;
+  openStudy(pg,()=>{ if(sess.mode==='flash') renderFlash(); else renderQuestion(); });
+});
+
 function startLesson(L){
   if(!state.lessons.started.includes(L.id)){ state.lessons.started.push(L.id); persist(); }
   const stages=[];
@@ -3975,6 +4093,7 @@ function teachCards(L){
 }
 function showTeachCard(){
   const R=lessonRun; if(!R) return;
+  sess.mode='teach';
   const cards=teachCards(R.L), c=cards[R.ti], last=R.ti>=cards.length-1;
   $('#sess-bar').style.width=((R.ti+1)/(cards.length+1)*30)+'%';
   let html=`<div class="qcard" style="text-align:start">
@@ -4047,34 +4166,56 @@ function lessonProgress(L,skill){
   }
   return {done,total,pct:total?Math.round(done/total*100):0};
 }
+function unlockOf(id,prs){
+  const pre=PREREQ[id]; if(!pre) return null;
+  const i=LESSONS.findIndex(x=>x.id===pre);
+  return prs[i].pct>=60?null:LESSONS[i];
+}
+function recommendedLesson(prs){
+  for(const T of TRACKS) for(const id of T.ls){
+    const i=LESSONS.findIndex(x=>x.id===id), pr=prs[i];
+    if(pr.total&&pr.done>=pr.total) continue;
+    if(unlockOf(id,prs)) continue;
+    return {L:LESSONS[i],pr,i};
+  }
+  return {L:LESSONS[0],pr:prs[0],i:0};
+}
 function renderLessons(){
   const root=document.getElementById('lessons-root'); if(!root) return;
   const skill=skillCells();
   const prs=LESSONS.map(L=>lessonProgress(L,skill));
-  const recIdx=Math.max(0,prs.findIndex(pr=>!pr.total||pr.done<pr.total));
-  const wasOpen=root.querySelector('details')?.open;
-  const pillOf=(pr,started,rec)=>{
-    const full=pr.total&&pr.done===pr.total;
-    return full?'<span class="pill" style="background:var(--good-soft);color:var(--good)">✓</span>'
-      :rec?`<span class="pill gold">${started||pr.pct?pr.pct+'% · ':''}start here</span>`
+  const rec=recommendedLesson(prs);
+  const row=id=>{
+    const i=LESSONS.findIndex(x=>x.id===id), L=LESSONS[i], pr=prs[i];
+    const started=state.lessons.started.includes(L.id);
+    const done=pr.total&&pr.done>=pr.total;
+    const lock=unlockOf(id,prs);
+    const isRec=rec.L.id===id;
+    const pill=done?'<span class="pill" style="background:var(--good-soft);color:var(--good)">✓</span>'
+      :isRec?`<span class="pill gold">${started&&pr.pct?pr.pct+'% · ':''}start here</span>`
+      :lock?'<span class="pill">🔒</span>'
       :started?`<span class="pill acc">${pr.pct}%</span>`
       :'<span class="pill">new</span>';
+    return `<button class="lrow lesson-btn${lock?' locked':''}" data-lesson="${L.id}">
+      <span class="ln" style="${done?'color:var(--good)':''}">${done?'✓':lock?'🔒':'•'}</span>
+      <span class="grow"><b>${L.title}</b><span class="d">${lock?'Builds on “'+lock.title+'”':L.sub||''}</span></span>
+      <span class="pill" data-notes="1" title="Read the lesson notes">📖</span>${pill}</button>`;
   };
-  const R=LESSONS[recIdx];
-  const rows=LESSONS.map((L,i)=>`<button class="lrow lesson-btn" data-lesson="${L.id}">
-      <span class="ln">${i+1}</span>
-      <span class="grow"><b>${L.title}</b><span class="d">${L.sub||''}</span></span>
-      ${pillOf(prs[i],state.lessons.started.includes(L.id),i===recIdx)}</button>`).join('');
   root.innerHTML=`
-    <button class="mode lesson-btn" data-lesson="${R.id}">
-      <span class="glyph" style="font-size:16px;font-family:'Heebo',sans-serif">${recIdx+1}</span>
-      <span class="grow"><b>${R.title}</b><span class="d">${R.sub||''}</span></span>
-      ${pillOf(prs[recIdx],state.lessons.started.includes(R.id),true)}</button>
-    <details class="ref"${wasOpen?' open':''}>
-      <summary><b style="font-size:14px">All ${LESSONS.length} lessons</b><span class="car">›</span></summary>
-      <div class="refbody" style="padding-top:0">${rows}</div></details>`;
-  root.querySelectorAll('.lesson-btn').forEach(b=>b.addEventListener('click',()=>{
-    const L=LESSONS.find(x=>x.id===b.dataset.lesson); if(L) startLesson(L);
+    <button class="mode lesson-btn" data-lesson="${rec.L.id}">
+      <span class="glyph">🎯</span>
+      <span class="grow"><b>${rec.L.title}</b><span class="d">${rec.L.sub||''}</span></span>
+      ${state.lessons.started.includes(rec.L.id)&&rec.pr.pct?`<span class="pill gold">${rec.pr.pct}% · continue</span>`:'<span class="pill gold">start here</span>'}</button>
+    ${TRACKS.map(T=>`<h2 class="sec">${T.t}</h2>
+      <p class="muted" style="font-size:12.5px;margin:-4px 2px 8px">${T.d}</p>
+      <div class="stack">${T.ls.map(row).join('')}</div>`).join('')}
+    <p class="muted" style="font-size:12px;margin:12px 2px 0">🔒 lessons unlock at 60% of the lesson they build on — tap one to start it anyway. 📖 re-reads a lesson's notes without drilling.</p>`;
+  root.querySelectorAll('.lesson-btn').forEach(b=>b.addEventListener('click',e=>{
+    const L=LESSONS.find(x=>x.id===b.dataset.lesson); if(!L) return;
+    if(e.target.closest('[data-notes]')){ openStudy(teachCards(L)); return; }
+    const lock=unlockOf(L.id,prs);
+    if(lock&&!confirm('"'+L.title+'" builds on "'+lock.title+'". Start anyway?')) return;
+    startLesson(L);
   }));
 }
 
@@ -4234,7 +4375,12 @@ const REF_NOTES={
 };
 function renderReference(){
   const root=$('#ref-root');
-  let html=`<div class="card">
+  let html=`<h2 class="sec" style="margin-top:0">Study guides</h2>
+  <div class="card">
+    <p class="muted" style="font-size:13px;margin:0 0 10px">Learn it before you drill it — what each pattern means, a model verb in full, and the verbs you'll meet.</p>
+    <div class="chips">${Object.keys(BINYANIM).map(b=>`<button class="chip" data-bguide="${b}">${BINYANIM[b].name}</button>`).join('')}</div>
+    <div class="chips" style="margin-top:8px">${[['num','Numbers'],['prep','Prepositions'],['na','Noun + adjective'],['spell','Spelling'],['roots','Roots'],['order','Word order']].map(x=>`<button class="chip" data-tguide="${x[0]}">${x[1]}</button>`).join('')}</div>
+  </div>`+`<div class="card">
     <b style="font-size:16px">How the system works</b>
     <p style="font-size:14px;margin:8px 0 0">Every verb is built from a <b>שֹׁרֶשׁ</b> (shoresh, "root") — usually three consonants. The binyan is the template; the root is what gets plugged in: <span class="he" style="font-size:18px">כָּתַב · נִכְתַּב · הִכְתִּיב</span> (wrote · was written · dictated) all share כ-ת-ב.</p>
     <p style="font-size:14px;margin:10px 0 0">Grammar names root positions with <span class="he">פ-ע-ל</span>: <span class="he"><b>פ</b></span>=1st, <span class="he"><b>ע</b></span>=2nd, <span class="he"><b>ל</b></span>=3rd. Labels like <span class="he">פ״נ</span> flag a weak letter:</p>
@@ -4267,6 +4413,8 @@ function renderReference(){
   }
   html+='</div>';
   root.innerHTML=html;
+  root.querySelectorAll('[data-bguide]').forEach(b=>b.addEventListener('click',()=>openStudy(binyanGuidePages(b.dataset.bguide))));
+  root.querySelectorAll('[data-tguide]').forEach(b=>b.addEventListener('click',()=>openStudy(topicPages(b.dataset.tguide))));
 }
 
 /* ===== vocab ===== */
@@ -4569,7 +4717,7 @@ document.getElementById('merge-file').addEventListener('change',e=>{
 });
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
-const APP_VER='v29';
+const APP_VER='v30';
 document.getElementById('app-ver').textContent=APP_VER;
 document.getElementById('update-btn').addEventListener('click',async()=>{
   const b=document.getElementById('update-btn'); b.disabled=true; b.textContent='Updating…';
