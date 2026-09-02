@@ -1948,10 +1948,22 @@ function spellNote(u,c){
   const d=spellDiff(u,c);
   return d.length?`<br><span class="muted">Letters: ${d.map(x=>`<b class="he">${x[1]}</b> not <span class="he">${x[0]}</span>`).join(' · ')}</span>`:'';
 }
-function maleHeur(pointed){
-  let p=pointed.normalize('NFC')
+/* irregular ktiv male spellings the rules can't derive — keyed by the
+   bare (mark-stripped) word, value is the correct everyday spelling */
+const MALE_EXC={
+  'מים':'מים','שמים':'שמים',                 /* the famous duals that DON'T double */
+  'תכנית':'תוכנית','תכניות':'תוכניות',        /* kamatz katan → ו */
+  'חכמה':'חוכמה','ארחת':'ארוחת','צהרים':'צוהריים','אזנים':'אוזניים',
+  'כתבת':'כתובת','יזמה':'יוזמה'
+};
+function maleWord(w){
+  const bare=w.replace(/[\u0591-\u05C7]/g,'');
+  if(Object.prototype.hasOwnProperty.call(MALE_EXC,bare)) return MALE_EXC[bare];
+  const p=w
     /* word-final ־ָו is written ־יו unpointed: עַכְשָׁו → עכשיו */
-    .replace(/\u05B8([\u0591-\u05C7]*)\u05D5(?![\u0591-\u05C7\u05D0-\u05EA])/g,'\u05B8$1\u05D9\u05D5')
+    .replace(/\u05B8([\u0591-\u05C7]*)\u05D5$/,'\u05B8$1\u05D9\u05D5')
+    /* the dual ending ־ַיִם doubles its yud: שְׁנַיִם → שניים (מים/שמים excepted above) */
+    .replace(/\u05B7([\u0591-\u05C7]*)\u05D9\u05B4(?=ם$)/,'\u05B7$1\u05D9\u05D9\u05B4')
     /* a mid-word consonantal ו doubles: תִּקְוָה → תקווה */
     .replace(/(?<=[\u05D0-\u05EA][\u0591-\u05C7]*)\u05D5(?=[\u05B0-\u05B8])/g,'וו');
   let out='';const chars=[...p];
@@ -1965,8 +1977,12 @@ function maleHeur(pointed){
       for(let k=j+1;k<chars.length&&chars[k]>='֑'&&chars[k]<='ׇ';k++) if(chars[k]==='ּ')hasDagesh=true;
       if(nb&&nb!=='י'&&hasDagesh) out+='י'; }
   }
-  /* remove only the pointing — keep spaces and punctuation (display uses this) */
+  /* remove only the pointing — keep everything else */
   return out.replace(/[\u0591-\u05C7]/g,'');
+}
+/* convert word by word so exceptions and word-edge rules apply per word */
+function maleHeur(s){
+  return s.normalize('NFC').replace(/[\u05D0-\u05EA][\u05D0-\u05EA\u0591-\u05C7]*/g,maleWord);
 }
 /* ktiv male: unpointed everyday Hebrew ADDS reading letters the pointed
    dictionary form lacks (עַכְשָׁו → עכשיו, מִצְוָה → מצווה, דִּבֵּר → דיבר).
@@ -4776,7 +4792,7 @@ document.getElementById('merge-file').addEventListener('change',e=>{
 });
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
-const APP_VER='v39';
+const APP_VER='v40';
 document.getElementById('app-ver').textContent=APP_VER;
 document.getElementById('update-btn').addEventListener('click',async()=>{
   const b=document.getElementById('update-btn'); b.disabled=true; b.textContent='Updating…';
