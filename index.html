@@ -2679,7 +2679,7 @@ function openSession(mode){
   }else if(mode==='na'){
     sess.items=buildNaItems(want);
   }else if(mode==='cloze'){
-    const pool=sessScope&&sessScope.verbs?SENTENCES.filter(s=>sessScope.verbs.includes(s.v)):SENTENCES;
+    const pool=sessScope&&sessScope.verbs?SENTENCES.filter(s=>sessScope.verbs.includes(s.v)&&(!sessScope.tenses||sessScope.tenses.includes(s.t))):SENTENCES;
     const base=pool.length?pool:SENTENCES;
     const skill=skillCells();
     sess.items=weightedSample(base.map(s=>({...s,wgt:cellWgt(skill,s.v+'|'+s.t+'|'+s.p)})),want);
@@ -3255,7 +3255,7 @@ function renderRoot(it,body){
 /* ===== word order: rebuild the sentence from tiles ===== */
 function buildOrderItems(n){
   const skill=skillCells();
-  const pool=sessScope&&sessScope.verbs?SENTENCES.filter(s=>sessScope.verbs.includes(s.v)):SENTENCES;
+  const pool=sessScope&&sessScope.verbs?SENTENCES.filter(s=>sessScope.verbs.includes(s.v)&&(!sessScope.tenses||sessScope.tenses.includes(s.t))):SENTENCES;
   const base=pool.length?pool:SENTENCES;
   return weightedSample(base.map(s=>({...s,wgt:cellWgt(skill,s.v+'|order|-')})),n);
 }
@@ -4841,7 +4841,7 @@ document.getElementById('merge-file').addEventListener('change',e=>{
 });
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
-const APP_VER='v45';
+const APP_VER='v46';
 document.getElementById('app-ver').textContent=APP_VER;
 document.getElementById('update-btn').addEventListener('click',async()=>{
   const b=document.getElementById('update-btn'); b.disabled=true; b.textContent='Updating…';
