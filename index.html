@@ -61,6 +61,7 @@ body[data-tab="chat"] #app{padding-top:10px}
 #nikud-btn,#gear-btn{font-size:13px;padding:4px 10px;border-radius:20px;background:var(--surface2);border:1px solid var(--line);font-weight:600;color:var(--ink)}
 .setsel{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;font-size:14px;color:var(--ink)}
 #nikud-btn.off{color:var(--muted)}
+.he{unicode-bidi:isolate}
 .lrow.locked{opacity:.55}
 /* ===== iOS-grouped settings ===== */
 #tab-settings>h1{font-size:30px;font-weight:800;margin:4px 2px 0;letter-spacing:-.02em}
@@ -1632,7 +1633,7 @@ const LESSONS=[
   verbs:['ktv1','sgr1','zkr1','shmr1','gmr1'],tenses:['past'],
   vocab:['etmol','shana','shavua','yom','layla','boker','erev']},
  {id:'L3',title:"Pa'al future",he:'עָתִיד',sub:'Prefixes take over',
-  intro:"The future flips the logic: prefixes mark the person — אֶכְתֹּב, תִּכְתֹּב, יִכְתֹּב, נִכְתֹּב. Note that הוּא and אַתָּה share a form.",
+  intro:"The future flips the logic: prefixes mark the person — אֶכְתֹּב, תִּכְתֹּב, יִכְתֹּב, נִכְתֹּב. Note that אַתָּה and הִיא share תִּכְתֹּב — context decides.",
   verbs:['ktv1','sgr1','gmr1','khshv1','spr1'],tenses:['future'],
   vocab:['makhar','zman','ulay','tamid']},
  {id:'L4',title:"Pi'el — speak, teach, tell",he:'פִּעֵל',sub:'The strengthened middle letter',
@@ -1689,7 +1690,14 @@ const LESSON_TEACH={
   {h:'Suffixes do the work',b:'One ending per person: <span class="he">־תִּי</span> I · <span class="he">־תָּ</span> you (m) · <span class="he">־תְּ</span> you (f) · <span class="he">־נוּ</span> we · <span class="he">־תֶּם</span> you all · <span class="he">־וּ</span> they. The he-form is the bare verb: <span class="he">כָּתַב</span>.',ex:['סָגַרְתִּי אֶת הַדֶּלֶת','sagarti et ha-delet — I closed the door']},
   {h:'On the street',b:'Everyday speech flattens the fancy stress — <span class="he">כְּתַבְתֶּם</span> comes out "katávtem", not the textbook "ktavtém". Understand the rule, then relax about it; Israelis do.'}],
  L3:[
-  {h:'Prefixes take over',b:'The future flips the logic: <span class="he">אֶ־</span> I · <span class="he">תִּ־</span> you/she · <span class="he">יִ־</span> he/they · <span class="he">נִ־</span> we. Note that <span class="he">הוּא</span> and <span class="he">אַתָּה</span> share a form — context decides.',ex:['מָחָר אֶגְמֹר אֶת הָעֲבוֹדָה','makhar egmor et ha-avoda — tomorrow I\'ll finish the work']},
+  {h:'Prefixes take over',b:'The future marks the person with a prefix on the front of the verb:'+
+   '<div style="margin:10px 0 2px">'+
+   [['אֶכְתֹּב','<b>e</b>khtov','I will write'],
+    ['תִּכְתֹּב','<b>ti</b>khtov','you / she will write'],
+    ['יִכְתֹּב','<b>yi</b>khtov','he will write'],
+    ['נִכְתֹּב','<b>ni</b>khtov','we will write']]
+   .map(r=>'<div style="display:flex;align-items:baseline;gap:10px;margin:5px 0"><span class="he" style="font-size:19px;min-width:86px">'+r[0]+'</span><span class="muted" style="font-size:13px"><i>'+r[1]+'</i> — '+r[2]+'</span></div>').join('')+
+   '</div>Note that <span class="he">אַתָּה</span> (you m.) and <span class="he">הִיא</span> (she) share <span class="he">תִּכְתֹּב</span> — context decides which is meant.',ex:['מָחָר אֶגְמֹר אֶת הָעֲבוֹדָה','makhar egmor et ha-avoda — tomorrow I\'ll finish the work']},
   {h:'Street warning',b:'You will absolutely hear Israelis say <span class="he">אֲנִי יִכְתֹּב</span> — everyone does it and teachers hate it. Recognize it, but learn the standard <span class="he">אֶכְתֹּב</span>: it\'s what you\'ll read and write.'}],
  L4:[
   {h:'The dagesh signature',b:'Pi\'el strengthens its middle letter (the dot in <span class="he">דִּבֵּר</span>) and the present opens with <span class="he">מְ־</span>: <span class="he">מְדַבֵּר, מְבַקֵּשׁ, מְלַמֵּד</span>. Communication verbs love this binyan.',ex:['אֲנִי מְדַבֵּר קְצָת עִבְרִית','ani medaber ktsat ivrit — I speak a little Hebrew']}],
@@ -4851,7 +4859,7 @@ document.getElementById('merge-file').addEventListener('change',e=>{
 });
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
-const APP_VER='v47';
+const APP_VER='v48';
 document.getElementById('app-ver').textContent=APP_VER;
 document.getElementById('update-btn').addEventListener('click',async()=>{
   const b=document.getElementById('update-btn'); b.disabled=true; b.textContent='Updating…';
