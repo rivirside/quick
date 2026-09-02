@@ -2761,11 +2761,12 @@ function finishSession(){
       <div class="muted" style="font-size:12.5px;margin-top:-6px">${gloss}</div>
       <h3>${right} of ${tot}</h3>
       <p class="muted">${more?'Stage '+lessonRun.i+' of '+lessonRun.stages.length+' done.':'Lesson complete!'}</p>
-      <div class="sess-actions" style="max-width:340px;margin:18px auto 0">
-        <button class="btn ghost" id="d-close">${redo?(more?'Continue':'Finish'):'Stop'}</button>
-        <button class="btn" id="d-next">${redo?'Try again':(more?'Continue':'Finish')}</button>
-      </div></div>`;
-    $('#d-close').addEventListener('click',redo?nextLessonStage:closeSession);
+      <div class="sess-actions" style="max-width:340px;margin:18px auto 0">${
+        redo?`<button class="btn ghost" id="d-close">${more?'Continue':'Finish'}</button><button class="btn" id="d-next">Try again</button>`
+        :more?`<button class="btn ghost" id="d-close">Stop</button><button class="btn" id="d-next">Continue</button>`
+        :`<button class="btn wide" id="d-next">Finish</button>`
+      }</div></div>`;
+    const dc=$('#d-close'); if(dc) dc.addEventListener('click',redo?nextLessonStage:closeSession);
     $('#d-next').addEventListener('click',redo?()=>{lessonRun.i--;nextLessonStage();}:nextLessonStage);
     bumpActivity(sess.items.length);
     return;
@@ -4817,7 +4818,7 @@ document.getElementById('merge-file').addEventListener('change',e=>{
 });
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
-const APP_VER='v43';
+const APP_VER='v44';
 document.getElementById('app-ver').textContent=APP_VER;
 document.getElementById('update-btn').addEventListener('click',async()=>{
   const b=document.getElementById('update-btn'); b.disabled=true; b.textContent='Updating…';
