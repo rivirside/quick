@@ -62,6 +62,29 @@ body[data-tab="chat"] #app{padding-top:10px}
 .setsel{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;font-size:14px;color:var(--ink)}
 #nikud-btn.off{color:var(--muted)}
 .lrow.locked{opacity:.55}
+/* ===== iOS-grouped settings ===== */
+#tab-settings>h1{font-size:30px;font-weight:800;margin:4px 2px 0;letter-spacing:-.02em}
+#tab-settings .sec{text-transform:uppercase;letter-spacing:.07em;font-size:12px;font-weight:600;color:var(--muted);margin:24px 16px 7px}
+.setgroup{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.setgroup>*{position:relative}
+.setgroup>*+*::before{content:'';position:absolute;top:0;left:14px;right:0;height:1px;background:var(--line)}
+.setrow{display:flex;align-items:center;gap:12px;min-height:48px;padding:8px 14px;width:100%;background:transparent;border:none;text-align:start;color:var(--ink);font-size:15px;font-weight:500}
+.setlbl{flex:1;min-width:0}
+.setlbl .d{display:block;font-size:12px;color:var(--muted);margin-top:1px;font-weight:400}
+.setico{width:29px;height:29px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;flex:none}
+.setfoot{font-size:12.5px;color:var(--muted);margin:7px 16px 0;line-height:1.45}
+.setval{display:flex;align-items:center;gap:4px;color:var(--muted);flex:none}
+.setval::after{content:'›';font-size:17px;opacity:.5;line-height:1}
+.setrow .setsel{background:transparent;border:none;padding:2px 0;font-size:15px;color:var(--muted);text-align:right;-webkit-appearance:none;appearance:none}
+button.setrow{cursor:pointer}
+.setrow.act .setlbl{color:var(--accent);font-weight:600}
+.setrow .chev{color:var(--muted);opacity:.5;font-size:18px;flex:none}
+.setpad{padding:12px 14px}
+/* iOS switch — driven by the .on class the JS already toggles */
+.sw{width:50px;height:30px;border-radius:15px;background:var(--surface2);border:1px solid var(--line);position:relative;flex:none;transition:background .18s;font-size:0!important;color:transparent!important;padding:0}
+.sw::after{content:'';position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1.5px 4px rgba(0,0,0,.35);transition:left .18s}
+.sw.on{background:var(--good);border-color:var(--good)}
+.sw.on::after{left:22px}
 nav.tabs{position:fixed;bottom:0;left:0;right:0;background:var(--surface);
   border-top:1px solid var(--line);display:flex;justify-content:center;gap:2px;
   padding:6px max(8px,env(safe-area-inset-left)) max(10px,env(safe-area-inset-bottom));z-index:40}
@@ -400,69 +423,62 @@ details.ref[open] summary .car{transform:rotate(90deg)}
   </section>
 
   <section class="screen" id="tab-settings">
-    <h2 class="sec">Display</h2>
-    <div class="card">
-      <div class="row" style="margin-bottom:12px"><span class="grow" style="font-size:14.5px">Theme</span>
-        <select class="setsel" id="set-theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
-      <div class="row"><span class="grow" style="font-size:14.5px">Niqqud (vowel marks)</span>
-        <button class="chip on" id="set-nikud">shown</button></div>
+    <h1>Settings</h1>
+    <h2 class="sec">Appearance</h2>
+    <div class="setgroup">
+      <div class="setrow"><span class="setico" style="background:#5e5ce6">🎨</span><span class="setlbl">Theme</span>
+        <span class="setval"><select class="setsel" id="set-theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></span></div>
+      <div class="setrow"><span class="setico" style="background:#0a84ff;color:#fff;font-weight:700">אָ</span><span class="setlbl">Niqqud<span class="d">Vowel marks under letters</span></span>
+        <button class="sw on" id="set-nikud">shown</button></div>
     </div>
     <h2 class="sec">Audio</h2>
-    <div class="card">
-      <div class="row"><span class="grow" style="font-size:14.5px">Speech speed</span><span class="muted tnum" id="rate-val">0.85×</span></div>
-      <input type="range" id="set-rate" min="0.6" max="1.2" step="0.05" value="0.85" style="width:100%;margin-top:8px">
-      <button class="btn ghost wide" id="rate-test" style="margin-top:10px">▶ Hear a sample</button>
+    <div class="setgroup">
+      <div class="setrow"><span class="setico" style="background:#ff9f0a">🔊</span><span class="setlbl">Speech speed</span><span class="muted tnum" id="rate-val">0.85×</span></div>
+      <div class="setpad" style="padding-top:2px"><input type="range" id="set-rate" min="0.6" max="1.2" step="0.05" value="0.85" style="width:100%"></div>
+      <button class="setrow act" id="rate-test"><span class="setlbl">Hear a sample</span></button>
     </div>
     <h2 class="sec">Practice</h2>
-    <div class="card">
-      <div class="row" style="margin-bottom:12px"><span class="grow" style="font-size:14.5px">Daily goal</span>
-        <select class="setsel" id="set-goal"><option value="10">10 answers</option><option value="20">20 answers</option><option value="30">30 answers</option><option value="50">50 answers</option></select></div>
-      <div class="row" style="margin-bottom:12px"><span class="grow" style="font-size:14.5px">Questions per round</span>
-        <select class="setsel" id="set-len"><option value="5">5</option><option value="10">10</option><option value="15">15</option></select></div>
-      <div class="row" style="margin-bottom:12px"><span class="grow" style="font-size:14.5px">New cards per day<br><span class="muted" style="font-size:12px">Reviews are always all due cards</span></span>
-        <select class="setsel" id="set-newday"><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option></select></div>
-      <div class="row" style="margin-bottom:12px"><span class="grow" style="font-size:14.5px">Auto-open keyboard<br><span class="muted" style="font-size:12px">In typing questions — leave off to tap Show answer &amp; self-grade</span></span>
-        <button class="chip" id="set-kb">off</button></div>
-      <div class="row"><span class="grow" style="font-size:14.5px">Pu'al &amp; Huf'al<br><span class="muted" style="font-size:12px">Literary binyanim — rare in speech</span></span>
-        <select class="setsel" id="set-lit"><option value="light">Rare (default)</option><option value="off">Skip them</option><option value="full">Full weight</option></select></div>
+    <div class="setgroup">
+      <div class="setrow"><span class="setico" style="background:#30d158">🎯</span><span class="setlbl">Daily goal</span>
+        <span class="setval"><select class="setsel" id="set-goal"><option value="10">10 answers</option><option value="20">20 answers</option><option value="30">30 answers</option><option value="50">50 answers</option></select></span></div>
+      <div class="setrow"><span class="setico" style="background:#64d2ff">🔁</span><span class="setlbl">Questions per round</span>
+        <span class="setval"><select class="setsel" id="set-len"><option value="5">5</option><option value="10">10</option><option value="15">15</option></select></span></div>
+      <div class="setrow"><span class="setico" style="background:#bf5af2">🃏</span><span class="setlbl">New cards per day<span class="d">Reviews are always all due cards</span></span>
+        <span class="setval"><select class="setsel" id="set-newday"><option value="5">5</option><option value="10">10</option><option value="15">15</option><option value="20">20</option></select></span></div>
+      <div class="setrow"><span class="setico" style="background:#8e8e93">⌨️</span><span class="setlbl">Auto-open keyboard<span class="d">Off = tap Show answer &amp; self-grade</span></span>
+        <button class="sw" id="set-kb">off</button></div>
+      <div class="setrow"><span class="setico" style="background:#ac8e68">📜</span><span class="setlbl">Pu'al &amp; Huf'al<span class="d">Literary binyanim — rare in speech</span></span>
+        <span class="setval"><select class="setsel" id="set-lit"><option value="light">Rare</option><option value="off">Skip</option><option value="full">Full</option></select></span></div>
     </div>
     <h2 class="sec">Study schedule</h2>
-    <div class="card">
-      <p class="muted" style="margin:0 0 10px;font-size:13px">Set a goal per weekday — go harder some days, rest on others. Rest days never break your streak.</p>
-      <div id="sched-rows"></div>
-      <div class="row" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--line)">
-        <span class="grow" style="font-size:14.5px">Goal ramp<br><span class="muted" style="font-size:12px" id="ramp-line">off</span></span>
-        <select class="setsel" id="set-rampto"><option value="">Off</option><option value="30">→ 30</option><option value="50">→ 50</option><option value="80">→ 80</option><option value="100">→ 100</option></select>
-        <select class="setsel" id="set-rampby"><option value="3">3 mo</option><option value="6">6 mo</option><option value="12">12 mo</option></select>
-      </div>
+    <div class="setgroup">
+      <div class="setpad" id="sched-rows"></div>
+      <div class="setrow"><span class="setlbl">Goal ramp<span class="d" id="ramp-line">off</span></span>
+        <span class="setval"><select class="setsel" id="set-rampto"><option value="">Off</option><option value="30">→ 30</option><option value="50">→ 50</option><option value="80">→ 80</option><option value="100">→ 100</option></select>
+        <select class="setsel" id="set-rampby"><option value="3">3 mo</option><option value="6">6 mo</option><option value="12">12 mo</option></select></span></div>
     </div>
+    <p class="setfoot">Rest days never break your streak. The ramp raises your default goal gradually over time.</p>
     <h2 class="sec">AI tutor</h2>
-    <div class="card" id="set-ai"></div>
+    <div class="setgroup"><div class="setpad" id="set-ai"></div></div>
+    <h2 class="sec">Study tools</h2>
+    <div class="setgroup">
+      <button class="setrow" id="sweep-btn"><span class="setico" style="background:#30d158;color:#fff">✓</span><span class="setlbl">Mark vocabulary you know<span class="d">Known words skip lesson flashcards</span></span><span class="chev">›</span></button>
+      <button class="setrow" id="set-level"><span class="setico" style="background:#ff9f0a">📈</span><span class="setlbl">Level check<span class="d">Re-evaluate anytime — 3 minutes</span></span><span class="chev">›</span></button>
+    </div>
     <h2 class="sec">Data</h2>
-    <div class="card">
-      <p class="muted" style="margin:0 0 12px;font-size:13.5px">Progress and vocab live on this device. Export a backup to move between devices — Restore replaces everything, Merge combines a backup with this device's progress.</p>
-      <div class="row">
-        <button class="btn ghost grow" id="backup-btn">Export</button>
-        <button class="btn ghost grow" id="restore-btn">Restore</button>
-        <button class="btn ghost grow" id="merge-btn">Merge</button>
-        <input type="file" id="restore-file" accept="application/json,.json" hidden>
-        <input type="file" id="merge-file" accept="application/json,.json" hidden>
-      </div>
+    <div class="setgroup">
+      <button class="setrow act" id="backup-btn"><span class="setlbl">Export backup</span></button>
+      <button class="setrow act" id="restore-btn"><span class="setlbl">Restore from backup…</span></button>
+      <button class="setrow act" id="merge-btn"><span class="setlbl">Merge a backup…</span></button>
+      <input type="file" id="restore-file" accept="application/json,.json" hidden>
+      <input type="file" id="merge-file" accept="application/json,.json" hidden>
     </div>
-    <div class="stack" style="margin-top:12px">
-      <button class="mode" id="sweep-btn"><span class="glyph">✓</span>
-        <span class="grow"><b>Mark vocabulary you know</b><span class="d">Known words skip lesson flashcards</span></span></button>
-      <button class="mode" id="set-level"><span class="glyph">📈</span>
-        <span class="grow"><b>Level check</b><span class="d">Re-evaluate anytime — 3 minutes</span></span></button>
-    </div>
+    <p class="setfoot">Progress lives on this device. Restore replaces everything; Merge combines a backup with this device's progress.</p>
     <h2 class="sec">App</h2>
-    <div class="card">
-      <p class="muted" style="margin:0 0 12px;font-size:13.5px">The app caches itself so it works offline. After an update is published, tap below to fetch the newest version right away — your progress is untouched.</p>
-      <div class="row" style="align-items:center">
-        <button class="btn ghost grow" id="update-btn">Get latest version</button>
-        <span class="muted" style="font-size:12.5px;flex:none" id="app-ver"></span>
-      </div>
+    <div class="setgroup">
+      <button class="setrow act" id="update-btn"><span class="setlbl">Get latest version</span><span class="muted tnum" style="font-size:14px" id="app-ver"></span></button>
     </div>
+    <p class="setfoot">Offline-first: the app caches itself. Updating never touches your progress.</p>
     <p class="savebadge" id="savebadge"></p>
   </section>
 </div>
@@ -4792,7 +4808,7 @@ document.getElementById('merge-file').addEventListener('change',e=>{
 });
 if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
-const APP_VER='v40';
+const APP_VER='v41';
 document.getElementById('app-ver').textContent=APP_VER;
 document.getElementById('update-btn').addEventListener('click',async()=>{
   const b=document.getElementById('update-btn'); b.disabled=true; b.textContent='Updating…';
